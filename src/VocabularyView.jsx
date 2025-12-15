@@ -11,10 +11,6 @@ import {
 // --- SHARED CONFIG ---
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 
-const INITIAL_FOLDERS = [
-  { id: 'f1', name: 'Irodori Book 1', parentId: 'root' },
-  { id: 'f2', name: 'Exam Prep', parentId: 'root' },
-];
 
 // --- SHARED COMPONENTS ---
 const Card = ({ children, className = "" }) => (
@@ -58,7 +54,7 @@ export const mapToApp = (row, index) => {
     return {
         id: realId, localId: realId || `local_${index}_${Date.now()}`, book: String(row.book || '1'),
         japanese: String(row.hiragana || ''), kanji: String(row.kanji || ''), bangla: String(row.bangla || ''),
-        lesson: String(row.lesson || '1'), cando: String(row.cando || '1'), folderId: 'root',
+        lesson: String(row.lesson || '1'), cando: String(row.cando || '1'), folderId: String(row.book || 'Uncategorized'),
         isMarked: row.is_problem === true || row.is_problem === "true", mistakes: Number(row.mistake_count) || 0,
         confidence: Number(row.confidence) || 0, responseTime: 0, lastPracticed: String(row.last_practiced || '')
     };

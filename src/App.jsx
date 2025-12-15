@@ -4,13 +4,12 @@ import VocabularyView, { mapToApp } from './VocabularyView';
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 
 const INITIAL_FOLDERS = [
-  { id: 'f1', name: 'Irodori Book 1', parentId: 'root' },
-  { id: 'f2', name: 'Exam Prep', parentId: 'root' },
+  // Folders will be generated dynamically
 ];
 
 function App() {
   const [vocabList, setVocabList] = useState([]);
-  const [folders, setFolders] = useState(INITIAL_FOLDERS);
+  const [folders, setFolders] = useState([]);
   const [currentFolderId, setCurrentFolderId] = useState('root');
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -68,19 +67,45 @@ function App() {
       if (!response.ok) throw new Error('Network response was not ok');
       
       const json = await response.json();
-      const data = Array.isArray(json) ? json : json.data;
       
-      if (Array.isArray(data)) {
-        const mappedData = data.map((row, index) => mapToApp(row, index));
+      let rawData = [];
+      
+      // HANDLE NEW SCRIPT RESPONSE: { "Sheet1": [...], "Sheet2": [...] }
+      if (typeof json === 'object' && !Array.isArray(json) && !json.data) {
+          Object.keys(json).forEach(sheetName => {
+              if (Array.isArray(json[sheetName])) {
+                  json[sheetName].forEach(row => {
+                      // Inject 'book' property from the key
+                      rawData.push({ ...row, book: sheetName }); 
+                  });
+              }
+          });
+      } else {
+          // Fallback for legacy or flat list format
+          rawData = Array.isArray(json) ? json : (json.data || []);
+      }
+      
+      if (rawData.length > 0) {
+        const mappedData = rawData.map((row, index) => mapToApp(row, index));
         
-        // Restore local marks to prevent overwriting with stale server data
+        // --- DYNAMIC FOLDER GENERATION ---
+        const uniqueBooks = [...new Set(mappedData.map(item => item.book))].filter(b => b);
+        const dynamicFolders = uniqueBooks.map(bookName => ({
+            id: bookName, // Use book name as ID for simplicity
+            name: bookName,
+            parentId: 'root'
+        }));
+        
+        setFolders(dynamicFolders);
+        // --------------------------------
+        
+        // Restore local marks
         const saved = localStorage.getItem('vocabList');
         if (saved) {
            try {
                const localMap = new Map(JSON.parse(saved).map(i => [i.localId, i]));
                mappedData.forEach(item => {
                    const local = localMap.get(item.localId);
-                   // Preserve isMarked and confidence if local version exists
                    if (local) {
                        item.isMarked = local.isMarked;
                        item.mistakes = local.mistakes;
@@ -107,8 +132,19 @@ function App() {
     const saved = localStorage.getItem('vocabList');
     if (saved) {
       try {
-        setVocabList(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setVocabList(parsed);
         setIsLoading(false);
+        
+        // Generate folders from saved data immediately
+        const uniqueBooks = [...new Set(parsed.map(item => item.book))].filter(b => b);
+        const savedFolders = uniqueBooks.map(bookName => ({
+            id: bookName,
+            name: bookName,
+            parentId: 'root'
+        }));
+        setFolders(savedFolders);
+        
       } catch (e) {
         console.error("Failed to parse saved data", e);
       }

@@ -44,20 +44,62 @@ const Toast = ({ message, type, onClose }) => {
 };
 
 // --- HELPERS ---
-const mapToSheet = (item) => ({
-    hiragana: item.japanese, kanji: item.kanji, bangla: item.bangla, lesson: item.lesson, cando: item.cando,
-    is_problem: item.isMarked, mistake_count: item.mistakes, confidence: item.confidence, last_practiced: item.lastPracticed || ''
-});
+const mapToSheet = (item) => {
+  const result = {};
+
+  Object.keys(item).forEach(key => {
+    if (INTERNAL_KEYS.has(key)) return;
+    if (key.startsWith('_')) return;
+
+    result[key] = item[key];
+  });
+
+  // System mappings
+  result.is_problem = item.isMarked;
+  result.mistake_count = item.mistakes;
+  result.confidence = item.confidence;
+  result.last_practiced = item.lastPracticed || '';
+
+  return result;
+};
+
 
 export const mapToApp = (row, index) => {
+    // START: Dynamic Mapping - Preserve all source data
+    const item = { ...row };
+    
+    // Normalize ID and Meta
     const realId = row.id ? String(row.id) : null; 
-    return {
-        id: realId, localId: realId || `local_${index}_${Date.now()}`, book: String(row.book || '1'),
-        japanese: String(row.hiragana || ''), kanji: String(row.kanji || ''), bangla: String(row.bangla || ''),
-        lesson: String(row.lesson || '1'), cando: String(row.cando || '1'), folderId: String(row.book || 'Uncategorized'),
-        isMarked: row.is_problem === true || row.is_problem === "true", mistakes: Number(row.mistake_count) || 0,
-        confidence: Number(row.confidence) || 0, responseTime: 0, lastPracticed: String(row.last_practiced || '')
-    };
+    item.id = realId;
+    item.localId = realId || `local_${index}_${Date.now()}`;
+    item.book = String(row.book || '1');
+    item.folderId = String(row.book || 'Uncategorized');
+
+    // Normalize System/Logic Fields
+    item.isMarked = (row.is_problem === true || row.is_problem === "true");
+    item.mistakes = Number(row.mistake_count) || 0;
+    item.confidence = Number(row.confidence) || 0;
+    item.lastPracticed = String(row.last_practiced || '');
+    item.responseTime = 0; // Runtime only field
+
+    // Ensure strictly required fields for app logic exist (Search, Audio, Filtering)
+    // We prioritize extracting from likely columns if the specific keys don't exist
+    // This allows renaming columns in Sheets without breaking existing logic
+    if (item.japanese === undefined) {
+        // Try 'hiragana', or just first likely string column? 
+        // We'll stick to 'hiragana' preference as per original design, or fallback to empty.
+        item.japanese = String(row.hiragana || row.japanese || ''); 
+    }
+    // Mark if 'japanese' is a synthetic alias so we don't show it twice unless it's real data
+    if (!row.japanese) {
+        Object.defineProperty(item, '_isSyntheticJapanese', { value: true, enumerable: false });
+    }
+
+    if (!item.lesson) item.lesson = String(row.lesson || '1');
+    if (!item.cando) item.cando = String(row.cando || '1');
+    if (!item.bangla) item.bangla = String(row.bangla || ''); // Fallback for specific UI components if they rely on it
+
+    return item;
 };
 
 const getChangedFields = (original, current) => {
@@ -132,77 +174,168 @@ const WeaknessCard = ({ suggestion, onApply }) => {
 };
 
 // --- DYNAMIC COLUMNS CONFIG ---
-const COLUMN_DEFS = [
-    { id: 'selection', label: '', width: 'w-10', type: 'system', fixed: 'left' },
-    { id: 'japanese', label: 'Hiragana', width: 'w-40', type: 'text', sortable: true },
-    { id: 'kanji', label: 'Kanji', width: 'w-32', type: 'text', sortable: true },
-    { id: 'bangla', label: 'Bangla', width: 'w-40', type: 'text', sortable: true },
-    { id: 'audio', label: '🔊', width: 'w-12', type: 'action' },
-    { id: 'mistakes', label: '🔥', width: 'w-24', type: 'heatmap' },
-    { id: 'confidence', label: 'Conf.', width: 'w-20', type: 'badge', sortable: true, icon: Check },
-    { id: 'responseTime', label: 'Time', width: 'w-20', type: 'text', sortable: true, icon: Clock },
-    { id: 'isMarked', label: '❗', width: 'w-12', type: 'action' },
-    { id: 'delete', label: '🗑', width: 'w-12', type: 'action', editOnly: true }
+// --- DYNAMIC COLUMNS HELPER ---
+// Fixed System Columns with exact order required by User
+// 1. Status (❗), 2. Audio (🔊), 3. Weak (🔥), 4. Conf., 5. Time
+const FIXED_SYSTEM_COLUMNS = [
+    { id: 'isMarked', label: '❗', width: 'w-12', type: 'action', fixed: 'right' },
+    { id: 'audio', label: '🔊', width: 'w-12', type: 'action', fixed: 'right' },
+    { id: 'mistakes', label: '🔥', width: 'w-24', type: 'heatmap', fixed: 'right' },
+    { id: 'confidence', label: 'Conf.', width: 'w-20', type: 'badge', sortable: true, icon: Check, fixed: 'right' },
+    { id: 'lastPracticed', label: 'Time', width: 'w-24', type: 'text', fixed: 'right' }
 ];
 
-const DEFAULT_COLUMN_ORDER = COLUMN_DEFS.map(c => c.id);
+const SELECTION_COLUMN = { id: 'selection', label: '', width: 'w-10', type: 'system', fixed: 'left' };
+const DELETE_COLUMN = { id: 'delete', label: '🗑', width: 'w-12', type: 'action', editOnly: true, fixed: 'right' };
+
+// Internal keys to exclude from being dynamic columns
+const INTERNAL_KEYS = new Set([
+  'id',
+  'localId',
+  'book',
+  'folderId',
+
+  // System / logic fields
+  'isMarked',
+  'mistakes',
+  'confidence',
+  'responseTime',
+
+  // Backend-only
+  'is_problem',
+  'mistake_count',
+  'last_practiced'
+]);
 
 // --- DYNAMIC HEADER COMPONENT ---
-const DynamicHeader = ({ colId, isEditMode, sortConfig, onSort, columnVisibility, onDragStart, onDragOver, onDrop }) => {
-    const def = COLUMN_DEFS.find(c => c.id === colId);
-    if (!def) return null;
+const DynamicHeader = ({
+  colId,
+  def,
+  isEditMode,
+  sortConfig,
+  onSort,
+  columnVisibility,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  columnWidths,
+  setColumnWidths
+}) => {
+  if (!def) return null;
+
+  // hidden হলে render না
+  if (columnVisibility[colId] === false) return null;
+
+  const isFixed =
+    def.fixed ||
+    def.id === 'selection' ||
+    def.id === 'delete';
+
+  /* =========================
+     RESIZE LOGIC
+  ========================= */
+  /* =========================
+     RESIZE LOGIC (OPTIMIZED)
+  ========================= */
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const startX = e.clientX;
+    const startWidth = columnWidths[colId] || 160;
     
-    const isVisibleInLayout = columnVisibility[colId] !== false;
-    if (!isVisibleInLayout) return null;
+    // Cache Elements
+    const colElement = document.getElementById(`col-${colId}`);
+    
+    let animationFrameId;
 
-    const visibilityClass = ''; // No longer needed as we don't render hidden cols
+    const onMouseMove = (moveEvent) => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      
+      animationFrameId = requestAnimationFrame(() => {
+          const delta = moveEvent.clientX - startX;
+          const newWidth = Math.max(80, startWidth + delta);
+          
+          // Update ColGroup Element directly - extremely fast table reflow
+          if(colElement) colElement.style.width = `${newWidth}px`;
+      });
+    };
 
-    // System columns: Not draggable for safety, or limit reorder?
-    // User wants "DATA DISPLAY COLUMNS". System columns like selection/audio/delete might be better fixed visually or draggable too.
-    // Let's allow dragging all columns for consistency, but maybe pin selection?
-    // The requirement says "Only for DATA DISPLAY COLUMNS".
-    // If we only drag text columns, they might mix with fixed columns.
-    // Let's enable dragging for ALL columns to keep it simple, or check 'type' if constraints are strict.
-    // "Click and drag a column header".
-    // Let's make everything draggable except 'selection' maybe?
-    // Let's make everything draggable as requested: "sob gula column kei jeno move korte pari"
-    const isDraggable = true; 
+    const onMouseUp = (upEvent) => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      
+      // Commit final width to React State once
+      const delta = upEvent.clientX - startX;
+      const finalWidth = Math.max(80, startWidth + delta);
+      
+      setColumnWidths(prev => ({
+        ...prev,
+        [colId]: finalWidth
+      }));
+    };
 
-    // System columns
-    if (def.id === 'selection' || def.id === 'delete' || def.id === 'audio' || def.id === 'isMarked' || def.id === 'mistakes') {
-        const content = def.icon ? <def.icon size={12}/> : (def.label || '');
-        return (
-            <th 
-                draggable={isDraggable}
-                onDragStart={(e) => isDraggable && onDragStart(e, colId)}
-                onDragOver={isDraggable ? onDragOver : undefined}
-                onDrop={(e) => isDraggable && onDrop(e, colId)}
-                className={`${def.width} px-2 py-3 bg-slate-50 border-b border-r border-slate-200 text-center text-xs font-bold text-slate-500 uppercase tracking-wider ${visibilityClass} ${isDraggable ? 'cursor-move active:cursor-grabbing hover:bg-slate-100' : ''}`}
-            >
-                {content}
-            </th>
-        );
-    }
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
 
-    const Icon = def.icon;
-    return (
-      <th 
-        draggable={true}
-        onDragStart={(e) => onDragStart(e, colId)}
-        onDragOver={onDragOver}
-        onDrop={(e) => onDrop(e, colId)}
-        className={`${def.width} px-4 py-3 bg-slate-50 border-b border-r border-slate-200 text-left text-xs font-bold text-slate-500 uppercase tracking-wider select-none hover:bg-slate-100 transition-colors ${isEditMode ? 'bg-amber-50 border-amber-200 text-amber-900' : ''} ${visibilityClass} cursor-move active:cursor-grabbing`}
+  /* =========================
+     HEADER RENDER
+  ========================= */
+  return (
+    <th
+      draggable={!isFixed}
+      onDragStart={(e) => !isFixed && onDragStart(e, colId)}
+      onDragOver={!isFixed ? onDragOver : undefined}
+      onDrop={(e) => !isFixed && onDrop(e, colId)}
+      // style={{ width: columnWidths[colId] || 160 }} // Managed by colgroup now
+      data-col-id={colId}
+      className={`
+        relative
+        px-3 py-3
+        bg-slate-50
+        border-b border-r border-slate-200
+        text-xs font-bold uppercase tracking-wider
+        select-none
+        ${!isFixed ? 'cursor-move hover:bg-slate-100' : 'text-center'}
+        ${isEditMode ? 'bg-amber-50 border-amber-200' : ''}
+      `}
+    >
+      <div
+        className="flex items-center gap-1"
+        onClick={() => def.sortable && onSort(def.id)}
       >
-        <div className="flex items-center gap-1 cursor-pointer" onClick={() => def.sortable && onSort(def.id)}>
-          {Icon && <Icon size={14} className={isEditMode ? "text-amber-700" : "text-slate-400"} />}
-          <span>{def.label}</span>
-          {sortConfig.key === def.id && <span className="text-blue-500 ml-auto">{sortConfig.direction === 'asc' ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</span>}
-        </div>
-      </th>
-    );
+        {def.icon && <def.icon size={14} />}
+        <span>{def.label}</span>
+
+        {sortConfig.key === def.id && (
+          <span className="ml-auto">
+            {sortConfig.direction === 'asc' ? '▲' : '▼'}
+          </span>
+        )}
+      </div>
+
+      {/* =========================
+          RESIZE HANDLE
+         ========================= */}
+      {!isFixed && (
+        <div
+          onMouseDown={handleMouseDown}
+          className="
+            absolute top-0 right-0
+            h-full w-1
+            cursor-col-resize
+            hover:bg-indigo-400
+          "
+        />
+      )}
+    </th>
+  );
 };
 
-const SheetRow = ({ item, columnOrder, columnVisibility, hiddenColumns, revealedCells, selectedIds, playbackMode, isPlaying, playbackQueue, currentIndex, isEditMode, onToggleSelection, onUpdateCell, onRevealCell, onPlaySingle, onMark, onDeleteRequest }) => {
+
+const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, columnWidths, hiddenColumns, revealedCells, selectedIds, playbackMode, isPlaying, playbackQueue, currentIndex, isEditMode, onToggleSelection, onUpdateCell, onRevealCell, onPlaySingle, onMark, onDeleteRequest }) => {
   if (!item) return null;
   const isSelected = selectedIds.has(item.localId);
   const isPlaylistActive = playbackMode === 'playlist' && isPlaying && playbackQueue[currentIndex] === item.localId;
@@ -223,62 +356,68 @@ const SheetRow = ({ item, columnOrder, columnVisibility, hiddenColumns, revealed
       const isHiddenMask = hiddenColumns[colId];
 
       switch (colId) {
+          case 'lastPracticed':
+  return (
+    <td data-col-id={colId} className="w-24 px-2 py-2 border-r border-slate-100 text-center text-xs text-slate-500">
+      {item.lastPracticed || '-'}
+    </td>
+  );
+
           case 'selection':
               // Selection often exempt from standard hiding, but if user wants to hide it...
               // If system type, maybe we don't hide? User said "DATA columns".
               // Let's assume selection ignores layout visibility unless explicitly requested.
               return (
-                  <td className={`w-10 px-4 py-2 border-r border-slate-100 text-center ${isActive ? 'border-indigo-200' : ''}`}>
+                  <td data-col-id={colId} className={`w-10 px-4 py-2 border-r border-slate-100 text-center ${isActive ? 'border-indigo-200' : ''}`}>
                       {isActive ? <div className="flex justify-center"><div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div></div> : <input type="checkbox" checked={isSelected} onChange={() => onToggleSelection(item.localId)} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />}
                   </td>
               );
           case 'audio':
-              return <td className={`w-12 px-2 py-2 border-r border-slate-100 text-center ${cellBaseClass}`}><button onClick={() => onPlaySingle(item)} className={`p-1.5 rounded-full transition-colors ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`}>{isActive && isPlaying ? <Pause size={14}/> : <Play size={14}/>}</button></td>;
+              return <td data-col-id={colId} className={`w-12 px-2 py-2 border-r border-slate-100 text-center ${cellBaseClass}`}><button onClick={() => onPlaySingle(item)} className={`p-1.5 rounded-full transition-colors ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`}>{isActive && isPlaying ? <Pause size={14}/> : <Play size={14}/>}</button></td>;
           case 'mistakes':
-              return <td className={`w-24 px-4 py-2 border-r border-slate-100 ${cellBaseClass}`}><HeatmapBar value={item.mistakes} /></td>;
+              return <td data-col-id={colId} className={`w-24 px-4 py-2 border-r border-slate-100 ${cellBaseClass}`}><HeatmapBar value={item.mistakes} /></td>;
           case 'confidence':
-              return <td className={`w-20 px-2 py-2 border-r border-slate-100 text-center ${cellBaseClass}`}><span className={`text-xs font-bold px-2 py-1 rounded-full ${item.confidence >= 80 ? 'bg-green-100 text-green-700' : item.confidence >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{item.confidence}%</span></td>;
+              return <td data-col-id={colId} className={`w-20 px-2 py-2 border-r border-slate-100 text-center ${cellBaseClass}`}><span className={`text-xs font-bold px-2 py-1 rounded-full ${item.confidence >= 80 ? 'bg-green-100 text-green-700' : item.confidence >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{item.confidence}%</span></td>;
           case 'responseTime':
-              return <td className={`w-20 px-2 py-2 border-r border-slate-100 text-center text-xs text-slate-500 font-mono ${cellBaseClass}`}>{item.responseTime > 0 ? `${item.responseTime}s` : '-'}</td>;
+              return <td data-col-id={colId} className={`w-20 px-2 py-2 border-r border-slate-100 text-center text-xs text-slate-500 font-mono ${cellBaseClass}`}>{item.responseTime > 0 ? `${item.responseTime}s` : '-'}</td>;
           case 'isMarked':
-              return <td className={`w-12 px-2 py-2 border-r border-slate-100 text-center ${cellBaseClass}`}><button onClick={() => onMark(item.localId)} className="p-1 hover:bg-slate-100 rounded"><AlertCircle size={18} className={item.isMarked ? "text-red-500 fill-red-500" : "text-slate-200"} /></button></td>;
+              return <td data-col-id={colId} className={`w-12 px-2 py-2 border-r border-slate-100 text-center ${cellBaseClass}`}><button onClick={() => onMark(item.localId)} className="p-1 hover:bg-slate-100 rounded"><AlertCircle size={18} className={item.isMarked ? "text-red-500 fill-red-500" : "text-slate-200"} /></button></td>;
           case 'delete':
-              return <td className="w-12 px-2 py-2 border-r border-slate-100 text-center">{isEditMode && <button onClick={() => onDeleteRequest('single', item.localId, item.japanese)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded transition-colors group-hover:text-slate-400"><Trash2 size={16} /></button>}</td>;
-          // Generic Text Cells
-          case 'japanese':
-          case 'kanji':
-          case 'bangla':
+              return <td data-col-id={colId} className="w-12 px-2 py-2 border-r border-slate-100 text-center">{isEditMode && <button onClick={() => onDeleteRequest('single', item.localId, item.japanese)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded transition-colors group-hover:text-slate-400"><Trash2 size={16} /></button>}</td>;
+          // Generic Text Cells (Dynamic)
+          default:
               const value = item[colId];
-              const isRevealedLocal = revealedCells[colId] === item.localId;
-              const shouldShowContent = (!isHiddenMask || isRevealedLocal); 
+              // Support array values if any (e.g. multi-select) - cast to string
+              const displayValue = (typeof value === 'object' && value !== null) ? JSON.stringify(value) : String(value || '');
               
-
+              const isRevealedLocal = revealedCells[colId] === item.localId;
+              const shouldShowContent = (!isHiddenMask || isRevealedLocal);
+              
+              const isPrimary = colId === 'japanese' || colId === 'hiragana' || colId === 'Hiragana'; // Simple heuristic for bolding
 
               return (
-                  <td className={`min-w-[140px] px-0 border-r border-slate-100 ${!shouldShowContent && !isEditMode ? 'bg-slate-100' : 'bg-white'}`}>
+                  <td data-col-id={colId} className={`px-0 border-r border-slate-100 ${!shouldShowContent && !isEditMode ? 'bg-slate-100' : 'bg-white'}`}>
                       {!shouldShowContent && !isEditMode ? (
                           <div onClick={() => onRevealCell(item.localId, colId)} className="w-full h-full px-4 py-2 text-transparent cursor-pointer hover:bg-slate-200 flex items-center justify-center transition-colors group/cell"><EyeOff size={16} className="text-slate-300 group-hover/cell:text-slate-500"/></div>
                       ) : (
-                          isEditMode ? <input className={`w-full h-full px-4 py-2 bg-transparent outline-none text-sm border-2 border-transparent focus:border-amber-500 focus:bg-amber-50 transition-all`} value={value || ''} onChange={(e) => onUpdateCell(item.localId, colId, e.target.value)} /> : 
-                          <div className={`w-full h-full px-4 py-2 flex items-center text-sm ${colId === 'japanese' ? 'font-bold' : ''} ${isActive ? 'text-indigo-700' : 'text-slate-800'}`}>{String(value)}</div>
+                          isEditMode ? <input className={`w-full h-full px-4 py-2 bg-transparent outline-none text-sm border-2 border-transparent focus:border-amber-500 focus:bg-amber-50 transition-all`} value={displayValue} onChange={(e) => onUpdateCell(item.localId, colId, e.target.value)} /> : 
+                          <div className={`w-full h-full px-4 py-2 flex items-center text-sm ${isPrimary ? 'font-bold' : ''} ${isActive ? 'text-indigo-700' : 'text-slate-800'}`}>{displayValue}</div>
                       )}
                   </td>
               );
-          default:
-              return <td className="px-4">?</td>;
       }
   };
   
   return (
     <tr className={`group border-b border-slate-100 hover:bg-blue-50/30 transition-colors ${isSelected ? 'bg-blue-50' : isActive ? 'bg-indigo-50 border-indigo-200' : 'bg-white'}`}>
-       {columnOrder.map((colId) => (
-           <React.Fragment key={colId}>
-               {(!COLUMN_DEFS.find(c=>c.id===colId)?.editOnly || isEditMode) && renderCellContent(colId)}
-           </React.Fragment>
-       ))}
+        {columnOrder.map((colId) => (
+            <React.Fragment key={colId}>
+                {(!columnDefs.find(c=>c.id===colId)?.editOnly || isEditMode) && renderCellContent(colId)}
+            </React.Fragment>
+        ))}
     </tr>
   );
-};
+});
 
 // --- UPDATED AUDIO PLAYER BAR ---
 const AudioPlayerBar = ({ 
@@ -451,7 +590,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
 };
 
 // --- NEW COMPONENT: ColumnManager ---
-const ColumnManager = ({ isOpen, onClose, columnOrder, setColumnOrder, columnVisibility, setColumnVisibility }) => {
+const ColumnManager = ({ isOpen, onClose, allColumns, columnOrder, setColumnOrder, columnVisibility, setColumnVisibility }) => {
     if (!isOpen) return null;
     
     // Reorder: Update columnOrder
@@ -480,7 +619,7 @@ const ColumnManager = ({ isOpen, onClose, columnOrder, setColumnOrder, columnVis
                 </div>
                 <div className="p-4 overflow-y-auto flex-1 space-y-2">
                     {columnOrder.map((colId, index) => {
-                        const def = COLUMN_DEFS.find(c => c.id === colId);
+                        const def = allColumns.find(c => c.id === colId);
                         if (!def) return null;
                         
                         const isVisible = columnVisibility[colId] !== false; // Default true if undefined
@@ -497,8 +636,8 @@ const ColumnManager = ({ isOpen, onClose, columnOrder, setColumnOrder, columnVis
                                 <span className="flex-1 text-sm font-bold text-slate-700">{def.label || (def.icon ? <def.icon size={14}/> : 'System')}</span>
                                 {isVisible && (
                                     <div className="flex gap-1">
-                                        <button onClick={() => move(index, index - 1)} disabled={index === 0} className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-indigo-600 disabled:opacity-20"><ChevronUp size={16}/></button>
-                                        <button onClick={() => move(index, index + 1)} disabled={index === columnOrder.length - 1} className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-indigo-600 disabled:opacity-20"><ChevronDown size={16}/></button>
+                                        <button onClick={() => move(index, index - 1)} disabled={index === 0 || def.fixed || def.id === 'selection' || def.id === 'delete'} className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-indigo-600 disabled:opacity-20"><ChevronUp size={16}/></button>
+                                        <button onClick={() => move(index, index + 1)} disabled={index === columnOrder.length - 1 || def.fixed || def.id === 'selection' || def.id === 'delete'} className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-indigo-600 disabled:opacity-20"><ChevronDown size={16}/></button>
                                     </div>
                                 )}
                             </div>
@@ -507,8 +646,12 @@ const ColumnManager = ({ isOpen, onClose, columnOrder, setColumnOrder, columnVis
                 </div>
                 <div className="p-4 border-t bg-slate-50 text-right">
                     <button onClick={() => {
-                        setColumnOrder(DEFAULT_COLUMN_ORDER);
-                        const defaults = {}; COLUMN_DEFS.forEach(c => defaults[c.id] = true);
+                        // Reset to default order: Selection -> Dynamic -> System
+                        // We need to reconstruct the default order here
+                        // Simple reset: just clear persistence and reload? 
+                        // Or just emit the 'natural' order of allColumns
+                        setColumnOrder(allColumns.map(c => c.id));
+                        const defaults = {}; allColumns.forEach(c => defaults[c.id] = true);
                         setColumnVisibility(defaults);
                     }} className="text-xs text-red-500 font-bold hover:underline mr-4">Reset Default</button>
                     <button onClick={onClose} className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 text-sm">Done</button>
@@ -546,34 +689,81 @@ function VocabularyView({
   const [revealedCells, setRevealedCells] = useState({ japanese: null, kanji: null, bangla: null });
   
   // Dynamic Column State
-  // Dynamic Column State
   const [columnOrder, setColumnOrder] = useState(() => {
-     try {
-         const saved = localStorage.getItem('columnOrder');
-         const parsed = saved ? JSON.parse(saved) : DEFAULT_COLUMN_ORDER;
-         // Ensure all defined columns are present (merge defaults if missing)
-         const allIds = new Set(parsed);
-         const missing = DEFAULT_COLUMN_ORDER.filter(id => !allIds.has(id));
-         return [...parsed, ...missing];
-     } catch { return DEFAULT_COLUMN_ORDER; }
+     try { return JSON.parse(localStorage.getItem('columnOrder')) || []; } catch { return []; }
   });
 
   const [columnVisibility, setColumnVisibility] = useState(() => {
-      try {
-          const saved = localStorage.getItem('columnVisibility');
-          if (saved) return JSON.parse(saved);
-          // Default: All visible
-          const defaults = {};
-          COLUMN_DEFS.forEach(c => defaults[c.id] = true);
-          return defaults;
-      } catch {
-          const defaults = {};
-          COLUMN_DEFS.forEach(c => defaults[c.id] = true);
-          return defaults;
-      }
+     try { return JSON.parse(localStorage.getItem('columnVisibility')) || {}; } catch { return {}; }
   });
 
+  const [columnWidths, setColumnWidths] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('columnWidths')) || {}; } catch { return {}; }
+  });
+  
   const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('columnWidths', JSON.stringify(columnWidths));
+  }, [columnWidths]);
+
+  // --- GENERATE ALL COLUMNS ---
+  const allColumns = useMemo(() => {
+      // 1. Identify Dynamic Columns from Data
+      let dynamicCols = [];
+      if (vocabList && vocabList.length > 0) {
+          const first = vocabList[0];
+          // Get all keys
+          const keys = Object.keys(first);
+          
+          dynamicCols = keys
+             .filter(key => !INTERNAL_KEYS.has(key)) // Filter internal keys
+             .filter(key => key !== 'japanese' || !first._isSyntheticJapanese) // Filter synthetic japanese
+             .map(key => ({
+                 id: key,
+                 label: key,
+                 width: 'min-w-[140px]', // Dynamic width
+                 type: 'text',
+                 sortable: true
+             }));
+      }
+
+      // 2. Assemble Full List: Selection -> Dynamic -> Fixed System -> Delete
+      // Note: User requested Fixed System Columns order.
+      return [SELECTION_COLUMN, ...dynamicCols, ...FIXED_SYSTEM_COLUMNS, DELETE_COLUMN];
+  }, [vocabList]);
+
+  // --- ORDER & VISIBILITY ---
+  // Initialize or Sync Order with available columns
+  useEffect(() => {
+      const availableIds = new Set(allColumns.map(c => c.id));
+      const fixedIds = new Set(FIXED_SYSTEM_COLUMNS.map(c => c.id));
+      fixedIds.add('delete'); 
+      fixedIds.add('selection');
+
+      setColumnOrder(prev => {
+          // Flatten standard fixed order
+          const fixedOrder = ['selection', ...FIXED_SYSTEM_COLUMNS.map(c => c.id), 'delete'];
+          
+          // Get dynamic column order from prev (user preference)
+          // Filter out any fixed columns from prev to prevent duplicates/wrong order
+          let dynamicOrder = (prev || []).filter(id => availableIds.has(id) && !fixedIds.has(id));
+          
+          // Identify any NEW dynamic columns that are not in prev
+          const knownDynamic = new Set(dynamicOrder);
+          const newDynamic = allColumns
+              .filter(c => !fixedIds.has(c.id) && !knownDynamic.has(c.id))
+              .map(c => c.id);
+          
+          // Combine: [Selection] + [Dynamic (User Order)] + [New Dynamic] + [Fixed System] + [Delete]
+          // Note: Selection is handled in fixedOrder[0].
+           // Wait, fixedOrder includes selection.
+           // User might want to reorder Dynamic columns.
+           // We place new dynamic columns at the END of the dynamic section (before fixed).
+           
+           return ['selection', ...dynamicOrder, ...newDynamic, ...FIXED_SYSTEM_COLUMNS.map(c => c.id), 'delete'];
+      });
+  }, [allColumns]);
 
   useEffect(() => {
       localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
@@ -606,6 +796,9 @@ function VocabularyView({
   const practiceSnapshot = useRef([]); 
   const practiceUpdates = useRef([]); 
 
+  // Compute this only once when sending to `SheetRow`
+  const activeColumnDefs = allColumns; 
+
   // const [chatHistory, setChatHistory] = useState([{ role: 'model', text: 'Konnichiwa! I am your Japanese spreadsheet assistant.' }]);
   // const [chatInput, setChatInput] = useState('');
   // const [isChatLoading, setIsChatLoading] = useState(false);
@@ -634,8 +827,8 @@ function VocabularyView({
     let data = [...safeDataList];
     if(currentFolderId !== 'root') data = data.filter(i => i.folderId === currentFolderId);
     if(searchTerm) { const l = searchTerm.toLowerCase(); data = data.filter(i => i.japanese.includes(l) || i.bangla.includes(l) || i.kanji.includes(l)); }
-    if(filters.lesson !== 'all') data = data.filter(i => i.lesson === filters.lesson);
-    if(filters.cando !== 'all') data = data.filter(i => i.cando === filters.cando);
+    if(filters.lesson !== 'all') data = data.filter(i => String(i.lesson) === String(filters.lesson));
+    if(filters.cando !== 'all') data = data.filter(i => String(i.cando) === String(filters.cando));
     if(viewMode === 'problem') data = data.filter(i => i.isMarked);
     else if(viewMode === 'weak') data = data.filter(i => i.confidence < 60 || i.mistakes >= 3);
     if(sortConfig.key) data.sort((a,b) => { let va = a[sortConfig.key], vb = b[sortConfig.key]; if (typeof va === 'string') va = va.toLowerCase(); if (typeof vb === 'string') vb = vb.toLowerCase(); return (va < vb ? -1 : 1) * (sortConfig.direction === 'asc' ? 1 : -1); });
@@ -677,6 +870,10 @@ function VocabularyView({
   }, [vocabList]);
 
   // --- ACTIONS ---
+  
+  // Define handlePlaySingle here as it was missing or inferred
+
+
   const showToast = (msg, type = 'success') => setToast({ message: msg, type });
   const attemptAction = (cb) => { if(isEditMode && hasUnsavedChanges) setUnsavedChangesModal({ open: true, pendingAction: cb }); else { if(isEditMode) setIsEditMode(false); cb(); }};
 
@@ -720,6 +917,39 @@ function VocabularyView({
       setIsSyncing(false);
     }
   };
+const resizeRef = useRef(null);
+
+const handleResizeStart = (e, colId) => {
+  e.preventDefault();
+
+  resizeRef.current = {
+    colId,
+    startX: e.clientX,
+    startWidth: columnWidths[colId] || e.target.parentElement.offsetWidth
+  };
+
+  document.addEventListener('mousemove', handleResizeMove);
+  document.addEventListener('mouseup', handleResizeEnd);
+};
+
+const handleResizeMove = (e) => {
+  if (!resizeRef.current) return;
+
+  const { colId, startX, startWidth } = resizeRef.current;
+  const delta = e.clientX - startX;
+  const newWidth = Math.max(80, startWidth + delta);
+
+  setColumnWidths(prev => ({
+    ...prev,
+    [colId]: newWidth
+  }));
+};
+
+const handleResizeEnd = () => {
+  resizeRef.current = null;
+  document.removeEventListener('mousemove', handleResizeMove);
+  document.removeEventListener('mouseup', handleResizeEnd);
+};
 
   const handleStartSmartPractice = () => attemptAction(() => {
       const problemItems = vocabList.filter(v => v.isMarked);
@@ -748,19 +978,19 @@ function VocabularyView({
 
   useEffect(() => { setRevealedCells({ japanese: null, kanji: null, bangla: null }); }, [currentFolderId, filters, searchTerm, sortConfig, viewMode]);
   const toggleGlobalVisibility = (k) => { setHiddenColumns(p => ({...p, [k]: !p[k]})); setRevealedCells(p => ({...p, [k]: null})); };
-  const revealSingleCell = (id, k) => setRevealedCells(p => ({...p, [k]: id}));
+  const revealSingleCell = useCallback((id, k) => setRevealedCells(p => ({...p, [k]: id})), []);
 
-  const handleUpdateCell = (lid, f, v) => { if(isEditMode) { setDraftVocabList(p => p.map(i => i.localId === lid ? { ...i, [f]: v } : i)); setHasUnsavedChanges(true); }};
-  const toggleMark = async (lid) => {
+  const handleUpdateCell = useCallback((lid, f, v) => { if(isEditMode) { setDraftVocabList(p => p.map(i => i.localId === lid ? { ...i, [f]: v } : i)); setHasUnsavedChanges(true); }}, [isEditMode]);
+  const toggleMark = useCallback(async (lid) => {
     if(isSyncing) return;
     if(isEditMode) { setDraftVocabList(p => p.map(v => v.localId === lid ? { ...v, isMarked: !v.isMarked } : v)); setHasUnsavedChanges(true); }
     else { const item = vocabList.find(v => v.localId === lid); if(!item || !item.id) return; const newState = !item.isMarked; const prev = [...vocabList]; setVocabList(p => p.map(v => v.localId === lid ? { ...v, isMarked: newState } : v)); setIsSyncing(true); try { await apiService.sendUpdate([{ id: item.id, is_problem: newState }]); } catch(e) { console.error(e); setVocabList(prev); showToast("Failed", "error"); } finally { setIsSyncing(false); } }
-  };
+  }, [isSyncing, isEditMode, vocabList, apiService]);
 
   const finishPractice = async () => { setPracticeModeActive(false); if(practiceUpdates.current.length > 0) { setIsSyncing(true); try { await apiService.sendUpdate(practiceUpdates.current); showToast("Saved!", "success"); } catch(e) { console.error(e); setVocabList(practiceSnapshot.current); showToast("Save Failed", "error"); } finally { setIsSyncing(false); }}};
-  const requestDelete = (type, id, name) => { if(!isEditMode && type !== 'folder') return; setDeleteModal({ open: true, type, targetId: id, targetName: name }); };
+  const requestDelete = useCallback((type, id, name) => { if(!isEditMode && type !== 'folder') return; setDeleteModal({ open: true, type, targetId: id, targetName: name }); }, [isEditMode]);
   const executeDelete = async () => { if(isEditMode) { if(deleteModal.type === 'single') setDraftVocabList(p => p.filter(v => v.localId !== deleteModal.targetId)); else { setDraftVocabList(p => p.filter(v => !selectedIds.has(v.localId))); setSelectedIds(new Set()); } setHasUnsavedChanges(true); } setDeleteModal({ open: false, type: null, targetId: null, targetName: '' }); };
-  const toggleSelection = (id) => { const s = new Set(selectedIds); if(s.has(id)) s.delete(id); else s.add(id); setSelectedIds(s); };
+  const toggleSelection = useCallback((id) => { setSelectedIds(prev => { const s = new Set(prev); if(s.has(id)) s.delete(id); else s.add(id); return s; }); }, []);
   const toggleSelectAll = (items) => { setSelectedIds(selectedIds.size === items.length ? new Set() : new Set(items.map(i => i.localId))); };
 
   const handleSort = (key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' });
@@ -820,7 +1050,7 @@ function VocabularyView({
     }
   };
 
-  const playSingleItem = (item) => { 
+  const handlePlaySingle = useCallback((item) => { 
       // Stop any running playlist
       stopPlaylist(); 
       // Set mode to single
@@ -830,7 +1060,29 @@ function VocabularyView({
       setCurrentIndex(0); 
       // Start!
       setIsPlaying(true); 
-  };
+  }, [vocabList, filteredAndSortedData]); // Dependencies might be tricky. stopPlaylist uses refs/state setters.
+  // Actually, setters are stable. stopPlaylist is defined above.
+  // I need to wrap stopPlaylist in useCallback too if I depend on it, or just inline the logic safely.
+  // stopPlaylist depends on many state setters.
+  // Let's wrap stopPlaylist first? No, too many changes.
+  // I will just use the function as is but wrap this one.
+  // IMPORTANT: If `stopPlaylist` is not stable, `handlePlaySingle` will change every render.
+  // `stopPlaylist` is defined at line 1136 (Step 141 view).
+  // "const stopPlaylist = () => { ... }"
+  // It is NOT wrapped in useCallback.
+  // So `handlePlaySingle` will also change every render if I depend on `stopPlaylist`.
+  
+  // Strategy:
+  // 1. Wrap `stopPlaylist` in useCallback. 
+  // 2. Wrap `startPlaylist` in useCallback.
+  // 3. Wrap `handlePlaySingle` in useCallback.
+  
+  // This is becoming a larger refactor of the audio logic.
+  // Given "onek slow", stabilizing the Grid (SheetRow) props is vital.
+  // `onPlaySingle` is passed to every row. If it changes, every row re-renders.
+  // So I MUST stabilize `handlePlaySingle`.
+  
+  // I will wrap `stopPlaylist` and `handlePlaySingle`.
 
   // UPDATED: Unified Playback Effect
   useEffect(() => { 
@@ -903,7 +1155,7 @@ function VocabularyView({
       setIsAudioBarManuallyHidden(false); // Reset visibility
   };
   
-  const stopPlaylist = () => { 
+  const stopPlaylist = useCallback(() => { 
       window.speechSynthesis.cancel(); 
       setIsPlaying(false); 
       setPlaybackMode('idle'); 
@@ -911,7 +1163,7 @@ function VocabularyView({
       setCurrentIndex(-1);
       setCurrentRepeatCount(0);
       setIsAudioBarManuallyHidden(false);
-  };
+  }, []);
 
   const nextCard = (isEasy) => { const card = practiceQueue[currentCardIndex]; const newConf = isEasy ? Math.min(100, card.confidence + 10) : Math.max(0, card.confidence - 15); const newMistakes = isEasy ? card.mistakes : card.mistakes + 1; const today = new Date().toISOString().split('T')[0]; setVocabList(p => p.map(v => v.localId === card.localId ? { ...v, confidence: newConf, mistakes: newMistakes, last_practiced: today } : v)); if(card.id) practiceUpdates.current.push({ id: card.id, confidence: newConf, mistake_count: newMistakes, last_practiced: today }); if(currentCardIndex < practiceQueue.length - 1) { setIsFlipped(false); setCurrentCardIndex(p => p + 1); } else finishPractice(); };
   // const handleChatSubmit = async (e) => { e.preventDefault(); if (!chatInput.trim()) return; setChatHistory(p => [...p, { role: 'user', text: chatInput }]); setChatInput(''); setIsChatLoading(true); try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${""}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: chatInput }] }] }) }); const d = await r.json(); setChatHistory(p => [...p, { role: 'model', text: d.candidates?.[0]?.content?.parts?.[0]?.text || "Error" }]); } catch (e) { setChatHistory(p => [...p, { role: 'model', text: "Error" }]); } finally { setIsChatLoading(false); } };
@@ -967,14 +1219,32 @@ function VocabularyView({
            className="flex-1 overflow-auto transition-all duration-300"
            style={{ paddingBottom: isAudioBarVisible ? '96px' : '0px' }}
          >
-           <table className="w-full border-collapse bg-white text-sm">
+           <table className="w-full border-collapse bg-white text-sm table-fixed">
+             <colgroup>
+               {columnOrder.map(colId => {
+                  const def = allColumns.find(c => c.id === colId);
+                  if (!def || (def.editOnly && !isEditMode) || columnVisibility[colId] === false) return null;
+                  
+                  let width = columnWidths[colId];
+                  if (!width) {
+                      const twMap = { 'w-10': 40, 'w-12': 48, 'w-16': 64, 'w-20': 80, 'w-24': 96, 'w-32': 128, 'w-40': 160, 'w-48': 192, 'w-64': 256 };
+                      const match = def.width && typeof def.width === 'string' && def.width.match(/w-(\d+)/);
+                      if (twMap[def.width]) width = twMap[def.width];
+                      else if (match) width = parseInt(match[1]) * 4;
+                      else width = 160; 
+                  }
+                  return <col key={colId} id={`col-${colId}`} style={{ width: width }} />;
+               })}
+             </colgroup>
              <thead className="sticky top-0 z-10 shadow-sm">
                 <tr>
-                  {columnOrder.map(colId => (
-                      (!COLUMN_DEFS.find(c=>c.id===colId)?.editOnly || isEditMode) && (
+                  {columnOrder.map(colId => {
+                      const def = allColumns.find(c => c.id === colId);
+                      return (!def?.editOnly || isEditMode) && (
                           <DynamicHeader 
                             key={colId} 
                             colId={colId} 
+                            def={def}
                             isEditMode={isEditMode} 
                             sortConfig={sortConfig} 
                             onSort={handleSort} 
@@ -982,15 +1252,17 @@ function VocabularyView({
                             onDragStart={handleColumnDragStart}
                             onDragOver={handleColumnDragOver}
                             onDrop={handleColumnDrop}
+                            columnWidths={columnWidths}
+                            setColumnWidths={setColumnWidths}
                           />
-                      )
-                  ))}
+                      );
+                  })}
                 </tr>
              </thead>
              <tbody>{filteredAndSortedData.map((item, index) => ( 
                 <SheetRow 
-                    key={item.localId} item={item} index={index} columnOrder={columnOrder} columnVisibility={columnVisibility} selectedIds={selectedIds} playbackMode={playbackMode} isPlaying={isPlaying} playbackQueue={playbackQueue} currentIndex={currentIndex} singlePlayId={singlePlayId} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
-                    onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={playSingleItem} onMark={toggleMark} onDeleteRequest={requestDelete}
+                    key={item.localId} item={item} index={index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} playbackMode={playbackMode} isPlaying={isPlaying} playbackQueue={playbackQueue} currentIndex={currentIndex} singlePlayId={singlePlayId} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
+                    onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={handlePlaySingle} onMark={toggleMark} onDeleteRequest={requestDelete}
                 /> 
              ))}</tbody>
            </table>
@@ -1025,7 +1297,7 @@ function VocabularyView({
       {editConfirmationOpen && <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-amber-50 p-6 flex flex-col items-center text-center"><PenTool className="text-amber-600 mb-4" size={24}/><h3 className="text-xl font-bold">Enable Editing?</h3><p className="text-sm text-slate-500 mt-2">You are entering Edit Mode.<br/>Changes are temporary until you click Save.</p></div><div className="p-4 bg-white flex justify-end gap-3"><button onClick={() => setEditConfirmationOpen(false)} className="flex-1 px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button><button onClick={startEditMode} className="flex-1 px-4 py-2.5 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600">Start Editing</button></div></div></div>}
       {unsavedChangesModal.open && <div className="fixed inset-0 z-[110] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"><div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95"><div className="bg-amber-50 p-6 flex flex-col items-center text-center border-b border-amber-100"><div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4"><AlertCircle className="text-amber-600" size={24} /></div><h3 className="text-xl font-bold text-slate-800">Unsaved Changes</h3><p className="text-sm text-slate-500 mt-2">You have unsaved edits in this session.<br/>What would you like to do?</p></div><div className="p-4 bg-white flex flex-col gap-2"><button onClick={confirmExitWithSave} className="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"><SaveIcon size={16}/> Save & Continue</button><button onClick={confirmExitWithDiscard} className="w-full px-4 py-3 bg-white border-2 border-red-100 text-red-600 font-bold rounded-lg hover:bg-red-50 flex items-center justify-center gap-2"><Trash2 size={16}/> Discard Changes</button><button onClick={cancelEditModeAttempt} className="w-full px-4 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-lg">Cancel (Stay Here)</button></div></div></div>}
       
-       <ColumnManager isOpen={isColumnManagerOpen} onClose={() => setIsColumnManagerOpen(false)} columnOrder={columnOrder} setColumnOrder={setColumnOrder} columnVisibility={columnVisibility} setColumnVisibility={setColumnVisibility} />
+       <ColumnManager isOpen={isColumnManagerOpen} onClose={() => setIsColumnManagerOpen(false)} allColumns={allColumns} columnOrder={columnOrder} setColumnOrder={setColumnOrder} columnVisibility={columnVisibility} setColumnVisibility={setColumnVisibility} />
        {/* Import Modal */}
       {importModalOpen && (
          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">

@@ -178,8 +178,8 @@ const WeaknessCard = ({ suggestion, onApply }) => {
 // Fixed System Columns with exact order required by User
 // 1. Status (❗), 2. Audio (🔊), 3. Weak (🔥), 4. Conf., 5. Time
 const FIXED_SYSTEM_COLUMNS = [
-    { id: 'isMarked', label: '❗', width: 'w-12', type: 'action', fixed: 'right' },
-    { id: 'audio', label: '🔊', width: 'w-12', type: 'action', fixed: 'right' },
+    { id: 'isMarked', label: '❗', width: 'w-12', type: 'action',  },
+    { id: 'audio', label: '🔊', width: 'w-12', type: 'action',  },
     { id: 'mistakes', label: '🔥', width: 'w-24', type: 'heatmap', fixed: 'right' },
     { id: 'confidence', label: 'Conf.', width: 'w-20', type: 'badge', sortable: true, icon: Check, fixed: 'right' },
     { id: 'lastPracticed', label: 'Time', width: 'w-24', type: 'text', fixed: 'right' }

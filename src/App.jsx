@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import VocabularyView, { mapToApp } from './VocabularyView';
+import VocabularyView from './VocabularyView';
+import { mapToApp } from './utils/vocabularyUtils';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 

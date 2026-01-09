@@ -18,6 +18,7 @@ import AdvancedToolbar from './components/Vocabulary/AdvancedToolbar';
 import ColumnManager from './components/Vocabulary/ColumnManager';
 import ImportModal from './components/Vocabulary/ImportModal';
 import Sidebar from './components/Vocabulary/Sidebar';
+import PaginationControls from './components/Vocabulary/PaginationControls';
 
 // --- HOOKS ---
 import { useAudioPlayer } from './hooks/useAudioPlayer';
@@ -138,6 +139,29 @@ function VocabularyView({
   const { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
       vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList
   );
+
+  // --- PAGINATION STATE ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+     try { return parseInt(localStorage.getItem('itemsPerPage'), 10) || 500; } catch { return 500; }
+  });
+
+  useEffect(() => {
+     localStorage.setItem('itemsPerPage', itemsPerPage);
+  }, [itemsPerPage]);
+
+  // Reset page when data/filters change
+  useEffect(() => {
+      setCurrentPage(1);
+  }, [currentFolderId, searchTerm, filters, viewMode, sortConfig]);
+
+  // Derived Paginated Data
+  const paginatedData = useMemo(() => {
+     const start = (currentPage - 1) * itemsPerPage;
+     return filteredAndSortedData.slice(start, start + itemsPerPage);
+  }, [filteredAndSortedData, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
 
   const {
       playbackMode, isPlaying, playbackQueue, currentIndex, audioConfig, isAudioBarManuallyHidden,
@@ -439,14 +463,23 @@ function VocabularyView({
                   })}
                 </tr>
              </thead>
-             <tbody>{filteredAndSortedData.map((item, index) => ( 
+             <tbody>{paginatedData.map((item, index) => ( 
                 <SheetRow 
-                    key={item.localId} item={item} index={index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} playbackMode={playbackMode} isPlaying={isPlaying} playbackQueue={playbackQueue} currentIndex={currentIndex} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
+                    key={item.localId} item={item} index={(currentPage - 1) * itemsPerPage + index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} playbackMode={playbackMode} isPlaying={isPlaying} playbackQueue={playbackQueue} currentIndex={currentIndex} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
                     onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={handlePlaySingle} onMark={toggleMark} onDeleteRequest={requestDelete}
                 /> 
              ))}</tbody>
            </table>
          </div>
+
+         <PaginationControls 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(n) => { setItemsPerPage(n); setCurrentPage(1); }}
+            totalItems={filteredAndSortedData.length}
+          />
 
          {isAudioBarVisible && (
              <AudioPlayerBar 

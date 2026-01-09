@@ -21,8 +21,10 @@ import Sidebar from './components/Vocabulary/Sidebar';
 import PaginationControls from './components/Vocabulary/PaginationControls';
 
 // --- HOOKS ---
+// --- HOOKS ---
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useVocabularyData } from './hooks/useVocabularyData';
+import { preferenceStore } from './utils/preferenceStore';
 
 // --- MAIN VOCABULARY VIEW ---
 function VocabularyView({ 
@@ -48,22 +50,16 @@ function VocabularyView({
   
   // Dynamic Column State
   const activeSyncs = useRef(0);
-  const [columnOrder, setColumnOrder] = useState(() => {
-     try { return JSON.parse(localStorage.getItem('columnOrder')) || []; } catch { return []; }
-  });
 
-  const [columnVisibility, setColumnVisibility] = useState(() => {
-     try { return JSON.parse(localStorage.getItem('columnVisibility')) || {}; } catch { return {}; }
-  });
-
-  const [columnWidths, setColumnWidths] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('columnWidths')) || {}; } catch { return {}; }
-  });
+  // Initialize from Preference Store
+  const [columnOrder, setColumnOrder] = useState(() => preferenceStore.loadPreferences().columnOrder);
+  const [columnVisibility, setColumnVisibility] = useState(() => preferenceStore.loadPreferences().columnVisibility);
+  const [columnWidths, setColumnWidths] = useState(() => preferenceStore.loadPreferences().columnWidths);
   
   const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('columnWidths', JSON.stringify(columnWidths));
+    preferenceStore.savePreferences({ columnWidths });
   }, [columnWidths]);
 
   // --- GENERATE ALL COLUMNS ---
@@ -106,11 +102,11 @@ function VocabularyView({
   }, [allColumns]);
 
   useEffect(() => {
-      localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
+      preferenceStore.savePreferences({ columnOrder });
   }, [columnOrder]);
 
   useEffect(() => {
-      localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
+      preferenceStore.savePreferences({ columnVisibility });
   }, [columnVisibility]);
   
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -142,13 +138,33 @@ function VocabularyView({
 
   // --- PAGINATION STATE ---
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(() => {
-     try { return parseInt(localStorage.getItem('itemsPerPage'), 10) || 500; } catch { return 500; }
-  });
+  const [itemsPerPage, setItemsPerPage] = useState(() => preferenceStore.loadPreferences().itemsPerPage);
 
   useEffect(() => {
-     localStorage.setItem('itemsPerPage', itemsPerPage);
+     preferenceStore.savePreferences({ itemsPerPage });
   }, [itemsPerPage]);
+
+  // Phase 5.3 & 6: Sync UI with Hydration (All Preferences)
+  useEffect(() => {
+      const unsubscribe = preferenceStore.subscribe((prefs) => {
+          if (prefs.itemsPerPage !== itemsPerPage) setItemsPerPage(prefs.itemsPerPage);
+          
+          // Deep compare or simple set? React setters are usually smart enough or we can check JSON.
+          // Since these are objects/arrays, we should check if they actually changed to avoid render loops if store emits same ref?
+          // Store loads from local storage which calls JSON.parse, creating new refs.
+          // So strict equality !== might pass even if content same.
+          // But setItemsPerPage(val) is safe.
+          // Let's rely on JSON stringify check we did in Store to only notify if changed? 
+          // Store notifies if ANY changed. But we get the whole 'prefs' object.
+          // We should just check basic equality or rely on React to bail out?
+          // Since we want to update ONLY if hydration changed it.
+          
+          if (JSON.stringify(prefs.columnOrder) !== JSON.stringify(columnOrder)) setColumnOrder(prefs.columnOrder);
+          if (JSON.stringify(prefs.columnVisibility) !== JSON.stringify(columnVisibility)) setColumnVisibility(prefs.columnVisibility);
+          if (JSON.stringify(prefs.columnWidths) !== JSON.stringify(columnWidths)) setColumnWidths(prefs.columnWidths);
+      });
+      return () => unsubscribe();
+  }, [itemsPerPage, columnOrder, columnVisibility, columnWidths]);
 
   // Reset page when data/filters change
   useEffect(() => {

@@ -4,18 +4,11 @@
  * RESPONSIBILITY:
  * - Handle reading and writing User Preferences (rowsPerPage, columnOrder, etc.) to Firestore.
  * - Provide a consistent API that `preferenceStore.js` can eventually switch to.
- * 
- * DATA STRUCTURE (Planned):
- * - Collection: `users`
- * - Document: `{userId}`
- * - Sub-collection or Field: `preferences`
  */
 
 import { getDb } from './firestoreClient';
-
 import { doc, getDoc, setDoc } from "firebase/firestore";
-
-const DEMO_USER_ID = 'demoUser'; // Placeholder for Phase 5
+import { getUserId } from "../userService";
 
 /**
  * Load all user preferences (config) from Firestore.
@@ -25,9 +18,15 @@ export const loadUserConfig = async () => {
     const db = getDb();
     if (!db) return null;
 
+    const userId = getUserId();
+    if (!userId) {
+        console.warn("[Firestore] No user ID available. Skipping load.");
+        return null;
+    }
+
     try {
-        console.log(`[Firestore] Fetching config for ${DEMO_USER_ID}`);
-        const docRef = doc(db, "users", DEMO_USER_ID, "preferences", "config");
+        console.log(`[Firestore] Fetching config for ${userId}`);
+        const docRef = doc(db, "users", userId, "preferences", "config");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -49,9 +48,15 @@ export const saveUserConfig = async (changes) => {
     const db = getDb();
     if (!db) return;
 
+    const userId = getUserId();
+    if (!userId) {
+        console.warn("[Firestore] No user ID available. Skipping save.");
+        return;
+    }
+
     try {
-        console.log(`[Firestore] Saving config for ${DEMO_USER_ID}`, changes);
-        const docRef = doc(db, "users", DEMO_USER_ID, "preferences", "config");
+        console.log(`[Firestore] Saving config for ${userId}`, changes);
+        const docRef = doc(db, "users", userId, "preferences", "config");
         await setDoc(docRef, changes, { merge: true });
     } catch (e) {
         console.error("[Firestore] Failed to save config", e);
@@ -69,4 +74,3 @@ export const saveRowsPerPage = async (val) => saveUserConfig({ rowsPerPage: val 
 // Deprecated placeholders (kept for interface compatibility if needed later)
 export const fetchUserPreferences = async (userId) => null;
 export const saveUserPreferences = async (userId, preferences) => { };
-

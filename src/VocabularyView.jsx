@@ -25,6 +25,7 @@ import PaginationControls from './components/Vocabulary/PaginationControls';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useVocabularyData } from './hooks/useVocabularyData';
 import { preferenceStore } from './utils/preferenceStore';
+import { updateProgress } from './services/firestore/activityService';
 
 // --- MAIN VOCABULARY VIEW ---
 function VocabularyView({ 
@@ -284,7 +285,8 @@ function VocabularyView({
         activeSyncs.current += 1;
 
         try { 
-            await apiService.sendUpdate([{ id: item.id, is_problem: newState }]); 
+            // Phase 8.3-A: Firestore Write
+            await updateProgress(item.id, { isMarked: newState });
         } catch(e) { 
             console.error(e); 
             // Revert state for this specific item only

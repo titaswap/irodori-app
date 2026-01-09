@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import VocabularyView from './VocabularyView';
 import { mapToApp } from './utils/vocabularyUtils';
+import { fetchAllProgress } from './services/firestore/activityService';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 
@@ -100,7 +101,7 @@ function App() {
         setFolders(dynamicFolders);
         // --------------------------------
         
-        // Restore local marks
+         // Restore local marks (Legacy LocalStorage)
         const saved = localStorage.getItem('vocabList');
         if (saved) {
            try {
@@ -115,6 +116,27 @@ function App() {
                    }
                });
            } catch(e) { console.error("Merge error", e); }
+        }
+
+        // Phase 8.2: Overlay Firestore Progress
+        try {
+            const firestoreProgress = await fetchAllProgress();
+            if (firestoreProgress && Object.keys(firestoreProgress).length > 0) {
+                 mappedData.forEach(item => {
+                     // We match by REAL ID (item.id), not localId
+                     if (item.id && firestoreProgress[item.id]) {
+                         const p = firestoreProgress[item.id];
+                         // Overwrite only if defined in Firestore
+                         if (p.isMarked !== undefined) item.isMarked = p.isMarked;
+                         if (p.mistakes !== undefined) item.mistakes = p.mistakes;
+                         if (p.confidence !== undefined) item.confidence = p.confidence;
+                         if (p.lastPracticed !== undefined) item.lastPracticed = p.lastPracticed;
+                     }
+                 });
+                 console.log("[App] Merged Firestore progress into vocabList");
+            }
+        } catch (e) {
+            console.error("[App] Failed to merge Firestore progress", e);
         }
         
         setVocabList(mappedData);

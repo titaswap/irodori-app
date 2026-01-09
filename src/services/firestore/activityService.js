@@ -72,12 +72,4 @@ export const updateProgress = async (itemId, partialData) => {
     }
 };
 
-/**
- * Save a batch of progress updates.
- * @param {Array<Object>} updates - Array of objects { id, isMarked, ... }
- */
-export const syncProgress = async (updates) => {
-    // Placeholder for Phase 9
-    const userId = getUserId();
-    console.log(`[Firestore] Syncing ${updates.length} items for ${userId} (Placeholder)`);
-};
+

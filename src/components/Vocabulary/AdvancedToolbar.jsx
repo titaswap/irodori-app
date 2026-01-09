@@ -1,11 +1,54 @@
 
 import React, { useState, useMemo } from 'react';
 import { 
-  Folder, Loader, PenTool, TrendingUp, Target, ArrowRight, ChevronDown, 
-  Eye, EyeOff, AlertCircle, Flame, BarChart2, Undo, Save as SaveIcon, 
+  Folder, Loader, PenTool, Target, ArrowRight, ChevronDown, 
+  Eye, EyeOff, AlertCircle, BarChart2, Undo, Save as SaveIcon, 
   Lock, Sparkles, Brain, Play, RefreshCw, Settings as SettingsIcon, Grid
 } from 'lucide-react';
-import { ProgressTrendChart, WeaknessCard } from './StatsWidgets';
+// import { ProgressTrendChart, WeaknessCard } from './StatsWidgets'; // REMOVED
+import { X } from 'lucide-react';
+
+const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' }) => {
+    // items: [[value, count], ...]
+    if (!items || items.length === 0) return null;
+    const safeActive = Array.isArray(activeValues) ? activeValues : [];
+
+    const colorClasses = {
+        blue: { active: 'bg-blue-600 text-white shadow-md shadow-blue-200', inactive: 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-blue-300' },
+        indigo: { active: 'bg-indigo-600 text-white shadow-md shadow-indigo-200', inactive: 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-indigo-300' }
+    };
+    const styles = colorClasses[color] || colorClasses.blue;
+
+    return (
+        <div className="flex items-center gap-2 overflow-hidden py-1 px-1 select-none transition-all duration-300">
+             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                {label === 'L' ? 'Lesson' : 'Can-do'}
+             </div>
+            
+            <div className="flex gap-2 overflow-x-auto no-scrollbar items-center">
+                {items.map(([val, count]) => {
+                        const isActive = safeActive.includes(val);
+                        return (
+                            <button
+                                key={val}
+                                onClick={() => onToggle(val)}
+                                title={`${label === 'L' ? 'Lesson' : 'Can-do'} ${val} – ${count} words`}
+                                className={`
+                                    flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all whitespace-nowrap
+                                    ${isActive ? styles.active : styles.inactive}
+                                `}
+                            >
+                                <span>{label}{val}</span>
+                                <span className={`text-[10px] opacity-80 ${isActive ? 'bg-white/20 px-1 rounded' : 'text-slate-400 bg-slate-100 px-1 rounded'}`}>{count}</span>
+                                {isActive && <X size={10} className="ml-0.5 opacity-80 hover:opacity-100" />}
+                            </button>
+                        );
+                    })}
+            </div>
+        </div>
+    );
+};
+
 
 const useAnimatedCounter = (end, duration = 600) => {
   const [count, setCount] = useState(0);
@@ -113,32 +156,24 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
 
 const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFolderChange, onDeleteRequest, onEditModeToggle, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPracticeStart, onPlaylistStart, onImportOpen, setIsColumnManagerOpen, isSyncing, filteredData, onStartSmartPractice, trendData, suggestion, onApplySuggestion, onRefresh, onShuffle }) => {
   const animatedCount = useAnimatedCounter(filteredData.length);
-  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(true);
+  // const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(true); // REMOVED
   
+  const [showChipPanel, setShowChipPanel] = useState(true);
+
   const lessonCounts = useMemo(() => {
     const counts = {};
-    filteredData.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
+    // Use vocabList (context data) instead of filteredData to keep valid options visible even when filtered
+    vocabList.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
     return Object.entries(counts).sort((a, b) => (parseInt(a[0]) || 999) - (parseInt(b[0]) || 999));
-  }, [filteredData]);
+  }, [vocabList]);
 
   const candoCounts = useMemo(() => {
     const counts = {};
-    filteredData.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
+    vocabList.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
     return Object.entries(counts).sort();
-  }, [filteredData]);
+  }, [vocabList]);
 
-  const toggleCando = (c) => { 
-      // Toggle logic for quick filter buttons in analytics
-      // If current filter is list containing only this C... toggle off to All?
-      // Or if current filter is All... toggle to this C.
-      // Let's say: clicking a Cando chip sets the filter to JUST that Cando (exclusive)
-      // If already just that Cando, reset to All.
-      const current = filters.cando || [];
-      const isJustThis = Array.isArray(current) && current.length === 1 && current[0] === c;
-      
-      if (isJustThis) onFilterChange({...filters, cando: []}); // Reset to all
-      else onFilterChange({...filters, cando: [c]}); // Set to just this
-  };
+
 
   return (
     <div className="bg-white border-b border-slate-200 flex flex-col flex-shrink-0 z-20 shadow-sm sticky top-0">
@@ -152,87 +187,121 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
                {hasUnsavedChanges && !isSyncing && <span className="flex items-center gap-1 text-xs font-bold text-red-600 animate-pulse"><div className="w-2 h-2 bg-red-600 rounded-full"></div> Unsaved Changes</span>}
                {isEditMode && <span className="flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200"><PenTool size={12}/> EDIT MODE</span>}
                <div className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">Showing <span className="font-bold text-indigo-600">{animatedCount}</span> of {vocabList.length}</div>
+               <button 
+                    onClick={() => setShowChipPanel(prev => !prev)}
+                    className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider hover:text-slate-600 transition-colors focus:outline-none"
+                    title={showChipPanel ? "Hide Filter Chips" : "Show Filter Chips"}
+                >
+                    {showChipPanel ? <ChevronDown size={12}/> : <ArrowRight size={12}/>} Chips
+                </button>
            </div>
        </div>
 
-       {isAnalyticsOpen && (
-           <div className="flex flex-col sm:flex-row gap-4 p-3 bg-slate-50/50 text-xs border-b border-slate-100 items-start overflow-x-auto">
-               <div className="flex flex-col gap-2 min-w-max">
-                   <span className="font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1"><TrendingUp size={12}/> 7-Day Trend</span>
-                   <ProgressTrendChart data={trendData} />
-               </div>
-               <div className="w-px bg-slate-200 self-stretch mx-2"></div>
-               {suggestion && (
-                   <>
-                       <WeaknessCard suggestion={suggestion} onApply={() => onApplySuggestion(suggestion)} />
-                       <div className="w-px bg-slate-200 self-stretch mx-2"></div>
-                   </>
-               )}
-               <div className="flex flex-col gap-2 flex-1 min-w-[200px]">
-                   <div className="flex gap-2 overflow-x-auto pb-1">
-                       {lessonCounts.map(([lesson, count]) => ( <span key={lesson} className="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-mono">L{lesson}:<span className="font-bold text-indigo-600 ml-0.5">{count}</span></span> ))}
-                   </div>
-                   <div className="flex gap-2 overflow-x-auto pb-1">
-                        {candoCounts.map(([cando, count]) => {
-                             const isSelected = Array.isArray(filters.cando) && filters.cando.includes(cando) && filters.cando.length === 1;
-                             return ( <button key={cando} onClick={() => toggleCando(cando)} className={`px-2 py-0.5 rounded border font-mono transition-all ${isSelected ? 'bg-indigo-100 text-indigo-700 border-indigo-300 ring-1 ring-indigo-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}>C{cando}:<span className="font-bold ml-0.5">{count}</span></button> );
-                        })}
-                   </div>
-               </div>
+       {/* CHIPS AREA - GLOBAL TOGGLE */}
+       {showChipPanel && (
+           <div className="flex flex-col gap-1 p-2 bg-slate-50/50 border-b border-slate-100 overflow-hidden animate-in slide-in-from-top-2 duration-300">
+               {/* Lesson Chips */}
+               <FilterChipBar 
+                   label="L" 
+                   items={lessonCounts} 
+                   activeValues={filters.lesson} 
+                   onToggle={(val) => {
+                       const curr = filters.lesson || [];
+                       const isSelected = curr.includes(val);
+                       let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val];
+                       onFilterChange({...filters, lesson: newVals});
+                   }}
+                   color="blue"
+               />
+               {/* Cando Chips */}
+               <FilterChipBar 
+                   label="C" 
+                   items={candoCounts} 
+                   activeValues={filters.cando} 
+                   onToggle={(val) => {
+                       const curr = filters.cando || [];
+                       const isSelected = curr.includes(val);
+                       let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val];
+                       onFilterChange({...filters, cando: newVals});
+                   }}
+                   color="indigo"
+               />
            </div>
        )}
 
-       <div className="p-2 grid grid-cols-1 lg:grid-cols-4 gap-2 items-center">
-            <div className="flex gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
-                <MultiSelectDropdown 
-                    label="Lesson" 
-                    options={[...new Set(vocabList.map(v => String(v.lesson)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} 
-                    selectedValues={filters.lesson} 
-                    onChange={(val) => onFilterChange({...filters, lesson: val})} 
-                />
-                <MultiSelectDropdown 
-                    label="Can-do" 
-                    options={[...new Set(vocabList.map(v => String(v.cando)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} 
-                    selectedValues={filters.cando} 
-                    onChange={(val) => onFilterChange({...filters, cando: val})} 
-                />
+
+
+       {/* UNIFIED CONTROLS TOOLBAR */}
+       <div className="p-2 flex flex-wrap items-center gap-2 bg-white sticky top-[48px] z-10">
+            {/* Filter Group */}
+             <div className="flex gap-2">
+                 <MultiSelectDropdown 
+                     label="Lesson" 
+                     options={[...new Set(vocabList.map(v => String(v.lesson)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} 
+                     selectedValues={filters.lesson} 
+                     onChange={(val) => onFilterChange({...filters, lesson: val})} 
+                 />
+                 <MultiSelectDropdown 
+                     label="Can-do" 
+                     options={[...new Set(vocabList.map(v => String(v.cando)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} 
+                     selectedValues={filters.cando} 
+                     onChange={(val) => onFilterChange({...filters, cando: val})} 
+                 />
             </div>
-           <div className="flex gap-1 items-center justify-center bg-slate-50 p-1.5 rounded-lg border border-slate-200">
-               <button onClick={() => onVisibilityToggle('bangla')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold border transition-all ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>{hiddenColumns.bangla ? <EyeOff size={12}/> : <Eye size={12}/>} BN</button>
-               <button onClick={() => onVisibilityToggle('japanese')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold border transition-all ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>{hiddenColumns.japanese ? <EyeOff size={12}/> : <Eye size={12}/>} JP</button>
-               <button onClick={() => onVisibilityToggle('kanji')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold border transition-all ${hiddenColumns.kanji ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>{hiddenColumns.kanji ? <EyeOff size={12}/> : <Eye size={12}/>} KN</button>
-           </div>
-           <div className="flex gap-1 items-center justify-center bg-slate-50 p-1.5 rounded-lg border border-slate-200">
-               <button onClick={() => onViewModeChange('problem')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-xs font-bold transition-all ${viewMode === 'problem' ? 'bg-red-100 text-red-600 border border-red-200' : 'text-slate-500 hover:bg-slate-200'}`}><AlertCircle size={14}/> Prob</button>
-               <button onClick={() => onViewModeChange('weak')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-xs font-bold transition-all ${viewMode === 'weak' ? 'bg-orange-100 text-orange-600 border border-orange-200' : 'text-slate-500 hover:bg-slate-200'}`}><Flame size={14}/> Weak</button>
-               <button onClick={() => setIsAnalyticsOpen(!isAnalyticsOpen)} className={`flex items-center gap-1 px-3 py-1.5 rounded text-xs font-bold transition-all ${isAnalyticsOpen ? 'bg-indigo-100 text-indigo-600 border-indigo-200' : 'text-slate-500 hover:bg-slate-200'}`}><BarChart2 size={14}/> Stats</button>
-           </div>
-           <div className="flex gap-1 items-center justify-end">
-               {isEditMode ? (
-                   <>
-                       <button onClick={onDiscard} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"><Undo size={14}/> Discard</button>
-                       <button onClick={onSave} disabled={!hasUnsavedChanges || isSyncing} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold shadow-sm transition-all ${hasUnsavedChanges ? 'bg-green-600 text-white hover:bg-green-700 animate-pulse' : 'bg-slate-100 text-slate-400'} disabled:opacity-50`}><SaveIcon size={14}/> Save</button>
-                   </>
-               ) : (
-                   <button onClick={onEditModeToggle} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm text-xs font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"><Lock size={14}/> Locked</button>
-               )}
-               {!isEditMode && (
-                   <>
-                       <button onClick={onPlaylistStart} disabled={isSyncing} className="flex items-center gap-1 px-3 py-2 bg-slate-800 text-white rounded-lg shadow text-xs font-bold hover:bg-slate-900 disabled:opacity-50"><Play size={14}/></button>
-                   </>
-               )}
-               {/* New Refresh Button */}
-                <button onClick={onRefresh} disabled={isSyncing || isEditMode} className="flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors" title="Refresh Data">
-                    <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
+
+            <div className="w-px h-6 bg-slate-100 mx-1"></div>
+
+            {/* Language Toggles */}
+            <div className="flex gap-1 items-center">
+                <button onClick={() => onVisibilityToggle('bangla')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold border transition-all ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>{hiddenColumns.bangla ? <EyeOff size={12}/> : <Eye size={12}/>} BN</button>
+                <button onClick={() => onVisibilityToggle('japanese')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold border transition-all ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>{hiddenColumns.japanese ? <EyeOff size={12}/> : <Eye size={12}/>} JP</button>
+                 <button onClick={() => onVisibilityToggle('kanji')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold border transition-all ${hiddenColumns.kanji ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>{hiddenColumns.kanji ? <EyeOff size={12}/> : <Eye size={12}/>} KN</button>
+            </div>
+
+            <div className="w-px h-6 bg-slate-100 mx-1"></div>
+
+            {/* View Modes */}
+            <div className="flex gap-1 items-center">
+                <button onClick={() => onViewModeChange('problem')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-xs font-bold transition-all ${viewMode === 'problem' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}><AlertCircle size={14}/> Marked</button>
+                <div className="w-px h-4 bg-slate-200 mx-1"></div>
+                <button 
+                    onClick={() => setShowChipPanel(!showChipPanel)} 
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded text-xs font-bold transition-all border ${showChipPanel ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                    title={showChipPanel ? "Hide Chips Panel" : "Show Chips Panel"}
+                >
+                    {showChipPanel ? <ChevronDown size={14}/> : <ArrowRight size={14}/>} Chips
                 </button>
-                <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors" title="Manage Columns">
-                    <SettingsIcon size={14}/> Cols
-                </button>
-                <button onClick={onShuffle} disabled={isSyncing} className="flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors" title="Randomize Order">
-                    <Sparkles size={14} className="text-purple-500"/> Shuffle
-                </button>
-               {isEditMode && <button onClick={onImportOpen} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-xs font-bold disabled:opacity-50"><Grid size={14}/> Import</button>}
-           </div>
+            </div>
+            
+            <div className="flex-grow"></div>
+
+            {/* Actions Group */}
+            <div className="flex gap-1 items-center justify-end">
+                {isEditMode ? (
+                    <>
+                        <button onClick={onDiscard} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"><Undo size={14}/> Discard</button>
+                        <button onClick={onSave} disabled={!hasUnsavedChanges || isSyncing} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold shadow-sm transition-all ${hasUnsavedChanges ? 'bg-green-600 text-white hover:bg-green-700 animate-pulse' : 'bg-slate-100 text-slate-400'} disabled:opacity-50`}><SaveIcon size={14}/> Save</button>
+                    </>
+                ) : (
+                    <button onClick={onEditModeToggle} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm text-xs font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"><Lock size={14}/> Locked</button>
+                )}
+                {!isEditMode && (
+                    <>
+                        <button onClick={onPlaylistStart} disabled={isSyncing} className="flex items-center gap-1 px-3 py-2 bg-slate-800 text-white rounded-lg shadow text-xs font-bold hover:bg-slate-900 disabled:opacity-50"><Play size={14}/></button>
+                    </>
+                )}
+                {/* New Refresh Button */}
+                 <button onClick={onRefresh} disabled={isSyncing || isEditMode} className="flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors" title="Refresh Data">
+                     <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
+                 </button>
+                 <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors" title="Manage Columns">
+                     <SettingsIcon size={14}/> Cols
+                 </button>
+                 <button onClick={onShuffle} disabled={isSyncing} className="flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors" title="Randomize Order">
+                     <Sparkles size={14} className="text-purple-500"/> Shuffle
+                 </button>
+                {isEditMode && <button onClick={onImportOpen} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-xs font-bold disabled:opacity-50"><Grid size={14}/> Import</button>}
+            </div>
        </div>
     </div>
   );

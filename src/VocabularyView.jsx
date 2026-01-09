@@ -87,17 +87,15 @@ function VocabularyView({
   // --- ORDER & VISIBILITY ---
   useEffect(() => {
       setColumnOrder(prev => {
-          // Logic Updated: Do NOT filter out missing IDs from 'prev' generally (to fix race condition).
-          // BUT: Explicitly remove columns that we permanently deleted from the system.
-          const removedKeys = new Set(['mistakes', 'confidence', 'lastPracticed', 'delete']);
-          const cleanPrev = (prev || []).filter(id => !removedKeys.has(id));
+          // Logic Updated: Clean prev
+          const cleanPrev = (prev || []); 
 
           const existingSet = new Set(cleanPrev);
           const newColumns = allColumns
               .filter(c => !existingSet.has(c.id))
               .map(c => c.id);
               
-          // Keep saved order (minus deleted ones), append ANY new ones found
+          // Keep saved order, append ANY new ones found
           return [...cleanPrev, ...newColumns];
       });
   }, [allColumns]);
@@ -120,8 +118,8 @@ function VocabularyView({
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [practiceModeActive, setPracticeModeActive] = useState(false);
   
-  const practiceSnapshot = useRef([]); 
-  const practiceUpdates = useRef([]); 
+  // const practiceSnapshot = useRef([]); 
+  // const practiceUpdates = useRef([]); 
 
   const [importModalOpen, setImportModalOpen] = useState(false);
   
@@ -202,12 +200,16 @@ function VocabularyView({
 
   const startPractice = (mode = 'standard') => {
     let queue = filteredAndSortedData;
-    if (mode === 'smart') queue = queue.filter(v => v.mistakes > 2 || v.confidence < 60 || v.isMarked);
+    // if (mode === 'smart') queue = queue.filter(v => v.mistakes > 2 || v.confidence < 60 || v.isMarked); // REMOVED SMART LOGIC (Stats are gone)
+    // Fallback to Marked Only if 'smart' is requested? Or just random?
+    // Let's assume 'smart' now just means 'shuffle' or 'isMarked'. 
+    if (mode === 'smart') queue = queue.filter(v => v.isMarked);
+    
     if (queue.length === 0) queue = filteredAndSortedData.slice(0, 10);
     if (queue.length === 0) { showToast('No words to practice!', 'error'); return; }
     
-    practiceSnapshot.current = [...vocabList]; 
-    practiceUpdates.current = []; 
+    // practiceSnapshot.current = [...vocabList]; // No longer needed for diffing stats
+    // practiceUpdates.current = []; // No longer needed
 
     setPracticeQueue([...queue].sort(() => Math.random() - 0.5));
     setCurrentCardIndex(0); setPracticeModeActive(true);
@@ -237,12 +239,15 @@ function VocabularyView({
 
   const handleStartSmartPractice = () => attemptAction(() => {
       const problemItems = vocabList.filter(v => v.isMarked);
-      const weakItems = vocabList.filter(v => v.mistakes >= 2 || v.confidence < 50);
-      const others = vocabList.filter(v => !v.isMarked && v.confidence >= 50);
+      // const weakItems = vocabList.filter(v => v.mistakes >= 2 || v.confidence < 50); // REMOVED
+      // const others = vocabList.filter(v => !v.isMarked && v.confidence >= 50); // REMOVED using confidence
+      // Just shuffle marked + random others
       const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
-      let queue = [...shuffle(problemItems).slice(0, 10), ...shuffle(weakItems).slice(0, 5), ...shuffle(others).slice(0, 5)];
+      
+      let queue = [...shuffle(problemItems).slice(0, 15), ...shuffle(vocabList.filter(v => !v.isMarked)).slice(0, 5)]; 
       if (queue.length === 0) queue = shuffle(vocabList).slice(0, 20);
-      practiceSnapshot.current = [...vocabList]; practiceUpdates.current = [];
+      
+      // practiceSnapshot.current = [...vocabList]; practiceUpdates.current = [];
       setPracticeQueue(queue); setCurrentCardIndex(0); setPracticeModeActive(true);
   });
 
@@ -299,7 +304,7 @@ function VocabularyView({
     }
   }, [isEditMode, vocabList, apiService, setVocabList, showToast]);
 
-  const finishPractice = async () => { setPracticeModeActive(false); if(practiceUpdates.current.length > 0) { setIsSyncing(true); try { await apiService.sendUpdate(practiceUpdates.current); showToast("Saved!", "success"); } catch(e) { console.error(e); setVocabList(practiceSnapshot.current); showToast("Save Failed", "error"); } finally { setIsSyncing(false); }}};
+  const finishPractice = async () => { setPracticeModeActive(false); }; // Removed saving logic
   const requestDelete = useCallback((type, id, name) => { if(!isEditMode && type !== 'folder') return; setDeleteModal({ open: true, type, targetId: id, targetName: name }); }, [isEditMode]);
   const executeDelete = async () => { if(isEditMode) { if(deleteModal.type === 'single') setDraftVocabList(p => p.filter(v => v.localId !== deleteModal.targetId)); else { setDraftVocabList(p => p.filter(v => !selectedIds.has(v.localId))); setSelectedIds(new Set()); } setHasUnsavedChanges(true); } setDeleteModal({ open: false, type: null, targetId: null, targetName: '' }); };
   const toggleSelection = useCallback((id) => { setSelectedIds(prev => { const s = new Set(prev); if(s.has(id)) s.delete(id); else s.add(id); return s; }); }, []);
@@ -394,12 +399,14 @@ function VocabularyView({
   };
 
   const nextCard = (isEasy) => { 
-      const card = practiceQueue[currentCardIndex]; 
-      const newConf = isEasy ? Math.min(100, card.confidence + 10) : Math.max(0, card.confidence - 15); 
-      const newMistakes = isEasy ? card.mistakes : card.mistakes + 1; 
-      const today = new Date().toISOString().split('T')[0]; 
-      setVocabList(p => p.map(v => v.localId === card.localId ? { ...v, confidence: newConf, mistakes: newMistakes, last_practiced: today } : v)); 
-      if(card.id) practiceUpdates.current.push({ id: card.id, confidence: newConf, mistake_count: newMistakes, last_practiced: today }); 
+      // Removed stats update logic
+      // const card = practiceQueue[currentCardIndex]; 
+      // const newConf = isEasy ? Math.min(100, card.confidence + 10) : Math.max(0, card.confidence - 15); 
+      // const newMistakes = isEasy ? card.mistakes : card.mistakes + 1; 
+      // const today = new Date().toISOString().split('T')[0]; 
+      // setVocabList(p => p.map(v => v.localId === card.localId ? { ...v, confidence: newConf, mistakes: newMistakes, last_practiced: today } : v)); 
+      // if(card.id) practiceUpdates.current.push({ id: card.id, confidence: newConf, mistake_count: newMistakes, last_practiced: today }); 
+      
       if(currentCardIndex < practiceQueue.length - 1) { setCurrentCardIndex(p => p + 1); } else finishPractice(); 
   };
 

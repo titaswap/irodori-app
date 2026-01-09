@@ -35,7 +35,7 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         }
 
         if (viewMode === 'problem') data = data.filter(i => i.isMarked);
-        else if (viewMode === 'weak') data = data.filter(i => i.confidence < 60 || i.mistakes >= 3);
+        else if (viewMode === 'weak') data = data.filter(i => i.isMarked); // Stats removed, fallback to marked
 
         if (sortConfig.key === 'random') {
             // Fisher-Yates Shuffle
@@ -55,29 +55,19 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
     }, [safeDataList, currentFolderId, searchTerm, filters, sortConfig, viewMode]);
 
     const trendData = useMemo(() => {
+        // Stats removed, return safe defaults
         if (!vocabList || !Array.isArray(vocabList)) return [];
-
         const today = new Date();
-        const last7Days = Array.from({ length: 7 }, (_, i) => {
+        return Array.from({ length: 7 }, (_, i) => {
             const d = new Date(today);
             d.setDate(today.getDate() - (6 - i));
-            return d.toISOString().split('T')[0];
-        });
-        return last7Days.map(date => {
-            const practicedItems = vocabList.filter(v => v.last_practiced && v.last_practiced.startsWith(date));
-            let score = 0; let hasActivity = practicedItems.length > 0;
-            if (hasActivity) {
-                const avgConf = practicedItems.reduce((sum, v) => sum + (v.confidence || 0), 0) / practicedItems.length;
-                const avgMistakes = practicedItems.reduce((sum, v) => sum + (v.mistakes || 0), 0) / practicedItems.length;
-                score = Math.max(0, avgConf - (avgMistakes * 10));
-            }
-            return { date, score, hasActivity };
+            return { date: d.toISOString().split('T')[0], score: 0, hasActivity: false };
         });
     }, [vocabList]);
 
     const weaknessSuggestion = useMemo(() => {
         if (!vocabList || !Array.isArray(vocabList)) return null;
-        const weakItems = vocabList.filter(v => v.confidence < 60 || v.mistakes >= 3 || v.isMarked);
+        const weakItems = vocabList.filter(v => v.isMarked); // Stats removed
         if (weakItems.length === 0) return null;
         const grouping = {};
         weakItems.forEach(item => {

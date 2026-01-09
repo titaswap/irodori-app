@@ -433,9 +433,21 @@ function VocabularyView({
     <div className="flex h-screen w-full bg-slate-100 font-sans text-slate-800 overflow-hidden">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       
-      <Sidebar folders={folders} currentFolderId={currentFolderId} handleFolderChange={handleFolderChange} />
-      
+      {/* Sidebar: Hidden on mobile, visible on desktop */}
+      <div className="hidden md:flex h-full flex-shrink-0">
+          <Sidebar folders={folders} currentFolderId={currentFolderId} handleFolderChange={handleFolderChange} />
+      </div>
+
       <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
+         {/* MOBILE HEADER (Visible only on mobile) */}
+         <div className="md:hidden bg-slate-900 text-white p-4 flex items-center justify-between shadow-md z-20">
+             <div className="flex items-center gap-3">
+                 <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg">あ</div>
+                 <span className="font-bold text-lg">Irodori<span className="text-indigo-400">AI</span></span>
+             </div>
+             <button className="p-1"><div className="space-y-1.5"><div className="w-6 h-0.5 bg-white"></div><div className="w-6 h-0.5 bg-white"></div><div className="w-6 h-0.5 bg-white"></div></div></button>
+         </div>
+
          <AdvancedToolbar 
             currentFolderId={currentFolderId} folders={folders} vocabList={contextData} selectedIds={selectedIds} isEditMode={isEditMode} hasUnsavedChanges={hasUnsavedChanges} filters={filters} hiddenColumns={hiddenColumns} viewMode={viewMode}
             onFolderChange={handleFolderChange} onDeleteRequest={requestDelete} onEditModeToggle={() => setEditConfirmationOpen(true)} onFilterChange={handleFilterChange} onViewModeChange={handleViewModeChange} onVisibilityToggle={toggleGlobalVisibility}

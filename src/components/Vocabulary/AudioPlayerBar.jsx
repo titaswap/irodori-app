@@ -24,7 +24,7 @@ const AudioPlayerBar = ({
   if (!currentItem) return null;
 
   return (
-      <div className="fixed bottom-0 right-0 left-16 lg:left-64 bg-white/95 backdrop-blur-sm border-t border-slate-200 h-20 flex items-center justify-between px-6 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] z-50 transition-transform duration-300">
+      <div className="w-full bg-white/95 backdrop-blur-sm border-t border-slate-200 h-20 flex items-center justify-between px-6 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] z-50 transition-transform duration-300">
           <div className="flex items-center gap-4 w-1/4">
               <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600 hidden md:block"><Layers size={24}/></div>
               <div className="overflow-hidden">

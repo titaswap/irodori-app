@@ -58,6 +58,7 @@ function VocabularyView({
   const [columnWidths, setColumnWidths] = useState(() => preferenceStore.loadPreferences().columnWidths);
   
   const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     preferenceStore.savePreferences({ columnWidths });
@@ -438,14 +439,31 @@ function VocabularyView({
           <Sidebar folders={folders} currentFolderId={currentFolderId} handleFolderChange={handleFolderChange} />
       </div>
 
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+          <div className="fixed inset-0 z-[100] md:hidden">
+              <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsMobileSidebarOpen(false)}></div>
+              <div className="absolute left-0 top-0 bottom-0 w-64 bg-slate-900 shadow-2xl animate-in slide-in-from-left duration-200">
+                  <Sidebar folders={folders} currentFolderId={currentFolderId} handleFolderChange={(id) => { handleFolderChange(id); setIsMobileSidebarOpen(false); }} isMobile={true} />
+              </div>
+          </div>
+      )}
+
       <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
-         {/* MOBILE HEADER (Visible only on mobile) */}
-         <div className="md:hidden bg-slate-900 text-white p-4 flex items-center justify-between shadow-md z-20">
-             <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg">あ</div>
-                 <span className="font-bold text-lg">Irodori<span className="text-indigo-400">AI</span></span>
+         {/* HEADER (Visible on all screens) */}
+         <div className="bg-slate-900 text-white px-3 py-1.5 flex items-center justify-between shadow-md z-20 h-11 shrink-0">
+             <div className="flex items-center gap-2">
+                 <div className="w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg">あ</div>
+                 <span className="font-bold text-base tracking-tight leading-none">Irodori<span className="text-indigo-400">AI</span></span>
              </div>
-             <button className="p-1"><div className="space-y-1.5"><div className="w-6 h-0.5 bg-white"></div><div className="w-6 h-0.5 bg-white"></div><div className="w-6 h-0.5 bg-white"></div></div></button>
+             
+             <div className="flex items-center gap-2">
+                <div className="text-[10px] text-slate-300 font-mono text-right leading-none flex flex-col gap-0.5">
+                    <div className="font-bold text-white max-w-[100px] truncate">{currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}</div>
+                    <div className="opacity-80">{filteredAndSortedData.length} / {vocabList.length}</div>
+                </div>
+                <button onClick={() => setIsMobileSidebarOpen(true)} className="md:hidden p-1 -mr-1"><div className="space-y-[3px]"><div className="w-4 h-0.5 bg-white rounded-full"></div><div className="w-4 h-0.5 bg-white rounded-full"></div><div className="w-4 h-0.5 bg-white rounded-full"></div></div></button>
+             </div>
          </div>
 
          <AdvancedToolbar 
@@ -453,6 +471,7 @@ function VocabularyView({
             onFolderChange={handleFolderChange} onDeleteRequest={requestDelete} onEditModeToggle={() => setEditConfirmationOpen(true)} onFilterChange={handleFilterChange} onViewModeChange={handleViewModeChange} onVisibilityToggle={toggleGlobalVisibility}
             onSave={saveChanges} onDiscard={discardChanges} onPracticeStart={handlePracticeStart} onPlaylistStart={handlePlaylistStart} onImportOpen={() => setImportModalOpen(true)} setIsColumnManagerOpen={setIsColumnManagerOpen} isSyncing={isSyncing}
             filteredData={filteredAndSortedData} onStartSmartPractice={handleStartSmartPractice} trendData={trendData} suggestion={weaknessSuggestion} onApplySuggestion={handleApplySuggestion} onRefresh={handleRefresh} onShuffle={handleShuffle}
+            isPlaying={isPlaying} onTogglePlay={togglePlayPause}
          />
          
          <div 
@@ -527,6 +546,7 @@ function VocabularyView({
                 onCycleSpeed={() => setAudioConfig(p => ({...p, speed: p.speed === 1 ? 1.5 : 1}))} 
                 onToggleBangla={() => setAudioConfig(p => ({...p, includeBangla: !p.includeBangla}))}
                 onHide={() => setIsAudioBarManuallyHidden(true)}
+                onToggleMark={toggleMark}
              />
          )}
 

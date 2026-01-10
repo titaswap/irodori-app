@@ -19,7 +19,7 @@ const DynamicHeader = ({
   // hidden check
   if (columnVisibility[colId] === false) return null;
 
-  const isFixed =
+         const isFixed =
     def.fixed ||
     def.id === 'selection' ||
     def.id === 'delete';
@@ -83,7 +83,7 @@ const DynamicHeader = ({
       data-col-id={colId}
       className={`
         relative
-        px-3 py-3
+        px-2 py-2
         bg-slate-50
         border-b border-r border-slate-200
         text-xs font-bold uppercase tracking-wider

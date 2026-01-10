@@ -20,12 +20,13 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' })
     const styles = colorClasses[color] || colorClasses.blue;
 
     return (
-        <div className="flex items-center gap-2 overflow-hidden py-1 px-1 select-none transition-all duration-300">
-             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+        <div className="flex items-center gap-2 overflow-hidden px-1 select-none transition-all duration-300 h-7 border-b border-transparent">
+             <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mr-0.5 w-[50px] shrink-0 text-right">
                 {label === 'L' ? 'Lesson' : 'Can-do'}
              </div>
             
-            <div className="flex gap-2 overflow-x-auto no-scrollbar items-center">
+            <div className="flex gap-1 overflow-x-auto items-center h-full no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{` .no-scrollbar::-webkit-scrollbar { display: none; } `}</style>
                 {items.map(([val, count]) => {
                         const isActive = safeActive.includes(val);
                         return (
@@ -34,12 +35,12 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' })
                                 onClick={() => onToggle(val)}
                                 title={`${label === 'L' ? 'Lesson' : 'Can-do'} ${val} – ${count} words`}
                                 className={`
-                                    flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all whitespace-nowrap
+                                    flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all whitespace-nowrap border shrink-0
                                     ${isActive ? styles.active : styles.inactive}
                                 `}
                             >
                                 <span>{label}{val}</span>
-                                <span className={`text-[10px] opacity-80 ${isActive ? 'bg-white/20 px-1 rounded' : 'text-slate-400 bg-slate-100 px-1 rounded'}`}>{count}</span>
+                                <span className={`text-[9px] opacity-70 ${isActive ? 'bg-white/20 px-1 rounded-[2px]' : 'text-slate-400 bg-slate-100 px-1 rounded-[2px]'}`}>{count}</span>
                                 {isActive && <X size={10} className="ml-0.5 opacity-80 hover:opacity-100" />}
                             </button>
                         );
@@ -76,15 +77,28 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = React.useRef(null);
 
+    const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+    const dropdownRef = React.useRef(null);
+
     React.useEffect(() => {
         const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
+            if (containerRef.current && !containerRef.current.contains(event.target) && (!dropdownRef.current || !dropdownRef.current.contains(event.target))) {
                 setIsOpen(false);
             }
         };
+        const handleScroll = (e) => { 
+            // If dragging scrollbar or scrolling inside dropdown, ignore
+            if (dropdownRef.current && dropdownRef.current.contains(e.target)) return;
+            if(isOpen) setIsOpen(false); 
+        };
+        
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        window.addEventListener('scroll', handleScroll, true); // Capture scroll to close
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('scroll', handleScroll, true);
+        };
+    }, [isOpen]);
 
     const toggleOption = (val) => {
         let newSelected;
@@ -105,7 +119,13 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     return (
         <div className="relative group flex-shrink-0" ref={containerRef}>
             <button 
-                onClick={() => setIsOpen(!isOpen)} 
+                onClick={(e) => { 
+                    if (!isOpen) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                    }
+                    setIsOpen(!isOpen); 
+                }}
                 title={`${label} Filter`}
                 className={`
                     flex items-center justify-center gap-2 appearance-none 
@@ -114,7 +134,7 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
                     rounded shadow-sm
                     focus:outline-none 
                     ${isOpen ? 'ring-2 ring-indigo-200' : ''}
-                    h-8 min-w-[36px] md:min-w-[120px] md:px-3 md:justify-between px-0
+                    h-8 min-w-[32px] md:min-w-[100px] md:px-2 md:justify-between px-0
                     ${!isAll 
                         ? 'bg-indigo-600 text-white border border-indigo-600 shadow-indigo-200' 
                         : 'bg-white text-slate-700 border border-slate-300 hover:border-indigo-400'
@@ -129,7 +149,11 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
                 <ChevronDown size={12} className={`hidden md:block transition-transform ${isOpen ? 'rotate-180' : ''} ${!isAll ? 'text-indigo-200' : 'text-slate-400'}`}/>
             </button>
             {isOpen && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-slate-200 z-50 max-h-64 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left">
+                <div 
+                    ref={dropdownRef}
+                    style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left }}
+                    className="w-48 bg-white rounded-lg shadow-xl border border-slate-200 z-[9999] max-h-64 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left"
+                >
                     <div 
                         onClick={() => { toggleAll(); setIsOpen(false); }}
                         className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-bold ${isAll ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
@@ -161,10 +185,10 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     );
 };
 
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFolderChange, onDeleteRequest, onEditModeToggle, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPracticeStart, onPlaylistStart, onImportOpen, setIsColumnManagerOpen, isSyncing, filteredData, onStartSmartPractice, trendData, suggestion, onApplySuggestion, onRefresh, onShuffle }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFolderChange, onDeleteRequest, onEditModeToggle, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPracticeStart, onPlaylistStart, onImportOpen, setIsColumnManagerOpen, isSyncing, filteredData, onStartSmartPractice, trendData, suggestion, onApplySuggestion, onRefresh, onShuffle, isPlaying, onTogglePlay }) => {
   const animatedCount = useAnimatedCounter(filteredData.length);
   
-  const [showChipPanel, setShowChipPanel] = useState(true);
+  const [showChipPanel, setShowChipPanel] = useState(false);
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
   
   const containerRef = React.useRef(null);
@@ -236,29 +260,22 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
 
   return (
     <div className="bg-white border-b border-slate-200 flex flex-col flex-shrink-0 z-20 shadow-sm sticky top-0 max-w-[100vw]">
-       <div className="h-12 border-b border-slate-100 flex items-center px-4 justify-between bg-slate-50/50">
-           <div className="flex items-center text-sm font-medium text-slate-500">
-               <button onClick={() => onFolderChange('root')} className="hover:text-blue-600 flex items-center gap-1"><Folder size={14} className="fill-slate-400 text-slate-400"/> My Drive</button>
-               {currentFolderId !== 'root' && folders.find(f => f.id === currentFolderId) && <><span className="mx-2 text-slate-300">/</span><span className="text-slate-800 font-bold flex items-center gap-1"><Folder size={14} className="fill-yellow-400 text-yellow-500"/>{folders.find(f => f.id === currentFolderId).name}</span></>}
-           </div>
-           <div className="flex items-center gap-4">
-               {isSyncing && <span className="flex items-center gap-1 text-xs font-bold text-blue-600 animate-pulse"><Loader size={12} className="animate-spin"/> Syncing...</span>}
-               {hasUnsavedChanges && !isSyncing && <span className="flex items-center gap-1 text-xs font-bold text-red-600 animate-pulse"><div className="w-2 h-2 bg-red-600 rounded-full"></div> Unsaved Changes</span>}
-               {isEditMode && <span className="flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200"><PenTool size={12}/> EDIT MODE</span>}
-               <div className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">Showing <span className="font-bold text-indigo-600">{animatedCount}</span> of {vocabList.length}</div>
-           </div>
-       </div>
+
 
        {showChipPanel && (
-           <div className="flex flex-col gap-1 p-2 bg-slate-50/50 border-b border-slate-100 overflow-hidden animate-in slide-in-from-top-2 duration-300">
+           <div className="flex flex-col gap-0.5 p-0.5 bg-slate-50/50 border-b border-slate-100 overflow-hidden animate-in slide-in-from-top-2 duration-300">
                <FilterChipBar label="L" items={lessonCounts} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({...filters, lesson: newVals}); }} color="blue" />
                <FilterChipBar label="C" items={candoCounts} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({...filters, cando: newVals}); }} color="indigo" />
            </div>
        )}
 
-       <div className="bg-white sticky top-[48px] z-10 border-b border-slate-200 shadow-sm max-w-[100vw]">
-            <div ref={containerRef} className="flex items-center gap-1 md:gap-2 p-2 overflow-x-auto no-scrollbar">
-                 <div className="flex gap-1 md:gap-2">
+       <div className="bg-white z-10 border-b border-slate-200 shadow-sm max-w-[100vw]">
+            <div ref={containerRef} className="flex items-center gap-1 p-1 overflow-x-auto no-scrollbar">
+                 {/* Status Indicators (Folder Nav removed) */}
+                 {isSyncing && <Loader size={12} className="text-blue-600 animate-spin mr-2 flex-shrink-0"/>}
+                 {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
+
+                 <div className="flex gap-1">
                      <MultiSelectDropdown label="Lesson" options={[...new Set(vocabList.map(v => String(v.lesson)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({...filters, lesson: val})} />
                      <MultiSelectDropdown label="Can-do" options={[...new Set(vocabList.map(v => String(v.cando)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} selectedValues={filters.cando} onChange={(val) => onFilterChange({...filters, cando: val})} />
                  </div>
@@ -272,7 +289,16 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
                  
                  {!isEditMode && (
                     <>
-                        {showPlay && <button onClick={onPlaylistStart} disabled={isSyncing} className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-slate-800 text-white rounded-lg shadow hover:bg-slate-900 disabled:opacity-50" title="Start Playlist"><Play size={14}/></button>}
+                        {showPlay && (
+                            <button 
+                                onClick={isPlaying ? onTogglePlay : onPlaylistStart} 
+                                disabled={isSyncing} 
+                                className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg shadow-sm transition-colors disabled:opacity-50 ${isPlaying ? 'bg-slate-800 text-white hover:bg-slate-900' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`} 
+                                title={isPlaying ? "Pause" : "Start Playlist"}
+                            >
+                                {isPlaying ? <div className="flex gap-0.5"><div className="w-1 h-3 bg-current rounded-full"></div><div className="w-1 h-3 bg-current rounded-full"></div></div> : <Play size={14} className="ml-0.5"/>}
+                            </button>
+                        )}
                         {showShuffle && <button onClick={onShuffle} disabled={isSyncing} className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white border border-slate-200 text-purple-600 rounded-lg shadow-sm hover:bg-slate-50 disabled:opacity-50" title="Shuffle"><Shuffle size={14}/></button>}
                     </>
                  )}
@@ -286,15 +312,15 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
 
                  
                  {showLanguages && (
-                    <div className="hidden md:flex items-center gap-1 scale-90 origin-left">
-                        <button onClick={() => onVisibilityToggle('bangla')} className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>BN</button>
-                        <button onClick={() => onVisibilityToggle('japanese')} className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>JP</button>
-                        <button onClick={() => onVisibilityToggle('kanji')} className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.kanji ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>KN</button>
+                    <div className="hidden md:flex items-center gap-0.5 scale-90 origin-left">
+                        <button onClick={() => onVisibilityToggle('bangla')} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>BN</button>
+                        <button onClick={() => onVisibilityToggle('japanese')} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>JP</button>
+                        <button onClick={() => onVisibilityToggle('kanji')} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.kanji ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>KN</button>
                     </div>
                  )}
                  {/* Mobile version of languages in main bar if enabled */}
                   {showLanguages && (
-                    <div className="md:hidden flex items-center gap-1">
+                    <div className="md:hidden flex items-center gap-0.5">
                         <button onClick={() => onVisibilityToggle('bangla')} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-[10px] font-bold transition-colors ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>BN</button>
                         <button onClick={() => onVisibilityToggle('japanese')} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-[10px] font-bold transition-colors ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>JP</button>
                         <button onClick={() => onVisibilityToggle('kanji')} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-[10px] font-bold transition-colors ${hiddenColumns.kanji ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>KN</button>

@@ -52,7 +52,6 @@ const AudioPlayerBar = ({
               <div className="hidden md:block text-[9px] text-slate-400 font-mono tracking-widest uppercase ml-2">{currentIndex + 1} / {playbackQueue.length} • {audioConfig.repeatMode.toUpperCase()}</div>
           </div>
           <div className="flex items-center gap-2 w-1/4 justify-end min-w-0">
-              <button onClick={onToggleBangla} className={`px-2 py-1 rounded-[6px] text-[10px] font-bold border transition-all ${audioConfig.includeBangla ? 'bg-green-100 text-green-700 border-green-200' : 'bg-white text-slate-400 border-slate-200'}`} title="Bangla">BN</button>
               <div className="relative group shrink-0">
                   <select 
                       value={audioConfig.repeatPerItem} 

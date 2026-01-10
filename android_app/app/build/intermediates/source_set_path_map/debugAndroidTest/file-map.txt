@@ -1,0 +1,4 @@
+com.example.webapp.test.app-androidTest-0 E:\JFT\Irodori apps - Copy\android_app\app\build\generated\res\resValues\androidTest\debug
+com.example.webapp.test.app-mergeDebugAndroidTestResources-1 E:\JFT\Irodori apps - Copy\android_app\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.example.webapp.test.app-mergeDebugAndroidTestResources-2 E:\JFT\Irodori apps - Copy\android_app\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.example.webapp.test.app-merged_res-3 E:\JFT\Irodori apps - Copy\android_app\app\build\intermediates\merged_res\debugAndroidTest

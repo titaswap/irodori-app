@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import VocabularyView from './VocabularyView';
+import UpdateNotification from './components/UpdateNotification';
 import { mapToApp } from './utils/vocabularyUtils';
 import { fetchAllProgress } from './services/firestore/activityService';
 
@@ -183,21 +184,66 @@ function App() {
     }
   }, [vocabList]);
 
+  // Audio Unlock for Android WebView
+  useEffect(() => {
+      const unlockAudio = () => {
+          // 1. Resume AudioContext if it exists (Web Audio API)
+          if (window.AudioContext || window.webkitAudioContext) {
+              const AudioContext = window.AudioContext || window.webkitAudioContext;
+              const ctx = new AudioContext();
+              if (ctx.state === 'suspended') {
+                  ctx.resume().then(() => console.log('AudioContext resumed'));
+              }
+              // Play silent buffer to force-wake audio thread
+              const buffer = ctx.createBuffer(1, 1, 22050);
+              const source = ctx.createBufferSource();
+              source.buffer = buffer;
+              source.connect(ctx.destination);
+              source.start(0);
+          }
+          
+          // 2. Wake up SpeechSynthesis (Android quirks)
+          if (window.speechSynthesis) {
+              window.speechSynthesis.cancel();
+          }
+
+          console.log('Audio subsystem unlocked via user interaction');
+          
+          // Remove listeners once unlocked
+          document.removeEventListener('click', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
+          document.removeEventListener('keydown', unlockAudio);
+      };
+
+      document.addEventListener('click', unlockAudio);
+      document.addEventListener('touchstart', unlockAudio);
+      document.addEventListener('keydown', unlockAudio);
+
+      return () => {
+          document.removeEventListener('click', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
+          document.removeEventListener('keydown', unlockAudio);
+      };
+  }, []);
+
   return (
-    <VocabularyView 
-      vocabList={vocabList} 
-      setVocabList={setVocabList} 
-      folders={folders} 
-      setFolders={setFolders} 
-      currentFolderId={currentFolderId} 
-      setCurrentFolderId={setCurrentFolderId}
-      isLoading={isLoading} 
-      setIsLoading={setIsLoading} 
-      isSyncing={isSyncing} 
-      setIsSyncing={setIsSyncing}
-      apiService={apiService}
-      fetchSheetData={fetchSheetData}
-    />
+    <div className="relative h-screen w-screen overflow-hidden bg-[#1e1e1e]">
+        <UpdateNotification />
+        <VocabularyView 
+            vocabList={vocabList} 
+            setVocabList={setVocabList} 
+            folders={folders} 
+            setFolders={setFolders} 
+            currentFolderId={currentFolderId} 
+            setCurrentFolderId={setCurrentFolderId}
+            isLoading={isLoading} 
+            setIsLoading={setIsLoading} 
+            isSyncing={isSyncing} 
+            setIsSyncing={setIsSyncing}
+            apiService={apiService}
+            fetchSheetData={fetchSheetData}
+        />
+    </div>
   );
 }
 

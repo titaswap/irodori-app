@@ -24,6 +24,7 @@ import PaginationControls from './components/Vocabulary/PaginationControls';
 // --- HOOKS ---
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useVocabularyData } from './hooks/useVocabularyData';
+import { useResultStats } from './hooks/useResultStats';
 import { preferenceStore } from './utils/preferenceStore';
 import { updateProgress } from './services/firestore/activityService';
 
@@ -135,6 +136,9 @@ function VocabularyView({
   const { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
       vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList
   );
+
+  // --- STATS ---
+  const { showingCount, totalCount } = useResultStats(vocabList, filteredAndSortedData, currentFolderId);
 
   // --- PAGINATION STATE ---
   const [currentPage, setCurrentPage] = useState(1);
@@ -460,7 +464,7 @@ function VocabularyView({
              <div className="flex items-center gap-2">
                 <div className="text-[10px] text-slate-300 font-mono text-right leading-none flex flex-col gap-0.5">
                     <div className="font-bold text-white max-w-[100px] truncate">{currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}</div>
-                    <div className="opacity-80">{filteredAndSortedData.length} / {vocabList.length}</div>
+                    <div className="opacity-80">{showingCount} / {totalCount}</div>
                 </div>
                 <button onClick={() => setIsMobileSidebarOpen(true)} className="md:hidden p-1 -mr-1"><div className="space-y-[3px]"><div className="w-4 h-0.5 bg-white rounded-full"></div><div className="w-4 h-0.5 bg-white rounded-full"></div><div className="w-4 h-0.5 bg-white rounded-full"></div></div></button>
              </div>
@@ -472,6 +476,8 @@ function VocabularyView({
             onSave={saveChanges} onDiscard={discardChanges} onPracticeStart={handlePracticeStart} onPlaylistStart={handlePlaylistStart} onImportOpen={() => setImportModalOpen(true)} setIsColumnManagerOpen={setIsColumnManagerOpen} isSyncing={isSyncing}
             filteredData={filteredAndSortedData} onStartSmartPractice={handleStartSmartPractice} trendData={trendData} suggestion={weaknessSuggestion} onApplySuggestion={handleApplySuggestion} onRefresh={handleRefresh} onShuffle={handleShuffle}
             isPlaying={isPlaying} onTogglePlay={togglePlayPause}
+            showingCount={showingCount}
+            totalCount={totalCount}
          />
          
          <div 

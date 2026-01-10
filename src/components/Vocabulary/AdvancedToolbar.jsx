@@ -185,8 +185,8 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     );
 };
 
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFolderChange, onDeleteRequest, onEditModeToggle, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPracticeStart, onPlaylistStart, onImportOpen, setIsColumnManagerOpen, isSyncing, filteredData, onStartSmartPractice, trendData, suggestion, onApplySuggestion, onRefresh, onShuffle, isPlaying, onTogglePlay }) => {
-  const animatedCount = useAnimatedCounter(filteredData.length);
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFolderChange, onDeleteRequest, onEditModeToggle, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPracticeStart, onPlaylistStart, onImportOpen, setIsColumnManagerOpen, isSyncing, filteredData, onStartSmartPractice, trendData, suggestion, onApplySuggestion, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount }) => {
+  const animatedCount = useAnimatedCounter(showingCount !== undefined ? showingCount : filteredData.length);
   
   const [showChipPanel, setShowChipPanel] = useState(false);
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
@@ -351,7 +351,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
                      </div>
                      <div className="text-slate-300">|</div>
                      <div className="text-slate-600 font-medium">
-                        Showing <span className="text-slate-900 font-bold font-mono">{filteredData.length}</span> / <span className="font-mono">{vocabList.length}</span>
+                        Showing <span className="text-slate-900 font-bold font-mono">{showingCount !== undefined ? showingCount : filteredData.length}</span> / <span className="font-mono">{totalCount !== undefined ? totalCount : vocabList.length}</span>
                      </div>
                  </div>
 

@@ -260,8 +260,6 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
 
   return (
     <div className="bg-white border-b border-slate-200 flex flex-col flex-shrink-0 z-20 shadow-sm sticky top-0 max-w-[100vw]">
-
-
        {showChipPanel && (
            <div className="flex flex-col gap-0.5 p-0.5 bg-slate-50/50 border-b border-slate-100 overflow-hidden animate-in slide-in-from-top-2 duration-300">
                <FilterChipBar label="L" items={lessonCounts} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({...filters, lesson: newVals}); }} color="blue" />
@@ -279,6 +277,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
                      <MultiSelectDropdown label="Lesson" options={[...new Set(vocabList.map(v => String(v.lesson)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({...filters, lesson: val})} />
                      <MultiSelectDropdown label="Can-do" options={[...new Set(vocabList.map(v => String(v.cando)))].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0))} selectedValues={filters.cando} onChange={(val) => onFilterChange({...filters, cando: val})} />
                  </div>
+
                  <div className="w-px h-6 bg-slate-100 mx-1 flex-shrink-0"></div>
                  {showMarked && (
                     <button onClick={() => onViewModeChange('problem')} className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all whitespace-nowrap ${viewMode === 'problem' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`} title="Toggle Marked View">
@@ -345,49 +344,18 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isE
                         <SettingsIcon size={14}/>
                     </button>
                  )}
-                 <div className="w-px h-6 bg-slate-100 mx-1 flex-shrink-0"></div>
-                 <button onClick={() => setIsOverflowOpen(!isOverflowOpen)} className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border transition-all ${isOverflowOpen ? 'bg-slate-100 border-slate-300 text-slate-800' : 'bg-white border-slate-200 text-slate-500'}`}>
-                    {isOverflowOpen ? <X size={16}/> : <MoreVertical size={16}/>}
-                 </button>
+                 {/* Desktop Folder Info (Right aligned) */}
+                 <div className="hidden md:flex items-center gap-2 ml-auto mr-2 text-[11px] bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
+                     <div className="font-bold text-slate-700 max-w-[200px] truncate">
+                        {currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}
+                     </div>
+                     <div className="text-slate-300">|</div>
+                     <div className="text-slate-600 font-medium">
+                        Showing <span className="text-slate-900 font-bold font-mono">{filteredData.length}</span> / <span className="font-mono">{vocabList.length}</span>
+                     </div>
+                 </div>
+
             </div>
-
-            {isOverflowOpen && (
-                <div className="border-t border-slate-100 bg-slate-50 p-3 animate-in slide-in-from-top-2 shadow-inner">
-                    <div className="flex flex-wrap items-center justify-center gap-3 mb-3 pb-3 border-b border-slate-200">
-                        {!showChips && (
-                             <button onClick={() => { setShowChipPanel(!showChipPanel); setIsOverflowOpen(false); }} className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm text-xs font-bold justify-center min-w-[40px] ${showChipPanel ? 'bg-indigo-100 text-indigo-700' : 'bg-white border border-slate-200'}`}>
-                                <ArrowRight size={16} className={showChipPanel ? "rotate-90" : ""} /> Chips
-                             </button>
-                        )}
-                        {!showShuffle && !isEditMode && <button onClick={onShuffle} className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 text-purple-600 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 justify-center min-w-[40px]"><Shuffle size={16}/> Shuffle</button>}
-                        {!showPlay && !isEditMode && <button onClick={onPlaylistStart} className="flex items-center gap-2 px-3 py-2 bg-slate-800 text-white rounded-lg shadow text-xs font-bold hover:bg-slate-900 justify-center min-w-[40px]"><Play size={16}/> Play</button>}
-                        {!showMarked && <button onClick={() => onViewModeChange('problem')} className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm text-xs font-bold justify-center min-w-[40px] ${viewMode === 'problem' ? 'bg-red-100 text-red-600' : 'bg-white border border-slate-200'}`}><AlertCircle size={16}/> Marked</button>}
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                        {!showRefresh && (
-                            <button onClick={onRefresh} disabled={isSyncing} className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 justify-center min-w-[40px]" title="Refresh Data">
-                                <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} /> <span className="hidden md:inline">Refresh</span>
-                            </button>
-                        )}
-                        {!showColumns && (
-                            <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm text-xs font-bold hover:bg-slate-50 justify-center min-w-[40px]" title="Manage Columns">
-                                <SettingsIcon size={16}/> <span className="hidden md:inline">Columns</span>
-                            </button>
-                        )}
-                        {isEditMode && <button onClick={onImportOpen} className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-xs font-bold justify-center min-w-[40px]" title="Import Data"><Grid size={16}/> <span className="hidden md:inline">Import</span></button>}
-                    </div>
-                    
-                    {!showLanguages && (
-                        <div className="flex justify-center gap-2 mt-3 border-t border-slate-200 pt-3">
-                            <span className="text-[10px] font-bold text-slate-400 self-center mr-1 hidden md:inline">SHOW:</span>
-                            <button onClick={() => onVisibilityToggle('bangla')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>BN</button>
-                            <button onClick={() => onVisibilityToggle('japanese')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>JP</button>
-                            <button onClick={() => onVisibilityToggle('kanji')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${hiddenColumns.kanji ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>KN</button>
-                        </div>
-                    )}
-                </div>
-            )}
        </div>
     </div>
   );

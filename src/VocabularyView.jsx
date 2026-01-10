@@ -450,8 +450,8 @@ function VocabularyView({
       )}
 
       <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
-         {/* HEADER (Visible on all screens) */}
-         <div className="bg-slate-900 text-white px-3 py-1.5 flex items-center justify-between shadow-md z-20 h-11 shrink-0">
+         {/* MOBILE HEADER (Visible only on mobile) */}
+         <div className="md:hidden bg-slate-900 text-white px-3 py-1.5 flex items-center justify-between shadow-md z-20 h-11 shrink-0">
              <div className="flex items-center gap-2">
                  <div className="w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg">あ</div>
                  <span className="font-bold text-base tracking-tight leading-none">Irodori<span className="text-indigo-400">AI</span></span>

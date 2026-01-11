@@ -1,14 +1,10 @@
 [
     {
-        "merged": "C:\\Users\\AR TECH\\.gradle\\daemon\\9.0-milestone-1\\com.example.webapp-merged_res-31:\\drawable_ic_launcher.xml.flat",
-        "source": "C:\\Users\\AR TECH\\.gradle\\daemon\\9.0-milestone-1\\com.example.webapp-main-33:\\drawable\\ic_launcher.xml"
+        "merged": "com.irodori.ai.app-merged_res-39:/drawable_ic_launcher.png.flat",
+        "source": "com.irodori.ai.app-main-41:/drawable/ic_launcher.png"
     },
     {
-        "merged": "com.example.webapp-merged_res-31:/drawable_ic_launcher.png.flat",
-        "source": "com.example.webapp-main-33:/drawable/ic_launcher.png"
-    },
-    {
-        "merged": "C:\\Users\\AR TECH\\.gradle\\daemon\\9.0-milestone-1\\com.example.webapp-merged_res-31:\\layout_activity_main.xml.flat",
-        "source": "C:\\Users\\AR TECH\\.gradle\\daemon\\9.0-milestone-1\\com.example.webapp-main-33:\\layout\\activity_main.xml"
+        "merged": "com.irodori.ai.app-merged_res-39:/layout_activity_main.xml.flat",
+        "source": "com.irodori.ai.app-main-41:/layout/activity_main.xml"
     }
 ]

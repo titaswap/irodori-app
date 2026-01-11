@@ -115,3 +115,6 @@ If a bad update is deployed, you can "rollback" by simply deploying a **newer** 
 
 
 
+node scripts/build-mobile.js
+firebase deploy --only hosting
+npm run build

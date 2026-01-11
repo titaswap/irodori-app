@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Helper function to check if user is authenticated and matches the requested UID
+    function isUser(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // 2. Deny everything by default
+    // (Implicitly handled, but good to be explicit for root)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 3. User Profile Isolation
+    // Only the authenticated user can read/write their own document
+    match /users/{uid} {
+      allow read, write: if isUser(uid);
+
+      // 4. Subcollection Access
+      // Same rule applies to subcollections: progress, preferences, activity
+      match /progress/{itemId} {
+        allow read, write: if isUser(uid);
+      }
+      
+      match /preferences/{configId} {
+        allow read, write: if isUser(uid);
+      }
+
+      match /activity/{activityId} {
+        allow read, write: if isUser(uid);
+      }
+    }
+  }
+}

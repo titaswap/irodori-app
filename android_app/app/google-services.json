@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "991926999380",
+    "project_id": "japanese-learning-app-fcb27",
+    "storage_bucket": "japanese-learning-app-fcb27.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991926999380:android:0a59715ad1bb9519ec10c1",
+        "android_client_info": {
+          "package_name": "com.irodori.ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991926999380-ijm3if42r1vnuimlcm8m3tr6uvsc3nne.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.irodori.ai",
+            "certificate_hash": "5b63f5f4564c11f270e4639317f16c5fc16d5834"
+          }
+        },
+        {
+          "client_id": "991926999380-lcick2b57knit0t59j5idfg2763lmguu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaC1-6BNIKOjurBp_GKfFmNQZjioXW7XA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991926999380-lcick2b57knit0t59j5idfg2763lmguu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

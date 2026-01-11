@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.webapp",
+  "applicationId": "com.irodori.ai",
   "variantName": "debug",
   "elements": [
     {

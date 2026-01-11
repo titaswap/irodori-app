@@ -4,7 +4,7 @@
     "type": "PROCESSED_RES",
     "kind": "Directory"
   },
-  "applicationId": "com.example.webapp.test",
+  "applicationId": "com.irodori.ai.test",
   "variantName": "debugAndroidTest",
   "elements": [
     {

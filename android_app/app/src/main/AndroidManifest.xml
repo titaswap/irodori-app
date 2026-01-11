@@ -14,8 +14,6 @@
         </intent>
     </queries>
 
-    <!-- Required for downloads on older versions or specific scope -->
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -25,15 +23,26 @@
         android:hardwareAccelerated="true"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.irodori.ai.MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.WebviewApp">
+            <!-- Launcher Intent (Required for App Icon) -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Deep Link to catch Firebase Auth Redirects -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="japanese-learning-app-fcb27.web.app" />
+                <data android:host="japanese-learning-app-fcb27.firebaseapp.com" />
             </intent-filter>
         </activity>
     </application>

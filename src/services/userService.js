@@ -3,18 +3,15 @@
  * 
  * RESPONSIBILITY:
  * - Provide a central way to get the current user's ID.
- * - Currently returns a hardcoded "demoUser".
- * - In the future, this will link to Firebase Auth or another identity provider.
+ * - Links strictly to Firebase Auth.
  */
 
-// Placeholder constant for Phase 7
-const DEMO_USER_ID = 'demoUser1';
+import { auth } from "../firebase";
 
 /**
  * Get the current user's ID.
- * @returns {string} The user ID.
+ * @returns {string|null} The user ID or null if not logged in.
  */
 export const getUserId = () => {
-    // Future: return firebase.auth().currentUser.uid;
-    return DEMO_USER_ID;
+    return auth.currentUser ? auth.currentUser.uid : null;
 };

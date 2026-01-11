@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.webapp-mergeDebugResources-29:/values-h320dp-port-v13/values-h320dp-port-v13.xml",
+            "outputFile": "com.irodori.ai.app-mergeDebugResources-37:/values-h320dp-port-v13/values-h320dp-port-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\AR TECH\\.gradle\\caches\\9.0-milestone-1\\transforms\\5a1d71a04bdc553bf688ba17ca70df95\\transformed\\material-1.11.0\\res\\values-h320dp-port-v13\\values-h320dp-port-v13.xml",
+                    "source": "C:\\Users\\AR TECH\\.gradle\\caches\\9.0-milestone-1\\transforms\\6433355e0f951c7ea3869b51c4ae1ad1\\transformed\\material-1.11.0\\res\\values-h320dp-port-v13\\values-h320dp-port-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

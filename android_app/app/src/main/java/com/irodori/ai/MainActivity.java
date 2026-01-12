@@ -170,8 +170,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         
         WebView.setWebContentsDebuggingEnabled(true);
         
-        // Load Live URL
-        webView.loadUrl("https://japanese-learning-app-fcb27.web.app");
+        // Load Local Assets (Offline/Dev Mode)
+        webView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override

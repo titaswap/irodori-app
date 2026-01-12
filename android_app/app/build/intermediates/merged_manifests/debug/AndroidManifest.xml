@@ -37,7 +37,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.WebviewApp" >
+        android:theme="@style/Theme.WebviewApp"
+        android:usesCleartextTraffic="true" >
         <activity
             android:name="com.irodori.ai.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"

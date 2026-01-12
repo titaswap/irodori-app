@@ -405,19 +405,132 @@ function App() {
                     <h1 className="text-2xl text-white font-bold">Welcome to IrodoriAI</h1>
 
                     {!isAndroid && (
-                        <button
-                            onClick={async () => {
-                                try {
-                                    await googleLogin();
-                                } catch (e) {
-                                    console.error(e);
-                                    alert("Login Error: " + e.message);
-                                }
-                            }}
-                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Sign in with Google
-                        </button>
+                        <div className="flex flex-col gap-6 w-full max-w-sm">
+                            {/* DESKTOP: Google Login */}
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        await googleLogin();
+                                    } catch (e) {
+                                        console.error(e);
+                                        alert("Login Error: " + e.message);
+                                    }
+                                }}
+                                className="bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-3 shadow-md transition-all transform hover:scale-105"
+                            >
+                                <svg className="w-6 h-6" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z" />
+                                    <path fill="#EA4335" d="M12 4.66c1.61 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.09 14.97 0 12 0 7.7 0 3.99 2.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                </svg>
+                                <span>Sign in with Google</span>
+                            </button>
+
+                            {/* Divider */}
+                            <div className="relative flex items-center justify-center w-full">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-600"></div>
+                                </div>
+                                <span className="relative z-10 bg-gray-900 px-4 text-gray-400 text-sm font-medium">
+                                    OR
+                                </span>
+                            </div>
+
+                            {/* Email/Password Form (Desktop) */}
+                            <form onSubmit={handleEmailAuth} className="w-full bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col gap-4">
+                                <h2 className="text-xl text-white font-semibold text-center">
+                                    {isSignup ? "Create Account" : "Sign In with Email"}
+                                </h2>
+
+                                {authError && (
+                                    <div className="bg-red-500/20 text-red-200 p-2 rounded text-sm text-center border border-red-500/50">
+                                        {authError}
+                                    </div>
+                                )}
+
+                                {isSignup && (
+                                    <input
+                                        type="text"
+                                        placeholder="First Name"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        className="bg-gray-700 text-white p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                )}
+
+                                <input
+                                    type="email"
+                                    placeholder="Email Address"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="bg-gray-700 text-white p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="bg-gray-700 text-white p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-3 text-gray-400 hover:text-white"
+                                    >
+                                        {showPassword ? (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                            </svg>
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        )}
+                                    </button>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isAuthSubmitting}
+                                    className={`font-bold py-3 px-4 rounded transition-colors ${isAuthSubmitting
+                                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-500 text-white"
+                                        }`}
+                                >
+                                    {isAuthSubmitting ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            {isSignup ? "Creating account..." : "Signing in..."}
+                                        </span>
+                                    ) : (
+                                        isSignup ? "Sign Up" : "Login"
+                                    )}
+                                </button>
+
+                                <div className="text-center mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsSignup(!isSignup);
+                                            setAuthError("");
+                                        }}
+                                        className="text-blue-400 hover:text-blue-300 text-sm underline"
+                                    >
+                                        {isSignup ? "Already have an account? Login" : "Need an account? Sign Up"}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     )}
 
                     {isAndroid && (
@@ -489,8 +602,8 @@ function App() {
                                 type="submit"
                                 disabled={isAuthSubmitting}
                                 className={`font-bold py-3 px-4 rounded transition-colors ${isAuthSubmitting
-                                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                                        : "bg-blue-600 hover:bg-blue-500 text-white"
+                                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-500 text-white"
                                     }`}
                             >
                                 {isAuthSubmitting ? (

@@ -48,324 +48,326 @@
 29-->[androidx.core:core:1.9.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\be393e18865b981d5178e93990e2e46a\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
 30
 31    <application
-31-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:17:5-48:19
+31-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:17:5-49:19
 32        android:allowBackup="true"
-32-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:18:9-35
+32-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:19:9-35
 33        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 33-->[androidx.core:core:1.9.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\be393e18865b981d5178e93990e2e46a\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
 34        android:debuggable="true"
 35        android:extractNativeLibs="false"
 36        android:hardwareAccelerated="true"
-36-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:23:9-43
+36-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:24:9-43
 37        android:icon="@drawable/ic_launcher"
-37-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:19:9-45
+37-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:20:9-45
 38        android:label="@string/app_name"
-38-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:20:9-41
+38-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:21:9-41
 39        android:supportsRtl="true"
-39-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:21:9-35
-40        android:theme="@style/Theme.WebviewApp" >
-40-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:22:9-48
-41        <activity
-41-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:25:9-47:20
-42            android:name="com.irodori.ai.MainActivity"
-42-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:26:13-55
-43            android:configChanges="orientation|screenSize|keyboardHidden"
-43-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:28:13-74
-44            android:exported="true"
-44-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:27:13-36
-45            android:screenOrientation="portrait"
-45-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:29:13-49
-46            android:theme="@style/Theme.WebviewApp" >
-46-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:30:13-52
-47
-48            <!-- Launcher Intent (Required for App Icon) -->
-49            <intent-filter>
-49-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:32:13-35:29
-50                <action android:name="android.intent.action.MAIN" />
-50-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:33:17-69
-50-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:33:25-66
-51
-52                <category android:name="android.intent.category.LAUNCHER" />
-52-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:34:17-77
-52-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:34:27-74
-53            </intent-filter>
-54
-55            <!-- Deep Link to catch Firebase Auth Redirects -->
-56            <intent-filter android:autoVerify="true" >
-56-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:38:13-46:29
-56-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:38:28-53
-57                <action android:name="android.intent.action.VIEW" />
-57-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:17-69
-57-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:25-66
-58
-59                <category android:name="android.intent.category.DEFAULT" />
-59-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:17-76
-59-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:27-73
-60                <category android:name="android.intent.category.BROWSABLE" />
-60-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:17-78
-60-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:27-75
-61
-62                <data android:scheme="https" />
-62-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:17-48
-62-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:23-45
-63                <data android:host="japanese-learning-app-fcb27.web.app" />
-63-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:17-48
-63-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-73
-64                <data android:host="japanese-learning-app-fcb27.firebaseapp.com" />
-64-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:17-48
-64-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-73
-65            </intent-filter>
-66        </activity>
-67        <activity
-67-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:29:9-46:20
-68            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
-68-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:30:13-80
-69            android:excludeFromRecents="true"
-69-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:31:13-46
-70            android:exported="true"
-70-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:32:13-36
-71            android:launchMode="singleTask"
-71-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:33:13-44
-72            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-72-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:34:13-72
-73            <intent-filter>
-73-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:35:13-45:29
-74                <action android:name="android.intent.action.VIEW" />
-74-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:17-69
-74-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:25-66
-75
-76                <category android:name="android.intent.category.DEFAULT" />
-76-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:17-76
-76-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:27-73
-77                <category android:name="android.intent.category.BROWSABLE" />
-77-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:17-78
-77-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:27-75
-78
-79                <data
-79-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:17-48
-80                    android:host="firebase.auth"
-80-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-73
-81                    android:path="/"
-82                    android:scheme="genericidp" />
-82-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:23-45
-83            </intent-filter>
-84        </activity>
-85        <activity
-85-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:47:9-64:20
-86            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
-86-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:48:13-79
-87            android:excludeFromRecents="true"
-87-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:49:13-46
-88            android:exported="true"
-88-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:50:13-36
-89            android:launchMode="singleTask"
-89-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:51:13-44
-90            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-90-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:52:13-72
-91            <intent-filter>
-91-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:53:13-63:29
-92                <action android:name="android.intent.action.VIEW" />
-92-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:17-69
-92-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:25-66
-93
-94                <category android:name="android.intent.category.DEFAULT" />
-94-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:17-76
-94-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:27-73
-95                <category android:name="android.intent.category.BROWSABLE" />
-95-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:17-78
-95-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:27-75
-96
-97                <data
-97-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:17-48
-98                    android:host="firebase.auth"
-98-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-73
-99                    android:path="/"
-100                    android:scheme="recaptcha" />
-100-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:43:23-45
-101            </intent-filter>
-102        </activity>
-103
-104        <service
-104-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:66:9-72:19
-105            android:name="com.google.firebase.components.ComponentDiscoveryService"
-105-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:67:13-84
-106            android:directBootAware="true"
-106-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:32:13-43
-107            android:exported="false" >
-107-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:68:13-37
-108            <meta-data
-108-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:69:13-71:85
-109                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
-109-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:70:17-109
-110                android:value="com.google.firebase.components.ComponentRegistrar" />
-110-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:71:17-82
-111            <meta-data
-111-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:35:13-37:85
-112                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
-112-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:36:17-109
-113                android:value="com.google.firebase.components.ComponentRegistrar" />
-113-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:37:17-82
-114        </service>
-115        <service
-115-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:24:9-32:19
-116            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
-116-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:25:13-94
-117            android:enabled="true"
-117-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:26:13-35
-118            android:exported="false" >
-118-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:27:13-37
-119            <meta-data
-119-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:29:13-31:104
-120                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
-120-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:30:17-76
-121                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
-121-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:31:17-101
-122        </service>
-123
-124        <activity
-124-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:34:9-41:20
-125            android:name="androidx.credentials.playservices.HiddenActivity"
-125-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:35:13-76
-126            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-126-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:36:13-87
-127            android:enabled="true"
-127-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:37:13-35
-128            android:exported="false"
-128-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:38:13-37
-129            android:fitsSystemWindows="true"
-129-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:39:13-45
-130            android:theme="@style/Theme.Hidden" >
-130-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:40:13-48
-131        </activity>
-132        <activity
-132-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:23:9-27:75
-133            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-133-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:24:13-93
-134            android:excludeFromRecents="true"
-134-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:25:13-46
-135            android:exported="false"
-135-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:26:13-37
-136            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-136-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:27:13-72
-137        <!--
-138            Service handling Google Sign-In user revocation. For apps that do not integrate with
-139            Google Sign-In, this service will never be started.
-140        -->
-141        <service
-141-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:33:9-37:51
-142            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
-142-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:34:13-89
-143            android:exported="true"
-143-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:35:13-36
-144            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
-144-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:36:13-107
-145            android:visibleToInstantApps="true" />
-145-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:37:13-48
-146
-147        <provider
-147-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:23:9-28:39
-148            android:name="com.google.firebase.provider.FirebaseInitProvider"
-148-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:24:13-77
-149            android:authorities="com.irodori.ai.firebaseinitprovider"
-149-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:25:13-72
-150            android:directBootAware="true"
-150-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:26:13-43
-151            android:exported="false"
-151-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:27:13-37
-152            android:initOrder="100" />
-152-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:28:13-36
-153
-154        <activity
-154-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:9-22:45
-155            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-155-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:19-85
-156            android:exported="false"
-156-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:22:19-43
-157            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-157-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:21:19-78
-158
-159        <provider
-159-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
-160            android:name="androidx.startup.InitializationProvider"
-160-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
-161            android:authorities="com.irodori.ai.androidx-startup"
-161-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
-162            android:exported="false" >
-162-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
-163            <meta-data
-163-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
-164                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-164-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
-165                android:value="androidx.startup" />
-165-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
-166            <meta-data
-166-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\ed073cba1a8a1e71e9d4e1412682fe74\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
-167                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-167-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\ed073cba1a8a1e71e9d4e1412682fe74\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
-168                android:value="androidx.startup" />
-168-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\ed073cba1a8a1e71e9d4e1412682fe74\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
-169            <meta-data
-169-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-170                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-170-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-171                android:value="androidx.startup" />
-171-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-172        </provider>
-173
-174        <meta-data
-174-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\305701966431b357b8241717ae5d563e\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
-175            android:name="com.google.android.gms.version"
-175-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\305701966431b357b8241717ae5d563e\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
-176            android:value="@integer/google_play_services_version" />
-176-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\305701966431b357b8241717ae5d563e\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
-177
-178        <receiver
-178-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-179            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-179-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-180            android:directBootAware="false"
-180-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-181            android:enabled="true"
-181-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-182            android:exported="true"
-182-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-183            android:permission="android.permission.DUMP" >
-183-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-184            <intent-filter>
-184-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-185                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-185-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-185-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-186            </intent-filter>
-187            <intent-filter>
-187-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-188                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-188-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-188-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-189            </intent-filter>
-190            <intent-filter>
-190-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-191                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-191-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-191-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-192            </intent-filter>
-193            <intent-filter>
-193-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-194                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-194-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-194-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-195            </intent-filter>
-196        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
-197        <activity
-197-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:14:9-18:65
-198            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
-198-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:15:13-93
-199            android:exported="false"
-199-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:16:13-37
-200            android:stateNotNeeded="true"
-200-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:17:13-42
-201            android:theme="@style/Theme.PlayCore.Transparent" />
-201-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:18:13-62
-202    </application>
-203
-204</manifest>
+39-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:22:9-35
+40        android:theme="@style/Theme.WebviewApp"
+40-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:23:9-48
+41        android:usesCleartextTraffic="true" >
+41-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:18:9-44
+42        <activity
+42-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:26:9-48:20
+43            android:name="com.irodori.ai.MainActivity"
+43-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:27:13-55
+44            android:configChanges="orientation|screenSize|keyboardHidden"
+44-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:29:13-74
+45            android:exported="true"
+45-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:28:13-36
+46            android:screenOrientation="portrait"
+46-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:30:13-49
+47            android:theme="@style/Theme.WebviewApp" >
+47-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:31:13-52
+48
+49            <!-- Launcher Intent (Required for App Icon) -->
+50            <intent-filter>
+50-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:33:13-36:29
+51                <action android:name="android.intent.action.MAIN" />
+51-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:34:17-69
+51-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:34:25-66
+52
+53                <category android:name="android.intent.category.LAUNCHER" />
+53-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:35:17-77
+53-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:35:27-74
+54            </intent-filter>
+55
+56            <!-- Deep Link to catch Firebase Auth Redirects -->
+57            <intent-filter android:autoVerify="true" >
+57-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:13-47:29
+57-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:39:28-53
+58                <action android:name="android.intent.action.VIEW" />
+58-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:17-69
+58-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:25-66
+59
+60                <category android:name="android.intent.category.DEFAULT" />
+60-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:17-76
+60-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:27-73
+61                <category android:name="android.intent.category.BROWSABLE" />
+61-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:42:17-78
+61-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:42:27-75
+62
+63                <data android:scheme="https" />
+63-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:17-48
+63-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-45
+64                <data android:host="japanese-learning-app-fcb27.web.app" />
+64-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:17-48
+64-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:45:23-73
+65                <data android:host="japanese-learning-app-fcb27.firebaseapp.com" />
+65-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:17-48
+65-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:45:23-73
+66            </intent-filter>
+67        </activity>
+68        <activity
+68-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:29:9-46:20
+69            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+69-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:30:13-80
+70            android:excludeFromRecents="true"
+70-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:31:13-46
+71            android:exported="true"
+71-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:32:13-36
+72            android:launchMode="singleTask"
+72-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:33:13-44
+73            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+73-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:34:13-72
+74            <intent-filter>
+74-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:35:13-45:29
+75                <action android:name="android.intent.action.VIEW" />
+75-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:17-69
+75-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:25-66
+76
+77                <category android:name="android.intent.category.DEFAULT" />
+77-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:17-76
+77-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:27-73
+78                <category android:name="android.intent.category.BROWSABLE" />
+78-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:42:17-78
+78-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:42:27-75
+79
+80                <data
+80-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:17-48
+81                    android:host="firebase.auth"
+81-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:45:23-73
+82                    android:path="/"
+83                    android:scheme="genericidp" />
+83-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-45
+84            </intent-filter>
+85        </activity>
+86        <activity
+86-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:47:9-64:20
+87            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
+87-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:48:13-79
+88            android:excludeFromRecents="true"
+88-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:49:13-46
+89            android:exported="true"
+89-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:50:13-36
+90            android:launchMode="singleTask"
+90-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:51:13-44
+91            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+91-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:52:13-72
+92            <intent-filter>
+92-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:53:13-63:29
+93                <action android:name="android.intent.action.VIEW" />
+93-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:17-69
+93-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:40:25-66
+94
+95                <category android:name="android.intent.category.DEFAULT" />
+95-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:17-76
+95-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:41:27-73
+96                <category android:name="android.intent.category.BROWSABLE" />
+96-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:42:17-78
+96-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:42:27-75
+97
+98                <data
+98-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:17-48
+99                    android:host="firebase.auth"
+99-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:45:23-73
+100                    android:path="/"
+101                    android:scheme="recaptcha" />
+101-->E:\JFT\Irodori apps - Copy\android_app\app\src\main\AndroidManifest.xml:44:23-45
+102            </intent-filter>
+103        </activity>
+104
+105        <service
+105-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:66:9-72:19
+106            android:name="com.google.firebase.components.ComponentDiscoveryService"
+106-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:67:13-84
+107            android:directBootAware="true"
+107-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:32:13-43
+108            android:exported="false" >
+108-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:68:13-37
+109            <meta-data
+109-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:69:13-71:85
+110                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+110-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:70:17-109
+111                android:value="com.google.firebase.components.ComponentRegistrar" />
+111-->[com.google.firebase:firebase-auth:24.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\11829f0290e4f1d4d6403f662bf5b109\transformed\jetified-firebase-auth-24.0.0\AndroidManifest.xml:71:17-82
+112            <meta-data
+112-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:35:13-37:85
+113                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+113-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:36:17-109
+114                android:value="com.google.firebase.components.ComponentRegistrar" />
+114-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:37:17-82
+115        </service>
+116        <service
+116-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:24:9-32:19
+117            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+117-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:25:13-94
+118            android:enabled="true"
+118-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:26:13-35
+119            android:exported="false" >
+119-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:27:13-37
+120            <meta-data
+120-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:29:13-31:104
+121                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+121-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:30:17-76
+122                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+122-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:31:17-101
+123        </service>
+124
+125        <activity
+125-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:34:9-41:20
+126            android:name="androidx.credentials.playservices.HiddenActivity"
+126-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:35:13-76
+127            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+127-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:36:13-87
+128            android:enabled="true"
+128-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:37:13-35
+129            android:exported="false"
+129-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:38:13-37
+130            android:fitsSystemWindows="true"
+130-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:39:13-45
+131            android:theme="@style/Theme.Hidden" >
+131-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2673cdf14a4ddfc6abb04bc758ab2fd9\transformed\jetified-credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:40:13-48
+132        </activity>
+133        <activity
+133-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:23:9-27:75
+134            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+134-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:24:13-93
+135            android:excludeFromRecents="true"
+135-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:25:13-46
+136            android:exported="false"
+136-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:26:13-37
+137            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+137-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:27:13-72
+138        <!--
+139            Service handling Google Sign-In user revocation. For apps that do not integrate with
+140            Google Sign-In, this service will never be started.
+141        -->
+142        <service
+142-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:33:9-37:51
+143            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+143-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:34:13-89
+144            android:exported="true"
+144-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:35:13-36
+145            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+145-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:36:13-107
+146            android:visibleToInstantApps="true" />
+146-->[com.google.android.gms:play-services-auth:21.1.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\72ea0b6cc4588f292b0064e2f2f73f80\transformed\jetified-play-services-auth-21.1.0\AndroidManifest.xml:37:13-48
+147
+148        <provider
+148-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:23:9-28:39
+149            android:name="com.google.firebase.provider.FirebaseInitProvider"
+149-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:24:13-77
+150            android:authorities="com.irodori.ai.firebaseinitprovider"
+150-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:25:13-72
+151            android:directBootAware="true"
+151-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:26:13-43
+152            android:exported="false"
+152-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:27:13-37
+153            android:initOrder="100" />
+153-->[com.google.firebase:firebase-common:22.0.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\a77858d8461576deb110fe8a783d82ff\transformed\jetified-firebase-common-22.0.0\AndroidManifest.xml:28:13-36
+154
+155        <activity
+155-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:9-22:45
+156            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+156-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:19-85
+157            android:exported="false"
+157-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:22:19-43
+158            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+158-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\b4e2115cd53cd54dd30986af3ca3e6ba\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:21:19-78
+159
+160        <provider
+160-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+161            android:name="androidx.startup.InitializationProvider"
+161-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
+162            android:authorities="com.irodori.ai.androidx-startup"
+162-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
+163            android:exported="false" >
+163-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
+164            <meta-data
+164-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+165                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+165-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
+166                android:value="androidx.startup" />
+166-->[androidx.emoji2:emoji2:1.2.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\4797bb9d937988a58d6405b3910f4949\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
+167            <meta-data
+167-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\ed073cba1a8a1e71e9d4e1412682fe74\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+168                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+168-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\ed073cba1a8a1e71e9d4e1412682fe74\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+169                android:value="androidx.startup" />
+169-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\ed073cba1a8a1e71e9d4e1412682fe74\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+170            <meta-data
+170-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+171                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+171-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+172                android:value="androidx.startup" />
+172-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+173        </provider>
+174
+175        <meta-data
+175-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\305701966431b357b8241717ae5d563e\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+176            android:name="com.google.android.gms.version"
+176-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\305701966431b357b8241717ae5d563e\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+177            android:value="@integer/google_play_services_version" />
+177-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\305701966431b357b8241717ae5d563e\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+178
+179        <receiver
+179-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+180            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+180-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+181            android:directBootAware="false"
+181-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+182            android:enabled="true"
+182-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+183            android:exported="true"
+183-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+184            android:permission="android.permission.DUMP" >
+184-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+185            <intent-filter>
+185-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+186                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+186-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+186-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+187            </intent-filter>
+188            <intent-filter>
+188-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+189                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+189-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+189-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+190            </intent-filter>
+191            <intent-filter>
+191-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+192                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+192-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+192-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+193            </intent-filter>
+194            <intent-filter>
+194-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+195                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+195-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+195-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\2379524ca794f463c88d25fd85965135\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+196            </intent-filter>
+197        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
+198        <activity
+198-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:14:9-18:65
+199            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+199-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:15:13-93
+200            android:exported="false"
+200-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:16:13-37
+201            android:stateNotNeeded="true"
+201-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:17:13-42
+202            android:theme="@style/Theme.PlayCore.Transparent" />
+202-->[com.google.android.play:core-common:2.0.3] C:\Users\AR TECH\.gradle\caches\9.0-milestone-1\transforms\7107ebefb357a3deced9e539adcbdae8\transformed\jetified-core-common-2.0.3\AndroidManifest.xml:18:13-62
+203    </application>
+204
+205</manifest>

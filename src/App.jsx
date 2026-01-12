@@ -153,14 +153,10 @@ function App() {
                 action: 'add',
                 items: newItems.map(item => ({
                     hiragana: item.japanese,
-                    kanji: item.kanji,
                     bangla: item.bangla,
                     lesson: item.lesson,
                     cando: item.cando,
                     is_problem: item.isMarked,
-                    mistake_count: item.mistakes,
-                    confidence: item.confidence,
-                    last_practiced: item.lastPracticed
                 }))
             };
 
@@ -238,9 +234,6 @@ function App() {
                             const local = localMap.get(item.localId);
                             if (local) {
                                 item.isMarked = local.isMarked;
-                                // item.mistakes = local.mistakes; // REMOVED
-                                // item.confidence = local.confidence; // REMOVED
-                                // item.lastPracticed = local.lastPracticed; // REMOVED
                             }
                         });
                     } catch (e) { console.error("Merge error", e); }
@@ -256,9 +249,6 @@ function App() {
                                 const p = firestoreProgress[item.id];
                                 // Overwrite only if defined in Firestore
                                 if (p.isMarked !== undefined) item.isMarked = p.isMarked;
-                                // if (p.mistakes !== undefined) item.mistakes = p.mistakes; // REMOVED
-                                // if (p.confidence !== undefined) item.confidence = p.confidence; // REMOVED
-                                // if (p.lastPracticed !== undefined) item.lastPracticed = p.lastPracticed; // REMOVED
                             }
                         });
                         console.log("[App] Merged Firestore progress into vocabList");

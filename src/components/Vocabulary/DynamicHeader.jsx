@@ -19,7 +19,7 @@ const DynamicHeader = ({
   // hidden check
   if (columnVisibility[colId] === false) return null;
 
-         const isFixed =
+  const isFixed =
     def.fixed ||
     def.id === 'selection' ||
     def.id === 'delete';
@@ -33,21 +33,21 @@ const DynamicHeader = ({
 
     const startX = e.clientX;
     const startWidth = columnWidths[colId] || 160;
-    
+
     // Cache Elements
     const colElement = document.getElementById(`col-${colId}`);
-    
+
     let animationFrameId;
 
     const onMouseMove = (moveEvent) => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      
+
       animationFrameId = requestAnimationFrame(() => {
-          const delta = moveEvent.clientX - startX;
-          const newWidth = Math.max(80, startWidth + delta);
-          
-          // Update ColGroup Element directly - extremely fast table reflow
-          if(colElement) colElement.style.width = `${newWidth}px`;
+        const delta = moveEvent.clientX - startX;
+        const newWidth = Math.max(80, startWidth + delta);
+
+        // Update ColGroup Element directly - extremely fast table reflow
+        if (colElement) colElement.style.width = `${newWidth}px`;
       });
     };
 
@@ -55,11 +55,11 @@ const DynamicHeader = ({
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      
+
       // Commit final width to React State once
       const delta = upEvent.clientX - startX;
       const finalWidth = Math.max(80, startWidth + delta);
-      
+
       setColumnWidths(prev => ({
         ...prev,
         [colId]: finalWidth
@@ -83,7 +83,7 @@ const DynamicHeader = ({
       data-col-id={colId}
       className={`
         relative
-        px-2 py-2
+        px-2 py-1
         bg-slate-50
         border-b border-r border-slate-200
         text-xs font-bold uppercase tracking-wider

@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  @media (max-width: 768px) {
+    .mobile-zoom-table {
+      zoom: var(--mobile-zoom, 1);
+    }
+  }
+
+  @media (min-width: 769px) {
+    .mobile-zoom-table {
+      zoom: var(--desktop-zoom, 1);
+    }
+  }
+}

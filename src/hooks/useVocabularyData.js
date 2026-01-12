@@ -8,7 +8,7 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
     const filteredAndSortedData = useMemo(() => {
         let data = [...safeDataList];
         if (currentFolderId !== 'root') data = data.filter(i => i.folderId === currentFolderId);
-        if (searchTerm) { const l = searchTerm.toLowerCase(); data = data.filter(i => i.japanese.includes(l) || i.bangla.includes(l) || i.kanji.includes(l)); }
+        if (searchTerm) { const l = searchTerm.toLowerCase(); data = data.filter(i => i.japanese.includes(l) || i.bangla.includes(l)); }
 
         // DEBUG LOGGING
         // console.log("Filtering Debug:", {

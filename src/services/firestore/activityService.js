@@ -2,7 +2,7 @@
  * activityService.js
  * 
  * RESPONSIBILITY:
- * - Handle reading and writing Learning Progress (marks, mistakes, confidence, lastPracticed).
+ * - Handle reading and writing Learning Progress (marks).
  * - This will eventually replace the Google Sheets "sync" logic for progress data.
  */
 

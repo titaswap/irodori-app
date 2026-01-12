@@ -27,6 +27,7 @@ import { useVocabularyData } from './hooks/useVocabularyData';
 import { useResultStats } from './hooks/useResultStats';
 import { preferenceStore } from './utils/preferenceStore';
 import { updateProgress } from './services/firestore/activityService';
+import { uiConfig } from './config/uiConfig';
 
 // --- MAIN VOCABULARY VIEW ---
 function VocabularyView({
@@ -48,14 +49,21 @@ function VocabularyView({
     const [draftVocabList, setDraftVocabList] = useState([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-    const [hiddenColumns, setHiddenColumns] = useState({ japanese: false, kanji: false, bangla: false });
-    const [revealedCells, setRevealedCells] = useState({ japanese: null, kanji: null, bangla: null });
+    const [hiddenColumns, setHiddenColumns] = useState({ japanese: false, bangla: false });
+    const [revealedCells, setRevealedCells] = useState({ japanese: null, bangla: null });
 
     // Dynamic Column State
     const activeSyncs = useRef(0);
 
     // Initialize from Preference Store
-    const [columnOrder, setColumnOrder] = useState(() => preferenceStore.loadPreferences().columnOrder);
+    const [columnOrder, setColumnOrder] = useState(() => {
+        const saved = preferenceStore.loadPreferences().columnOrder;
+        if (saved && saved.length > 0) return saved;
+
+        // No saved preference? Use Config Default
+        const isMobile = window.innerWidth <= 768;
+        return isMobile ? (uiConfig.defaultMobileColumnOrder || []) : (uiConfig.defaultDesktopColumnOrder || []);
+    });
     const [columnVisibility, setColumnVisibility] = useState(() => preferenceStore.loadPreferences().columnVisibility);
     const [columnWidths, setColumnWidths] = useState(() => preferenceStore.loadPreferences().columnWidths);
 
@@ -206,7 +214,7 @@ function VocabularyView({
 
     const startPractice = (mode = 'standard') => {
         let queue = filteredAndSortedData;
-        // if (mode === 'smart') queue = queue.filter(v => v.mistakes > 2 || v.confidence < 60 || v.isMarked); // REMOVED SMART LOGIC (Stats are gone)
+
         // Fallback to Marked Only if 'smart' is requested? Or just random?
         // Let's assume 'smart' now just means 'shuffle' or 'isMarked'. 
         if (mode === 'smart') queue = queue.filter(v => v.isMarked);
@@ -245,8 +253,6 @@ function VocabularyView({
 
     const handleStartSmartPractice = () => attemptAction(() => {
         const problemItems = vocabList.filter(v => v.isMarked);
-        // const weakItems = vocabList.filter(v => v.mistakes >= 2 || v.confidence < 50); // REMOVED
-        // const others = vocabList.filter(v => !v.isMarked && v.confidence >= 50); // REMOVED using confidence
         // Just shuffle marked + random others
         const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
 
@@ -271,7 +277,7 @@ function VocabularyView({
     const confirmExitWithDiscard = () => { setHasUnsavedChanges(false); setIsEditMode(false); setUnsavedChangesModal({ open: false, pendingAction: null }); unsavedChangesModal.pendingAction?.(); };
     const cancelEditModeAttempt = () => setUnsavedChangesModal({ open: false, pendingAction: null });
 
-    useEffect(() => { setRevealedCells({ japanese: null, kanji: null, bangla: null }); }, [currentFolderId, filters, searchTerm, sortConfig, viewMode]);
+    useEffect(() => { setRevealedCells({ japanese: null, bangla: null }); }, [currentFolderId, filters, searchTerm, sortConfig, viewMode]);
     const toggleGlobalVisibility = (k) => { setHiddenColumns(p => ({ ...p, [k]: !p[k] })); setRevealedCells(p => ({ ...p, [k]: null })); };
     const revealSingleCell = useCallback((id, k) => setRevealedCells(p => ({ ...p, [k]: id })), []);
 
@@ -352,16 +358,15 @@ function VocabularyView({
             // Need mapping to app format? Or just use raw?
             // mapToApp handles raw sheet row. 
             // Let's assume data keys match app keys if I mapped them correctly in modal.
-            // In Modal, I mapped to 'japanese', 'kanji', etc.
             return {
                 ...d,
                 id: null,
                 localId: `imported_${Date.now()}_${Math.random()}`,
                 folderId: currentFolderId === 'root' ? 'Uncategorized' : currentFolderId,
                 book: folders.find(f => f.id === currentFolderId)?.name || 'Uncategorized',
-                mistakes: 0, confidence: 0, isMarked: false,
+                isMarked: false,
                 lesson: d.lesson || '1', cando: d.cando || '1',
-                japanese: d.japanese || '', bangla: d.bangla || '', kanji: d.kanji || ''
+                japanese: d.japanese || '', bangla: d.bangla || ''
             };
         });
 
@@ -407,11 +412,9 @@ function VocabularyView({
     const nextCard = (isEasy) => {
         // Removed stats update logic
         // const card = practiceQueue[currentCardIndex]; 
-        // const newConf = isEasy ? Math.min(100, card.confidence + 10) : Math.max(0, card.confidence - 15); 
-        // const newMistakes = isEasy ? card.mistakes : card.mistakes + 1; 
+
         // const today = new Date().toISOString().split('T')[0]; 
-        // setVocabList(p => p.map(v => v.localId === card.localId ? { ...v, confidence: newConf, mistakes: newMistakes, last_practiced: today } : v)); 
-        // if(card.id) practiceUpdates.current.push({ id: card.id, confidence: newConf, mistake_count: newMistakes, last_practiced: today }); 
+
 
         if (currentCardIndex < practiceQueue.length - 1) { setCurrentCardIndex(p => p + 1); } else finishPractice();
     };
@@ -482,8 +485,12 @@ function VocabularyView({
                 />
 
                 <div
-                    className="flex-1 overflow-auto transition-all duration-300"
-                    style={{ paddingBottom: isAudioBarVisible ? '96px' : '0px' }}
+                    className="flex-1 overflow-auto transition-all duration-300 mobile-zoom-table"
+                    style={{
+                        paddingBottom: isAudioBarVisible ? '96px' : '0px',
+                        '--mobile-zoom': uiConfig.mobileTableZoom,
+                        '--desktop-zoom': uiConfig.desktopTableZoom
+                    }}
                 >
                     <table className="w-full border-collapse bg-white text-sm table-fixed">
                         <colgroup>

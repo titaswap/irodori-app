@@ -10,15 +10,6 @@ export const INTERNAL_KEYS = new Set([
 
     // System / logic fields
     'isMarked',
-    'mistakes',
-    'confidence',
-    'responseTime',
-
-    // Backend-only
-    'is_problem',
-    'mistake_count',
-    'last_practiced',
-    'lastPracticed'
 ]);
 
 export const FIXED_SYSTEM_COLUMNS = [
@@ -42,9 +33,6 @@ export const mapToSheet = (item) => {
 
     // System mappings
     result.is_problem = item.isMarked;
-    // result.mistake_count = item.mistakes; // REMOVED
-    // result.confidence = item.confidence; // REMOVED
-    // result.last_practiced = item.lastPracticed || ''; // REMOVED
 
     return result;
 };
@@ -63,10 +51,8 @@ export const mapToApp = (row, index) => {
 
     // Normalize System/Logic Fields
     item.isMarked = (row.is_problem === true || row.is_problem === "true");
-    // item.mistakes = Number(row.mistake_count) || 0; // REMOVED
-    // item.confidence = Number(row.confidence) || 0; // REMOVED
-    // item.lastPracticed = String(row.last_practiced || ''); // REMOVED
-    item.responseTime = 0; // Runtime only field
+
+
 
     // Ensure strictly required fields for app logic exist (Search, Audio, Filtering)
     // We prioritize extracting from likely columns if the specific keys don't exist
@@ -90,13 +76,11 @@ export const mapToApp = (row, index) => {
 
 export const getChangedFields = (original, current) => {
     const changes = {}; let hasChanges = false;
-    const keys = ['japanese', 'kanji', 'bangla', 'lesson', 'cando', 'isMarked']; // Removed stats
+    const keys = ['japanese', 'bangla', 'lesson', 'cando', 'isMarked']; // Removed stats
     keys.forEach(key => {
         if (JSON.stringify(original[key]) !== JSON.stringify(current[key])) {
             if (key === 'japanese') changes.hiragana = current[key];
             else if (key === 'isMarked') changes.is_problem = current[key];
-            // else if (key === 'mistakes') changes.mistake_count = current[key]; // REMOVED
-            // else if (key === 'lastPracticed') changes.last_practiced = current[key]; // REMOVED
             else changes[key] = current[key];
             hasChanges = true;
         }

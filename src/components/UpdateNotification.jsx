@@ -3,7 +3,7 @@ import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { Download, X, AlertTriangle } from 'lucide-react';
 
 const UpdateNotification = () => {
-    const { updateAvailable, force, message, storeUrl, version } = useUpdateCheck();
+    const { updateAvailable, force, message, version } = useUpdateCheck();
     const [dismissed, setDismissed] = React.useState(false);
 
     if (!updateAvailable) return null;

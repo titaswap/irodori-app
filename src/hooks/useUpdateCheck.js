@@ -32,9 +32,14 @@ export const useUpdateCheck = () => {
 
                 if (!remoteUrl) return;
 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
                 const response = await fetch(`${remoteUrl}?t=${Date.now()}`, {
                     cache: 'no-store',
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 if (!response.ok) return;
 
@@ -47,7 +52,7 @@ export const useUpdateCheck = () => {
                     setUpdateAvailable(true);
                     setUpdateDetails(remoteData);
                 }
-            } catch (err) {
+            } catch {
                 // Fail silently in production
                 // console.error('[UpdateCheck] Error:', err);
             }

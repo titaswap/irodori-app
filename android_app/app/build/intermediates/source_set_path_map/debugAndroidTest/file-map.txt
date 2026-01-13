@@ -1,4 +1,0 @@
-com.irodori.ai.test.app-androidTest-0 E:\JFT\Irodori apps - Copy\android_app\app\build\generated\res\resValues\androidTest\debug
-com.irodori.ai.test.app-mergeDebugAndroidTestResources-1 E:\JFT\Irodori apps - Copy\android_app\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
-com.irodori.ai.test.app-mergeDebugAndroidTestResources-2 E:\JFT\Irodori apps - Copy\android_app\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
-com.irodori.ai.test.app-merged_res-3 E:\JFT\Irodori apps - Copy\android_app\app\build\intermediates\merged_res\debugAndroidTest

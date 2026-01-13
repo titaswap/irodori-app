@@ -34,11 +34,9 @@ function VocabularyView({
     vocabList,
     setVocabList,
     folders,
-    setFolders,
     currentFolderId,
     setCurrentFolderId,
     isLoading,
-    setIsLoading,
     isSyncing,
     setIsSyncing,
     apiService,
@@ -121,9 +119,12 @@ function VocabularyView({
 
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
     const [filters, setFilters] = useState({ lesson: [], cando: [] });
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm] = useState('');
     const [viewMode, setViewMode] = useState('all');
     const [selectedIds, setSelectedIds] = useState(new Set());
+
+    const [isShuffled, setIsShuffled] = useState(false);
+    const [shuffledData, setShuffledData] = useState([]);
 
     const [practiceQueue, setPracticeQueue] = useState([]);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -141,13 +142,18 @@ function VocabularyView({
     const [toast, setToast] = useState(null);
     const showToast = useCallback((msg, type = 'success') => setToast({ message: msg, type }), []);
 
+    // Reset shuffle when filters, sort, or view mode change
+    useEffect(() => setIsShuffled(false), [filters, sortConfig, viewMode]);
+
     // --- HOOKS ---
     const { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
         vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList
     );
 
+    const displayData = isShuffled ? shuffledData : filteredAndSortedData;
+
     // --- STATS ---
-    const { showingCount, totalCount } = useResultStats(vocabList, filteredAndSortedData, currentFolderId);
+    const { showingCount, totalCount } = useResultStats(vocabList, displayData, currentFolderId);
 
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
@@ -182,22 +188,22 @@ function VocabularyView({
     // Reset page when data/filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [currentFolderId, searchTerm, filters, viewMode, sortConfig]);
+    }, [currentFolderId, searchTerm, filters, viewMode, sortConfig, isShuffled]);
 
     // Derived Paginated Data
     const paginatedData = useMemo(() => {
         const start = (currentPage - 1) * itemsPerPage;
-        return filteredAndSortedData.slice(start, start + itemsPerPage);
-    }, [filteredAndSortedData, currentPage, itemsPerPage]);
+        return displayData.slice(start, start + itemsPerPage);
+    }, [displayData, currentPage, itemsPerPage]);
 
-    const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
+    const totalPages = Math.ceil(displayData.length / itemsPerPage);
 
     const {
         playbackMode, isPlaying, playbackQueue, currentIndex, audioConfig, isAudioBarManuallyHidden,
         setAudioConfig, setIsAudioBarManuallyHidden,
-        togglePlayPause, stopPlaylist, startPlaylist, handlePlaySingle,
+        togglePlayPause, startPlaylist, handlePlaySingle,
         onPrevTrack, onNextTrack
-    } = useAudioPlayer(vocabList, filteredAndSortedData, showToast);
+    } = useAudioPlayer(vocabList, displayData, showToast);
 
     // --- CONTEXT DATA FOR TOOLBAR ---
     const contextData = useMemo(() => {
@@ -323,7 +329,15 @@ function VocabularyView({
     // const toggleSelectAll = (items) => { setSelectedIds(selectedIds.size === items.length ? new Set() : new Set(items.map(i => i.localId))); };
 
     const handleSort = (key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' });
-    const handleShuffle = () => setSortConfig({ key: 'random', seed: Date.now() });
+    const handleShuffle = () => {
+        const shuffled = [...filteredAndSortedData];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        setShuffledData(shuffled);
+        setIsShuffled(true);
+    };
 
     // Column Drag and Drop Logic
     const handleColumnDragStart = (e, colId) => {
@@ -380,7 +394,7 @@ function VocabularyView({
                 await apiService.sendAdd(newItems);
                 showToast("Imported successfully", "success");
                 await fetchSheetData();
-            } catch (e) {
+            } catch {
                 showToast("Import failed", "error");
             } finally {
                 setIsSyncing(false);
@@ -389,27 +403,7 @@ function VocabularyView({
         setImportModalOpen(false);
     };
 
-    const handleCreateNewFolder = (name) => {
-        // Stub for Sidebar folder creation if moved there? 
-        // Sidebar extracted doesn't have creation logic.
-        // Original code had `handleCreateFolder`.
-        // I should pass this down to Sidebar if needed, or if Sidebar has the UI for it.
-        // The Sidebar I extracted just shows buttons.
-        // The original Sidebar code had logic?
-        // Let's check original sidebar... it had a mapping of folders. 
-        // Original `VocabularyView` had `handleCreateFolder`. 
-        // But where was the UI? It was inside `VocabularyView` render but not in the "Unified Playback Effect" block in the snippet I saw?
-        // Ah, I missed where the "New Folder" button was.
-        // Searching "handleCreateFolder" in original file...
-        // It was in line 1003. usage?
-        // I don't see usage in the provided snippet of `render`.
-        // Maybe it was in a modal not shown or I missed it.
-        // I'll leave it out for now as I must strictly follow what I extracted.
-        // If I missed logic, I should add it back.
-        // But for now, focusing on existing functionality.
-    };
-
-    const nextCard = (isEasy) => {
+    const nextCard = () => {
         // Removed stats update logic
         // const card = practiceQueue[currentCardIndex]; 
 
@@ -427,8 +421,8 @@ function VocabularyView({
             <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
                 <h2 className="text-4xl font-bold mb-4">{practiceQueue[currentCardIndex]?.japanese}</h2>
                 <div className="flex gap-4 mt-8">
-                    <button onClick={() => nextCard(false)} className="px-6 py-3 bg-red-100 text-red-600 rounded-lg font-bold">Hard</button>
-                    <button onClick={() => nextCard(true)} className="px-6 py-3 bg-green-100 text-green-600 rounded-lg font-bold">Easy</button>
+                    <button onClick={nextCard} className="px-6 py-3 bg-red-100 text-red-600 rounded-lg font-bold">Hard</button>
+                    <button onClick={nextCard} className="px-6 py-3 bg-green-100 text-green-600 rounded-lg font-bold">Easy</button>
                 </div>
                 <button onClick={() => finishPractice()} className="mt-8 text-slate-400 underline text-sm">Save & Exit</button>
             </div>
@@ -478,7 +472,7 @@ function VocabularyView({
                     currentFolderId={currentFolderId} folders={folders} vocabList={contextData} selectedIds={selectedIds} isEditMode={isEditMode} hasUnsavedChanges={hasUnsavedChanges} filters={filters} hiddenColumns={hiddenColumns} viewMode={viewMode}
                     onFolderChange={handleFolderChange} onDeleteRequest={requestDelete} onEditModeToggle={() => setEditConfirmationOpen(true)} onFilterChange={handleFilterChange} onViewModeChange={handleViewModeChange} onVisibilityToggle={toggleGlobalVisibility}
                     onSave={saveChanges} onDiscard={discardChanges} onPracticeStart={handlePracticeStart} onPlaylistStart={handlePlaylistStart} onImportOpen={() => setImportModalOpen(true)} setIsColumnManagerOpen={setIsColumnManagerOpen} isSyncing={isSyncing}
-                    filteredData={filteredAndSortedData} onStartSmartPractice={handleStartSmartPractice} trendData={trendData} suggestion={weaknessSuggestion} onApplySuggestion={handleApplySuggestion} onRefresh={handleRefresh} onShuffle={handleShuffle}
+                    filteredData={displayData} onStartSmartPractice={handleStartSmartPractice} trendData={trendData} suggestion={weaknessSuggestion} onApplySuggestion={handleApplySuggestion} onRefresh={handleRefresh} onShuffle={handleShuffle}
                     isPlaying={isPlaying} onTogglePlay={togglePlayPause}
                     showingCount={showingCount}
                     totalCount={totalCount}
@@ -533,12 +527,19 @@ function VocabularyView({
                                 })}
                             </tr>
                         </thead>
-                        <tbody>{paginatedData.map((item, index) => (
-                            <SheetRow
-                                key={item.localId} item={item} index={(currentPage - 1) * itemsPerPage + index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} playbackMode={playbackMode} isPlaying={isPlaying} playbackQueue={playbackQueue} currentIndex={currentIndex} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
-                                onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={handlePlaySingle} onMark={toggleMark} onDeleteRequest={requestDelete}
-                            />
-                        ))}</tbody>
+                        <tbody>{paginatedData.map((item, index) => {
+                            const isPlaylistActive = playbackMode === 'playlist' && isPlaying && playbackQueue[currentIndex] === item.localId;
+                            const isSingleActive = playbackMode === 'single' && isPlaying && playbackQueue[currentIndex] === item.localId;
+                            const isActive = isPlaylistActive || isSingleActive;
+
+                            return (
+                                <SheetRow
+                                    key={item.localId} item={item} index={(currentPage - 1) * itemsPerPage + index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} isPlaying={isPlaying} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
+                                    onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={handlePlaySingle} onMark={toggleMark} onDeleteRequest={requestDelete}
+                                    isActive={isActive}
+                                />
+                            );
+                        })}</tbody>
                     </table>
                 </div>
 

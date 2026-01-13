@@ -1,16 +1,13 @@
 
 import React from 'react';
 import {
-    Play, Pause, AlertCircle, Trash2, EyeOff
+    Play, Pause, AlertCircle, EyeOff
 } from 'lucide-react';
 import { HeatmapBar } from './Shared';
 
-const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, columnWidths, hiddenColumns, revealedCells, selectedIds, playbackMode, isPlaying, playbackQueue, currentIndex, index, isEditMode, onToggleSelection, onUpdateCell, onRevealCell, onPlaySingle, onMark, onDeleteRequest }) => {
+const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, hiddenColumns, revealedCells, selectedIds, isPlaying, index, isEditMode, onUpdateCell, onRevealCell, onPlaySingle, onMark, isActive }) => {
     if (!item) return null;
     const isSelected = selectedIds.has(item.localId);
-    const isPlaylistActive = playbackMode === 'playlist' && isPlaying && playbackQueue[currentIndex] === item.localId;
-    const isSingleActive = playbackMode === 'single' && isPlaying && playbackQueue[currentIndex] === item.localId;
-    const isActive = isPlaylistActive || isSingleActive;
 
     const renderCellContent = (colId) => {
         // Safety check

@@ -8,14 +8,36 @@ window._speechUtteranceHolder = null;
 // This function is executing by Android's 'webView.evaluateJavascript'
 // when the native TTS engine finishes speaking.
 window.androidAudioFinished = () => {
-    // This will be overridden by the current playback 'onEnd'
-    if (window._currentAndroidCallback) {
-        window._currentAndroidCallback();
+    // Dispatch a custom event that React components can listen to
+    // This decouples the global callback from specific React closures/instances
+    const event = new CustomEvent('android-audio-ended');
+    window.dispatchEvent(event);
+
+    // Legacy support (optional, can be removed if strictly following event pattern, 
+    // but keeping for safety if other parts rely on it temporarily, though plan says decouple)
+    // We will prioritizing the Event approach.
+    if (window._currentAndroidCallback && !isStopped) {
+        // window._currentAndroidCallback(); // Commented out to enforce Event-driven logic
         window._currentAndroidCallback = null;
     }
 };
 
+// Module-level flag to prevent retry after manual stop
+let isManuallyStopped = false;
+
+// Module-level flag to prevent callback after manual stop
+let isStopped = false;
+
+// Module-level playback session counter to prevent ghost callbacks
+let playbackSessionId = 0;
+
 export const stopAudio = () => {
+    // Set flags to prevent retry and callback after manual stop
+    isManuallyStopped = true;
+    isStopped = true;
+    // Invalidate old playback sessions
+    playbackSessionId++;
+
     // Stop Native Android TTS
     if (window.Android && window.Android.stop) {
         window.Android.stop();
@@ -71,16 +93,19 @@ export const playJapaneseAudio = (text, onEnd) => {
 };
 
 const _playJapaneseAudioInternal = (text, onEnd) => {
+    // Increment session for new playback
+    playbackSessionId++;
+
     // 1. Native Android TTS (Priority #1)
     // MATCHING MainActivity.java: webView.addJavascriptInterface(..., "Android")
     if (window.Android && window.Android.speak) {
-        window._currentAndroidCallback = onEnd;
+        // We rely on 'android-audio-ended' event listener in useAudioPlayer hook
+        // just triggering speak here is enough.
         window.Android.speak(text);
         return;
     }
     // Fallback for older code referencing AndroidNative
     if (window.AndroidNative && window.AndroidNative.speak) {
-        window._currentAndroidCallback = onEnd;
         window.AndroidNative.speak(text);
         return;
     }
@@ -107,7 +132,12 @@ const _playJapaneseAudioInternal = (text, onEnd) => {
 
     const speak = (attempt = 1) => {
         try {
+            // Reset flags for new speak attempt
+            isManuallyStopped = false;
+            isStopped = false;
+
             const u = new SpeechSynthesisUtterance(text);
+            const currentSessionId = playbackSessionId;
             u.lang = 'ja-JP';
             u.rate = 1.0;
 
@@ -122,17 +152,28 @@ const _playJapaneseAudioInternal = (text, onEnd) => {
             };
 
             u.onend = () => {
+                if (isStopped) return;
+                if (currentSessionId !== playbackSessionId) return;
                 window._speechUtteranceHolder = null;
                 if (onEnd) onEnd();
+                isStopped = false;
             };
 
             u.onerror = (e) => {
+                if (e.error === "interrupted") {
+                    if (currentSessionId !== playbackSessionId) return;
+                    // Treat as manual stop, no error log, no retry
+                    window._speechUtteranceHolder = null;
+                    if (onEnd) onEnd();
+                    return;
+                }
+                if (currentSessionId !== playbackSessionId) return;
                 console.error(`TTS Error (Attempt ${attempt})`, e);
                 window._speechUtteranceHolder = null;
 
                 // If error happens immediately (no start) and we haven't retried yet, TRY AGAIN.
                 // This fixes the "first click failure" on many browsers.
-                if (!u._hasStarted && attempt <= 2) {
+                if (!u._hasStarted && attempt <= 2 && !isManuallyStopped) {
                     console.log("Retrying TTS...");
                     setTimeout(() => speak(attempt + 1), 50);
                 } else {
@@ -142,7 +183,7 @@ const _playJapaneseAudioInternal = (text, onEnd) => {
             window.speechSynthesis.speak(u);
         } catch (e) {
             console.error("TTS Speak Error", e);
-            if (attempt <= 2) {
+            if (attempt <= 2 && !isManuallyStopped) {
                 setTimeout(() => speak(attempt + 1), 50);
             } else {
                 if (onEnd) onEnd();

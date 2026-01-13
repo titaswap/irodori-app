@@ -176,23 +176,45 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onInit(int status) {
+        Log.d(TAG, "TTS onInit: " + status);
         if (status == TextToSpeech.SUCCESS) {
             int result = tts.setLanguage(Locale.JAPAN);
+            Log.d(TAG, "TTS setLanguage result: " + result);
+            
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                @Override public void onStart(String utteranceId) { }
+                @Override public void onStart(String utteranceId) {
+                    Log.d(TAG, "TTS onStart: " + utteranceId);
+                }
+
                 @Override public void onDone(String utteranceId) {
-                    if (UTTERANCE_ID.equals(utteranceId)) {
-                        runOnUiThread(() -> {
-                            if (webView != null) webView.evaluateJavascript("if(window.androidAudioFinished) window.androidAudioFinished();", null);
+                    Log.d(TAG, "TTS onDone: " + utteranceId);
+                    if (webView != null) {
+                        webView.post(() -> {
+                            try {
+                                Log.d(TAG, "TTS calling androidAudioFinished via JS");
+                                webView.evaluateJavascript("if(window.androidAudioFinished) window.androidAudioFinished(); else console.error('androidAudioFinished missing')", null);
+                            } catch (Exception e) {
+                                Log.e(TAG, "TTS JS Callback Failed", e);
+                            }
+                        });
+                    } else {
+                        Log.e(TAG, "TTS onDone: webView is null!");
+                    }
+                }
+
+                @Override public void onError(String utteranceId) {
+                    Log.e(TAG, "TTS onError: " + utteranceId);
+                    if (webView != null) {
+                        webView.post(() -> {
+                             try {
+                                webView.evaluateJavascript("if(window.androidAudioFinished) window.androidAudioFinished();", null);
+                             } catch (Exception e) { e.printStackTrace(); }
                         });
                     }
                 }
-                @Override public void onError(String utteranceId) {
-                   runOnUiThread(() -> {
-                        if (webView != null) webView.evaluateJavascript("if(window.androidAudioFinished) window.androidAudioFinished();", null);
-                   });
-                }
             });
+        } else {
+            Log.e(TAG, "TTS Init Failed!");
         }
     }
 
@@ -220,10 +242,24 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         @Keep
         @JavascriptInterface
-        public void speak(String text) { if (tts != null) tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, UTTERANCE_ID); }
+        public void speak(String text) {
+            Log.d(TAG, "TTS speak requested: " + text);
+            if (tts != null) {
+                // Use Bundle for API 21+ compatibility
+                Bundle params = new Bundle();
+                params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, UTTERANCE_ID);
+                int res = tts.speak(text, TextToSpeech.QUEUE_FLUSH, params, UTTERANCE_ID);
+                Log.d(TAG, "TTS speak result: " + res);
+            } else {
+                 Log.e(TAG, "TTS mock speak: tts is null");
+            }
+        }
 
         @Keep
         @JavascriptInterface
-        public void stop() { if (tts != null) tts.stop(); }
+        public void stop() {
+            Log.d(TAG, "TTS stop requested");
+            if (tts != null) tts.stop();
+        }
     }
 }

@@ -37,14 +37,8 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         if (viewMode === 'problem') data = data.filter(i => i.isMarked);
         else if (viewMode === 'weak') data = data.filter(i => i.isMarked); // Stats removed, fallback to marked
 
-        if (sortConfig.key === 'random') {
-            // Fisher-Yates Shuffle
-            for (let i = data.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [data[i], data[j]] = [data[j], data[i]];
-            }
-        } else if (sortConfig.key) {
-            data.sort((a, b) => {
+        if (sortConfig.key) {
+            data = [...data].sort((a, b) => {
                 let va = a[sortConfig.key], vb = b[sortConfig.key];
                 if (typeof va === 'string') va = va.toLowerCase();
                 if (typeof vb === 'string') vb = vb.toLowerCase();
@@ -54,29 +48,5 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         return data;
     }, [safeDataList, currentFolderId, searchTerm, filters, sortConfig, viewMode]);
 
-    const trendData = useMemo(() => {
-        // Stats removed, return safe defaults
-        if (!vocabList || !Array.isArray(vocabList)) return [];
-        const today = new Date();
-        return Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(today);
-            d.setDate(today.getDate() - (6 - i));
-            return { date: d.toISOString().split('T')[0], score: 0, hasActivity: false };
-        });
-    }, [vocabList]);
-
-    const weaknessSuggestion = useMemo(() => {
-        if (!vocabList || !Array.isArray(vocabList)) return null;
-        const weakItems = vocabList.filter(v => v.isMarked); // Stats removed
-        if (weakItems.length === 0) return null;
-        const grouping = {};
-        weakItems.forEach(item => {
-            const key = `${item.lesson}-${item.cando}`;
-            if (!grouping[key]) grouping[key] = { count: 0, lesson: item.lesson, cando: item.cando };
-            grouping[key].count++;
-        });
-        return Object.values(grouping).sort((a, b) => b.count - a.count)[0] || null;
-    }, [vocabList]);
-
-    return { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList };
+    return { filteredAndSortedData, safeDataList };
 };

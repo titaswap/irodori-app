@@ -50,23 +50,6 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' })
     );
 };
 
-
-const useAnimatedCounter = (end, duration = 600) => {
-    const [count, setCount] = useState(0);
-    React.useEffect(() => {
-        let start = count; const startTime = performance.now(); let frameId;
-        const animate = (currentTime) => {
-            const elapsedTime = currentTime - startTime; const progress = Math.min(elapsedTime / duration, 1);
-            const ease = 1 - Math.pow(1 - progress, 4);
-            setCount(Math.floor(start + (end - start) * ease));
-            if (progress < 1) frameId = requestAnimationFrame(animate);
-        };
-        if (start !== end) frameId = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(frameId);
-    }, [end]);
-    return count;
-};
-
 // --- MULTI-SELECT DROPDOWN COMPONENT ---
 const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     // selectedValues is now expected to be an array.
@@ -185,11 +168,8 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     );
 };
 
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, selectedIds, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFolderChange, onDeleteRequest, onEditModeToggle, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPracticeStart, onPlaylistStart, onImportOpen, setIsColumnManagerOpen, isSyncing, filteredData, onStartSmartPractice, trendData, suggestion, onApplySuggestion, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount }) => {
-    const animatedCount = useAnimatedCounter(showingCount !== undefined ? showingCount : filteredData.length);
-
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount }) => {
     const [showChipPanel, setShowChipPanel] = useState(false);
-    const [isOverflowOpen, setIsOverflowOpen] = useState(false);
 
     const containerRef = React.useRef(null);
     const [containerWidth, setContainerWidth] = useState(0);

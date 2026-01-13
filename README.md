@@ -31,3 +31,22 @@ If you are developing a production application, we recommend using TypeScript wi
    ```bash
    git push
    ```
+
+apk build note:
+
+Power shell
+cd "E:\JFT\Irodori apps - Copy\android_app"
+.\gradlew clean
+.\gradlew assembleRelease
+
+
+adb logcat note:
+// clear logcat
+// filter logcat by tag name
+adb logcat -c
+adb logcat -s IRODORI_WEBVIEW IRODORI_TTS
+
+
+
+adb uninstall com.irodori.ai
+adb install "E:\JFT\Irodori apps - Copy\android_app\app\build\outputs\apk\release\IrodoriAI.apk"

@@ -72,5 +72,5 @@ export const saveRowsPerPage = async (val) => saveUserConfig({ rowsPerPage: val 
 
 
 // Deprecated placeholders (kept for interface compatibility if needed later)
-export const fetchUserPreferences = async (userId) => null;
-export const saveUserPreferences = async (userId, preferences) => { };
+export const fetchUserPreferences = async () => null;
+export const saveUserPreferences = async () => { };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from './firebase'; // Singleton imports
-import { onAuthStateChanged, signOut, getRedirectResult } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import VocabularyView from './VocabularyView';
 import UpdateNotification from './components/UpdateNotification';
@@ -131,9 +131,15 @@ function App() {
             if (currentUser) {
                 // Logged In
                 setUser(currentUser);
-                await ensureUserProfile(currentUser);
-                // Trigger data fetch now that we have a user
-                fetchSheetData(false); // Force fresh fetch to merge Firestore data
+
+                // CRITICAL: Fire-and-forget user profile check to prevent blocking offline startup
+                ensureUserProfile(currentUser).catch(err => console.warn("Profile sync skipped (offline):", err));
+
+                // 1. Try to load local data INSTANTLY
+                const hasLocalData = loadLocalData();
+
+                // 2. Fetch fresh data in background (silent if we have local data, blocking only if completely empty)
+                fetchSheetData(hasLocalData);
             } else {
                 // Logged Out
                 setUser(null);
@@ -144,6 +150,34 @@ function App() {
 
         return () => unsubscribe();
     }, []);
+
+    // Helper: Load from LocalStorage
+    const loadLocalData = () => {
+        const saved = localStorage.getItem('vocabList');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    setVocabList(parsed);
+
+                    // Generate folders immediately
+                    const uniqueBooks = [...new Set(parsed.map(item => item.book))].filter(b => b);
+                    const savedFolders = uniqueBooks.map(bookName => ({
+                        id: bookName,
+                        name: bookName,
+                        parentId: 'root'
+                    }));
+                    setFolders(savedFolders);
+
+                    setIsLoading(false); // Unblock UI immediately
+                    return true;
+                }
+            } catch (e) {
+                console.error("Failed to parse saved data", e);
+            }
+        }
+        return false;
+    };
 
     const apiService = {
         // Send new items to Sheet
@@ -187,9 +221,17 @@ function App() {
 
 
     const fetchSheetData = async (silent = false) => {
+        // If not silent (meaning no local data), show loader.
         if (!silent && vocabList.length === 0) setIsLoading(true);
+
         try {
-            const response = await fetch(GOOGLE_SCRIPT_URL);
+            // Set timeout for fetch to prevent infinite hanging on slow connections
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+            const response = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
             if (!response.ok) throw new Error('Network response was not ok');
 
             const json = await response.json();
@@ -240,6 +282,7 @@ function App() {
                 }
 
                 // Phase 8.2: Overlay Firestore Progress
+                // Run in background, don't block render if possible (though we are in async)
                 try {
                     const firestoreProgress = await fetchAllProgress();
                     if (firestoreProgress && Object.keys(firestoreProgress).length > 0) {
@@ -262,39 +305,14 @@ function App() {
                 console.error("Unexpected data format:", json);
             }
         } catch (error) {
-            console.error("Fetch error:", error);
+            console.warn("Fetch skipped or failed (offline/timeout):", error);
+            // If we are in silent mode (have local data), this is fine.
+            // If we are NOT in silent mode, we might be stuck loading?
+            // Ensure we stop loading state.
         } finally {
-            if (!silent) setIsLoading(false);
+            setIsLoading(false);
         }
     };
-
-    // Load from LocalStorage on mount AND fetch fresh data
-    // Auth Listener handles this now (lines 75-77). 
-    // We disable this effect to prevent double-fetching or race conditions.
-    /* useEffect(() => {
-        const saved = localStorage.getItem('vocabList');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                setVocabList(parsed);
-                setIsLoading(false);
-
-                // Generate folders from saved data immediately
-                const uniqueBooks = [...new Set(parsed.map(item => item.book))].filter(b => b);
-                const savedFolders = uniqueBooks.map(bookName => ({
-                    id: bookName,
-                    name: bookName,
-                    parentId: 'root'
-                }));
-                setFolders(savedFolders);
-
-            } catch (e) {
-                console.error("Failed to parse saved data", e);
-            }
-        }
-        // Always fetch latest data (silently if we have local data)
-        fetchSheetData(!!saved);
-    }, []); */
 
     // Save to LocalStorage whenever list changes
     useEffect(() => {

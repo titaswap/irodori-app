@@ -22,3 +22,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Android / Gradle
+android_app/.gradle/
+android_app/**/build/
+android_app/app/build/
+android_app/build/
+android_app/app/build/outputs/
+android_app/app/build/intermediates/
+
+# APKs
+*.apk
+
+# Gradle cache
+.gradle/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+

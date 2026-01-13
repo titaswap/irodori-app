@@ -6,8 +6,7 @@ const PaginationControls = ({
   totalPages, 
   itemsPerPage, 
   onPageChange, 
-  onItemsPerPageChange, 
-  totalItems 
+  onItemsPerPageChange 
 }) => {
   const perPageOptions = [50, 100, 150, 250, 500, 1000];
 

@@ -159,15 +159,10 @@ function VocabularyView({
     const [viewMode, setViewMode] = useState('all');
     const [selectedIds, setSelectedIds] = useState(new Set());
 
-    const [isShuffled, setIsShuffled] = useState(false);
-    const [shuffledData, setShuffledData] = useState([]);
 
     const [practiceQueue, setPracticeQueue] = useState([]);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
     const [practiceModeActive, setPracticeModeActive] = useState(false);
-
-    // const practiceSnapshot = useRef([]); 
-    // const practiceUpdates = useRef([]); 
 
     const [importModalOpen, setImportModalOpen] = useState(false);
 
@@ -178,15 +173,12 @@ function VocabularyView({
     const [toast, setToast] = useState(null);
     const showToast = useCallback((msg, type = 'success') => setToast({ message: msg, type }), []);
 
-    // Reset shuffle when filters, sort, or view mode change
-    useEffect(() => setIsShuffled(false), [filters, sortConfig, viewMode]);
-
     // --- HOOKS ---
     const { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
         vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList
     );
 
-    const displayData = isShuffled ? shuffledData : filteredAndSortedData;
+    const displayData = filteredAndSortedData;
 
     // --- STATS ---
     const { showingCount, totalCount } = useResultStats(vocabList, displayData, currentFolderId);
@@ -224,7 +216,7 @@ function VocabularyView({
     // Reset page when data/filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [currentFolderId, searchTerm, filters, viewMode, sortConfig, isShuffled]);
+    }, [currentFolderId, searchTerm, filters, viewMode, sortConfig]);
 
     // Derived Paginated Data
     const paginatedData = useMemo(() => {
@@ -235,7 +227,7 @@ function VocabularyView({
     const totalPages = Math.ceil(displayData.length / itemsPerPage);
 
     const {
-        playbackMode, isPlaying, playbackQueue, currentIndex, audioConfig, isAudioBarManuallyHidden,
+        playbackMode, isPlaying, playbackQueue, currentIndex, currentSingleId, audioConfig, isAudioBarManuallyHidden,
         setAudioConfig, setIsAudioBarManuallyHidden,
         togglePlayPause, startPlaylist, handlePlaySingle,
         onPrevTrack, onNextTrack
@@ -366,13 +358,7 @@ function VocabularyView({
 
     const handleSort = (key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' });
     const handleShuffle = () => {
-        const shuffled = [...filteredAndSortedData];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        setShuffledData(shuffled);
-        setIsShuffled(true);
+        setSortConfig({ key: 'random', direction: 'asc', seed: Date.now() });
     };
 
     // Column Drag and Drop Logic
@@ -565,7 +551,7 @@ function VocabularyView({
                         </thead>
                         <tbody>{paginatedData.map((item, index) => {
                             const isPlaylistActive = playbackMode === 'playlist' && isPlaying && playbackQueue[currentIndex] === item.localId;
-                            const isSingleActive = playbackMode === 'single' && isPlaying && playbackQueue[currentIndex] === item.localId;
+                            const isSingleActive = playbackMode === 'single' && isPlaying && currentSingleId === item.localId;
                             const isActive = isPlaylistActive || isSingleActive;
 
                             return (
@@ -588,9 +574,10 @@ function VocabularyView({
                     totalItems={filteredAndSortedData.length}
                 />
 
-                {isAudioBarVisible && (
+                {playbackMode !== 'idle' && !isAudioBarManuallyHidden && (
                     <AudioPlayerBar
-                        playbackMode={playbackMode} playbackQueue={playbackQueue} currentIndex={currentIndex} vocabList={safeDataList} isPlaying={isPlaying} audioConfig={audioConfig}
+                        playbackMode={playbackMode} playbackQueue={playbackQueue} currentIndex={currentIndex}
+                        currentSingleId={currentSingleId} vocabList={safeDataList} isPlaying={isPlaying} audioConfig={audioConfig}
                         onPrevTrack={onPrevTrack} onNextTrack={onNextTrack}
                         onTogglePlayPause={togglePlayPause}
                         onCycleRepeat={(val) => setAudioConfig(p => ({ ...p, repeatPerItem: val, repeatMode: `${val}x` }))}

@@ -39,18 +39,16 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
 
         if (sortConfig.key === 'random') {
             // Deterministic Shuffle using Seed
-            // We need a seeded PRNG to ensure the order stays the same 
-            // when filters doesn't change but data attributes (isMarked) do.
-            let seed = sortConfig.seed || 0;
+            // We need a stable seed to ensure the order stays the same 
+            // even when item attributes (like isMarked) change.
+            let seed = sortConfig.seed || 12345;
 
-            // Simple LCG (Linear Congruential Generator) or Math.sin hack
-            // Using Math.sin hack for simplicity as it requires no extra state object
             const random = () => {
                 const x = Math.sin(seed++) * 10000;
                 return x - Math.floor(x);
             };
 
-            // Fisher-Yates Shuffle
+            // Fisher-Yates Shuffle with stable random generator
             for (let i = data.length - 1; i > 0; i--) {
                 const j = Math.floor(random() * (i + 1));
                 [data[i], data[j]] = [data[j], data[i]];

@@ -8,6 +8,7 @@ const AudioPlayerBar = ({
     playbackMode,
     playbackQueue,
     currentIndex,
+    currentSingleId, // New prop
     vocabList,
     isPlaying,
     audioConfig,
@@ -19,8 +20,10 @@ const AudioPlayerBar = ({
     onHide,
     onToggleMark
 }) => {
-    if (playbackMode !== 'playlist' || playbackQueue.length === 0) return null;
-    const currentItem = vocabList.find(v => v.localId === playbackQueue[currentIndex]);
+    if (playbackMode === 'idle' || (playbackMode === 'playlist' && playbackQueue.length === 0)) return null;
+
+    let currentId = playbackMode === 'playlist' ? playbackQueue[currentIndex] : currentSingleId;
+    const currentItem = vocabList.find(v => v.localId === currentId);
     if (!currentItem) return null;
 
     return (

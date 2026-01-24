@@ -93,14 +93,13 @@ export const playJapaneseAudio = (text, onEnd) => {
 };
 
 const _playJapaneseAudioInternal = (text, onEnd) => {
+    console.log("[audioPlayer] _playJapaneseAudioInternal text:", text);
     // Increment session for new playback
     playbackSessionId++;
 
     // 1. Native Android TTS (Priority #1)
-    // MATCHING MainActivity.java: webView.addJavascriptInterface(..., "Android")
     if (window.Android && window.Android.speak) {
-        // We rely on 'android-audio-ended' event listener in useAudioPlayer hook
-        // just triggering speak here is enough.
+        console.log("[audioPlayer] Using Android Native Bridge");
         window.Android.speak(text);
         return;
     }

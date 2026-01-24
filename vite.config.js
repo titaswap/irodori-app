@@ -12,5 +12,9 @@ export default defineConfig(({ mode }) => {
       __APP_VERSION__: JSON.stringify(packageJson.version),
       __REMOTE_VERSION_URL__: JSON.stringify(env.VITE_REMOTE_VERSION_URL || ''),
     },
+    build: {
+      minify: false,
+    }
+
   }
 })

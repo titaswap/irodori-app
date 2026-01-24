@@ -1,14 +1,6 @@
 import React, { useMemo } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-<<<<<<< HEAD
-const PaginationControls = ({ 
-  currentPage, 
-  totalPages, 
-  itemsPerPage, 
-  onPageChange, 
-  onItemsPerPageChange 
-=======
 const PaginationControls = ({
   currentPage,
   totalPages,
@@ -16,7 +8,6 @@ const PaginationControls = ({
   onPageChange,
   onItemsPerPageChange,
   totalItems
->>>>>>> 7d0ca60 (dark mode and audio controle update)
 }) => {
   const perPageOptions = [50, 100, 150, 250, 500, 1000];
 

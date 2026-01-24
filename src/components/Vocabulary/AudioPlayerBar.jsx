@@ -16,7 +16,6 @@ const AudioPlayerBar = ({
     onTogglePlayPause,
     onCycleRepeat,
     onCycleSpeed,
-    onToggleBangla,
     onHide,
     onToggleMark
 }) => {

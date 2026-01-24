@@ -4,22 +4,6 @@ import {
     Layers, SkipBack, Pause, Play, SkipForward, ChevronDown, Repeat, Star
 } from 'lucide-react';
 
-<<<<<<< HEAD
-const AudioPlayerBar = ({ 
-  playbackMode, 
-  playbackQueue, 
-  currentIndex, 
-  vocabList, 
-  isPlaying, 
-  audioConfig, 
-  onPrevTrack, 
-  onNextTrack, 
-  onTogglePlayPause, 
-  onCycleRepeat, 
-  onCycleSpeed, 
-  onHide,
-  onToggleMark 
-=======
 const AudioPlayerBar = ({
     playbackMode,
     playbackQueue,
@@ -35,7 +19,6 @@ const AudioPlayerBar = ({
     onToggleBangla,
     onHide,
     onToggleMark
->>>>>>> 7d0ca60 (dark mode and audio controle update)
 }) => {
     if (playbackMode !== 'playlist' || playbackQueue.length === 0) return null;
     const currentItem = vocabList.find(v => v.localId === playbackQueue[currentIndex]);

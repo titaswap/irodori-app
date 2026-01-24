@@ -61,18 +61,18 @@ const UserProfileMenu = ({ user, isMobile }) => {
             {/* Popup Menu */}
             {isOpen && (
                 <div
-                    className="absolute bottom-full left-4 mb-2 w-48 bg-white rounded-lg shadow-xl overflow-hidden py-1 z-50 animate-in fade-in zoom-in-95 origin-bottom-left"
+                    className="absolute bottom-full left-4 mb-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl overflow-hidden py-1 z-50 animate-in fade-in zoom-in-95 origin-bottom-left border border-slate-200 dark:border-slate-700"
                     style={{ left: isMobile ? '16px' : '64px', bottom: '16px' }}
                 >
                     {/* Header in Popup (Gmail style shows detailed info inside) */}
-                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                        <p className="text-sm font-bold text-gray-900 truncate">{user.displayName || 'User'}</p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50">
+                        <p className="text-sm font-bold text-gray-900 dark:text-slate-200 truncate">{user.displayName || 'User'}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{user.email}</p>
                     </div>
 
                     <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 font-medium"
+                        className="w-full text-left px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-700 flex items-center gap-2 font-medium"
                     >
                         <LogOut size={16} />
                         Sign out

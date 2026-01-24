@@ -84,12 +84,14 @@ const DynamicHeader = ({
       className={`
         relative
         px-2 py-1
-        bg-slate-50
-        border-b border-r border-slate-200
+        bg-slate-50 dark:bg-slate-900/90
+        backdrop-blur-sm
+        border-b border-r border-slate-200 dark:border-slate-700
         text-xs font-bold uppercase tracking-wider
         select-none
-        ${!isFixed ? 'cursor-move hover:bg-slate-100' : 'text-center'}
-        ${isEditMode ? 'bg-amber-50 border-amber-200' : ''}
+        text-slate-700 dark:text-slate-300
+        ${!isFixed ? 'cursor-move hover:bg-slate-100 dark:hover:bg-slate-800' : 'text-center'}
+        ${isEditMode ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' : ''}
       `}
     >
       <div

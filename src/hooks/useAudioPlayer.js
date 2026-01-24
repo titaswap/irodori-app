@@ -253,7 +253,6 @@ export const useAudioPlayer = (vocabList, filteredAndSortedData, showToast) => {
         });
     }, [handlePlaySingle]);
 
-
     return {
         playbackMode: state.playbackMode,
         isPlaying: state.isPlaying,

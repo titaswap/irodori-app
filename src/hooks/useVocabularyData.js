@@ -37,8 +37,26 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         if (viewMode === 'problem') data = data.filter(i => i.isMarked);
         else if (viewMode === 'weak') data = data.filter(i => i.isMarked); // Stats removed, fallback to marked
 
-        if (sortConfig.key) {
-            data = [...data].sort((a, b) => {
+        if (sortConfig.key === 'random') {
+            // Deterministic Shuffle using Seed
+            // We need a seeded PRNG to ensure the order stays the same 
+            // when filters doesn't change but data attributes (isMarked) do.
+            let seed = sortConfig.seed || 0;
+
+            // Simple LCG (Linear Congruential Generator) or Math.sin hack
+            // Using Math.sin hack for simplicity as it requires no extra state object
+            const random = () => {
+                const x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            };
+
+            // Fisher-Yates Shuffle
+            for (let i = data.length - 1; i > 0; i--) {
+                const j = Math.floor(random() * (i + 1));
+                [data[i], data[j]] = [data[j], data[i]];
+            }
+        } else if (sortConfig.key) {
+            data.sort((a, b) => {
                 let va = a[sortConfig.key], vb = b[sortConfig.key];
                 if (typeof va === 'string') va = va.toLowerCase();
                 if (typeof vb === 'string') vb = vb.toLowerCase();

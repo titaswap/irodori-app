@@ -1,12 +1,22 @@
 import React, { useMemo } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
+<<<<<<< HEAD
 const PaginationControls = ({ 
   currentPage, 
   totalPages, 
   itemsPerPage, 
   onPageChange, 
   onItemsPerPageChange 
+=======
+const PaginationControls = ({
+  currentPage,
+  totalPages,
+  itemsPerPage,
+  onPageChange,
+  onItemsPerPageChange,
+  totalItems
+>>>>>>> 7d0ca60 (dark mode and audio controle update)
 }) => {
   const perPageOptions = [50, 100, 150, 250, 500, 1000];
 
@@ -43,8 +53,8 @@ const PaginationControls = ({
   }, [currentPage, totalPages]);
 
   return (
-    <div className="flex flex-row flex-wrap items-center justify-between gap-2 py-2 px-3 bg-white border-t border-slate-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] z-20 text-xs">
-      
+    <div className="flex flex-row flex-wrap items-center justify-between gap-2 py-2 px-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] z-20 text-xs">
+
       <div className="flex items-center gap-2 group order-1">
         <label htmlFor="rows-per-page" className="hidden sm:block text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-600 transition-colors">
           Rows
@@ -54,7 +64,7 @@ const PaginationControls = ({
             id="rows-per-page"
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded pl-2 pr-6 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 hover:border-slate-300 transition-all cursor-pointer shadow-sm"
+            className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded pl-2 pr-6 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-slate-500 transition-all cursor-pointer shadow-sm"
           >
             {perPageOptions.map(opt => (
               <option key={opt} value={opt}>{opt}</option>
@@ -68,7 +78,7 @@ const PaginationControls = ({
 
       {/* Right: Navigation & Numbers */}
       <div className="flex items-center gap-1 order-2">
-        
+
         {/* Previous Group */}
         <div className="flex items-center gap-1 mr-1">
           <NavButton onClick={() => onPageChange(1)} disabled={currentPage === 1} title="First Page">
@@ -84,15 +94,15 @@ const PaginationControls = ({
           {pageNumbers.map((page, index) => (
             <React.Fragment key={index}>
               {page === '...' ? (
-                <span className="text-slate-400 px-0.5 select-none font-medium">...</span>
+                <span className="text-slate-400 dark:text-slate-600 px-0.5 select-none font-medium">...</span>
               ) : (
                 <button
                   onClick={() => onPageChange(page)}
                   className={`
                     min-w-[28px] h-7 px-1.5 rounded text-xs font-bold transition-all duration-200 border
                     ${currentPage === page
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
-                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200'
+                      ? 'bg-indigo-600 dark:bg-indigo-700 text-white border-indigo-600 dark:border-indigo-700 shadow-sm shadow-indigo-200 dark:shadow-none'
+                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-800'
                     }
                   `}
                 >
@@ -126,9 +136,9 @@ const NavButton = ({ onClick, disabled, title, children }) => (
     title={title}
     className={`
       p-1.5 rounded transition-all duration-200 flex items-center justify-center border
-      ${disabled 
-        ? 'text-slate-300 bg-slate-50 border-transparent cursor-not-allowed' 
-        : 'text-slate-500 bg-white border-slate-200 hover:text-indigo-600 hover:bg-indigo-50 hover:border-indigo-100 active:scale-95'
+      ${disabled
+        ? 'text-slate-300 dark:text-slate-600 bg-slate-50 dark:bg-slate-800/50 border-transparent cursor-not-allowed'
+        : 'text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 hover:border-indigo-100 dark:hover:border-slate-600 active:scale-95'
       }
     `}
   >

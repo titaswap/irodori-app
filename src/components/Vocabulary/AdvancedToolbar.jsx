@@ -114,13 +114,13 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
                     flex items-center justify-center gap-2 appearance-none 
                     transition-all duration-200
                     text-xs font-bold 
-                    rounded shadow-sm
+                    rounded-lg shadow-sm
                     focus:outline-none 
                     ${isOpen ? 'ring-2 ring-indigo-200' : ''}
-                    h-8 min-w-[32px] md:min-w-[100px] md:px-2 md:justify-between px-0
+                    h-9 min-w-[36px] md:min-w-[100px] md:px-2 md:justify-between px-0
                     ${!isAll
-                        ? 'bg-indigo-600 text-white border border-indigo-600 shadow-indigo-200'
-                        : 'bg-white text-slate-700 border border-slate-300 hover:border-indigo-400'
+                        ? 'bg-indigo-600 text-white border border-indigo-600 shadow-indigo-200 dark:shadow-none'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-400'
                     }
                 `}
             >
@@ -135,27 +135,27 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
                 <div
                     ref={dropdownRef}
                     style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left }}
-                    className="w-48 bg-white rounded-lg shadow-xl border border-slate-200 z-[9999] max-h-64 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left"
+                    className="w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-[9999] max-h-64 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left"
                 >
                     <div
                         onClick={() => { toggleAll(); setIsOpen(false); }}
-                        className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-bold ${isAll ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+                        className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-bold ${isAll ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                     >
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isAll ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 bg-white'}`}>
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isAll ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
                             {isAll && <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>}
                         </div>
                         All
                     </div>
-                    <div className="h-px bg-slate-100 my-1"></div>
+                    <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
                     {options.map(opt => {
                         const isSelected = safeSelected.includes(opt);
                         return (
                             <div
                                 key={opt}
                                 onClick={() => toggleOption(opt)}
-                                className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-medium ${isSelected ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+                                className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-medium ${isSelected ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                             >
-                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 bg-white'}`}>
+                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
                                     {isSelected && <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                                 </div>
                                 {label} {opt}
@@ -221,7 +221,8 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
     if (!isDesktop && showColumns) available -= itemCost;
 
     // Language Group Cost ~100px (3 buttons + label)
-    const showLanguages = isDesktop || available >= 100;
+    // Always show languages as they are critical controls, relying on overflow-x-auto for mobile layout
+    const showLanguages = true;
 
 
 
@@ -239,16 +240,16 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
     }, [vocabList]);
 
     return (
-        <div className="bg-white border-b border-slate-200 flex flex-col flex-shrink-0 z-20 shadow-sm sticky top-0 max-w-[100vw]">
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0 z-20 shadow-sm sticky top-0 max-w-[100vw]">
             {showChipPanel && (
-                <div className="flex flex-col gap-0.5 p-0.5 bg-slate-50/50 border-b border-slate-100 overflow-hidden animate-in slide-in-from-top-2 duration-300">
+                <div className="flex flex-col gap-0.5 p-0.5 bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 overflow-hidden animate-in slide-in-from-top-2 duration-300">
                     <FilterChipBar label="L" items={lessonCounts} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
                     <FilterChipBar label="C" items={candoCounts} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
                 </div>
             )}
 
-            <div className="bg-white z-10 border-b border-slate-200 shadow-sm max-w-[100vw]">
-                <div ref={containerRef} className="flex items-center gap-1 p-1 overflow-x-auto no-scrollbar">
+            <div className="bg-white dark:bg-slate-900 z-10 border-b border-slate-200 dark:border-slate-800 shadow-sm max-w-[100vw]">
+                <div ref={containerRef} className="flex items-center gap-1 p-1 overflow-x-auto no-scrollbar pr-4">
                     {/* Status Indicators (Folder Nav removed) */}
                     {isSyncing && <Loader size={12} className="text-blue-600 animate-spin mr-2 flex-shrink-0" />}
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
@@ -258,78 +259,92 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                         <MultiSelectDropdown label="Can-do" options={[...new Set(vocabList.map(v => String(v.cando)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
                     </div>
 
-                    <div className="w-px h-6 bg-slate-100 mx-1 flex-shrink-0"></div>
-                    {showMarked && (
-                        <button onClick={() => onViewModeChange('problem')} className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all whitespace-nowrap ${viewMode === 'problem' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`} title="Toggle Marked View">
-                            <AlertCircle size={14} />
-                            <span className="hidden md:inline">Marked</span>
-                        </button>
-                    )}
+                    {/* --- VIEW ACTIONS GROUP --- */}
+                    <div className="flex items-center bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg gap-0.5 flex-shrink-0">
+                        {showMarked && (
+                            <button
+                                onClick={() => onViewModeChange('problem')}
+                                className={`flex items-center justify-center gap-1 h-8 px-2.5 rounded-md text-xs font-bold transition-all active:scale-95 whitespace-nowrap ${viewMode === 'problem' ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10' : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                                title="Toggle Marked View"
+                            >
+                                <AlertCircle size={14} className={viewMode === 'problem' ? "fill-red-100" : ""} />
+                                <span className={viewMode === 'problem' ? "inline" : "hidden md:inline"}>Marked</span>
+                            </button>
+                        )}
+                    </div>
 
+                    <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 flex-shrink-0"></div>
+
+                    {/* --- PLAYBACK GROUP --- */}
                     {!isEditMode && (
-                        <>
+                        <div className="flex items-center bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg gap-0.5 flex-shrink-0">
                             {showPlay && (
                                 <button
                                     onClick={isPlaying ? onTogglePlay : onPlaylistStart}
                                     disabled={isSyncing}
-                                    className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg shadow-sm transition-colors disabled:opacity-50 ${isPlaying ? 'bg-slate-800 text-white hover:bg-slate-900' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-md transition-all active:scale-95 disabled:opacity-50 ${isPlaying ? 'bg-slate-800 dark:bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm dark:hover:text-slate-200'}`}
                                     title={isPlaying ? "Pause" : "Start Playlist"}
                                 >
-                                    {isPlaying ? <div className="flex gap-0.5"><div className="w-1 h-3 bg-current rounded-full"></div><div className="w-1 h-3 bg-current rounded-full"></div></div> : <Play size={14} className="ml-0.5" />}
+                                    {isPlaying ? <div className="flex gap-0.5"><div className="w-1 h-3 bg-current rounded-full"></div><div className="w-1 h-3 bg-current rounded-full"></div></div> : <Play size={14} className="ml-0.5 fill-current" />}
                                 </button>
                             )}
-                            {showShuffle && <button onClick={onShuffle} disabled={isSyncing} className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white border border-slate-200 text-purple-600 rounded-lg shadow-sm hover:bg-slate-50 disabled:opacity-50" title="Shuffle"><Shuffle size={14} /></button>}
-                        </>
-                    )}
-
-                    {showRefresh && (
-                        <button onClick={onRefresh} disabled={isSyncing} className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-lg shadow-sm hover:bg-slate-50 disabled:opacity-50" title="Refresh">
-                            <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
-                        </button>
-                    )}
-
-
-
-                    {showLanguages && (
-                        <div className="hidden md:flex items-center gap-0.5 scale-90 origin-left">
-                            <button onClick={() => onVisibilityToggle('bangla')} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>BN</button>
-                            <button onClick={() => onVisibilityToggle('japanese')} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition-colors ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>JP</button>
-                        </div>
-                    )}
-                    {/* Mobile version of languages in main bar if enabled */}
-                    {showLanguages && (
-                        <div className="md:hidden flex items-center gap-0.5">
-                            <button onClick={() => onVisibilityToggle('bangla')} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-[10px] font-bold transition-colors ${hiddenColumns.bangla ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>BN</button>
-                            <button onClick={() => onVisibilityToggle('japanese')} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-[10px] font-bold transition-colors ${hiddenColumns.japanese ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>JP</button>
+                            {showShuffle && (
+                                <button onClick={onShuffle} disabled={isSyncing} className="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 rounded-md hover:bg-white dark:hover:bg-slate-700 hover:text-purple-600 dark:hover:text-purple-400 hover:shadow-sm transition-all active:scale-95 disabled:opacity-50" title="Shuffle">
+                                    <Shuffle size={14} />
+                                </button>
+                            )}
+                            {showRefresh && (
+                                <button onClick={onRefresh} disabled={isSyncing} className="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 rounded-md hover:bg-white dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-sm transition-all active:scale-95 disabled:opacity-50" title="Refresh">
+                                    <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
+                                </button>
+                            )}
                         </div>
                     )}
 
-
-                    {isEditMode && (
-                        <>
-                            <button onClick={onDiscard} className="bg-white border px-2 py-1 rounded text-xs whitespace-nowrap"><Undo size={14} /></button>
-                            <button onClick={onSave} className="bg-green-600 text-white px-2 py-1 rounded text-xs whitespace-nowrap"><SaveIcon size={14} /></button>
-                        </>
+                    {/* --- LANGUAGE TOGGLE (Segmented Control) --- */}
+                    {showLanguages && (
+                        <div className="flex items-center ml-1 flex-shrink-0 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 gap-0">
+                            <button
+                                onClick={() => onVisibilityToggle('bangla')}
+                                className={`h-8 w-8 md:w-auto md:px-3 flex items-center justify-center rounded-md text-[10px] font-semibold transition-all duration-200 ${hiddenColumns.bangla ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-md hover:shadow-lg active:shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-transparent border-none'}`}
+                                title={!hiddenColumns.bangla ? "Hide Bangla" : "Show Bangla"}
+                            >
+                                BN
+                            </button>
+                            <button
+                                onClick={() => onVisibilityToggle('japanese')}
+                                className={`h-8 w-8 md:w-auto md:px-3 flex items-center justify-center rounded-md text-[10px] font-semibold transition-all duration-200 ${hiddenColumns.japanese ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-md hover:shadow-lg active:shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-transparent border-none'}`}
+                                title={!hiddenColumns.japanese ? "Hide Japanese" : "Show Japanese"}
+                            >
+                                JP
+                            </button>
+                        </div>
                     )}
+
+                    {/* Columns Button (Standalone) */}
                     {showChips && (
-                        <button onClick={() => setShowChipPanel(!showChipPanel)} className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm ${showChipPanel ? 'bg-indigo-600 text-white border border-indigo-600 shadow-indigo-200' : 'bg-white text-slate-600 border border-slate-200'}`} title={showChipPanel ? "Hide Chips" : "Show Chips"}>
+                        <button
+                            onClick={() => setShowChipPanel(!showChipPanel)}
+                            className={`flex-shrink-0 flex items-center justify-center gap-1 h-9 px-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ml-1 ${showChipPanel ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                            title={showChipPanel ? "Hide Chips" : "Show Chips"}
+                        >
                             {showChipPanel ? <ChevronDown size={14} /> : <ArrowRight size={14} />}
                             <span className="hidden md:inline">Chips</span>
                         </button>
                     )}
                     {showColumns && (
-                        <button onClick={() => setIsColumnManagerOpen(true)} className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-lg shadow-sm hover:bg-slate-50 disabled:opacity-50" title="Columns">
-                            <SettingsIcon size={14} />
+                        <button onClick={() => setIsColumnManagerOpen(true)} className="ml-0.5 w-9 h-9 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="Columns">
+                            <SettingsIcon size={16} />
                         </button>
                     )}
                     {/* Desktop Folder Info (Right aligned) */}
-                    <div className="hidden md:flex items-center gap-2 ml-auto mr-2 text-[11px] bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                        <div className="font-bold text-slate-700 max-w-[200px] truncate">
+                    <div className="hidden md:flex items-center gap-2 ml-auto mr-2 text-[11px] bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+                        <div className="font-bold text-slate-700 dark:text-slate-200 max-w-[200px] truncate">
                             {currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}
                         </div>
-                        <div className="text-slate-300">|</div>
-                        <div className="text-slate-600 font-medium">
-                            Showing <span className="text-slate-900 font-bold font-mono">{showingCount !== undefined ? showingCount : filteredData.length}</span> / <span className="font-mono">{totalCount !== undefined ? totalCount : vocabList.length}</span>
+                        <div className="text-slate-300 dark:text-slate-600">|</div>
+                        <div className="text-slate-600 dark:text-slate-400 font-medium">
+                            Showing <span className="text-slate-900 dark:text-slate-100 font-bold font-mono">{showingCount !== undefined ? showingCount : filteredData.length}</span> / <span className="font-mono">{totalCount !== undefined ? totalCount : vocabList.length}</span>
                         </div>
                     </div>
 

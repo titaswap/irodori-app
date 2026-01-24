@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import {
     Folder, Loader, PenTool, TrendingUp, Target, Undo, Save as SaveIcon,
     Trash2, AlertCircle, Volume2
@@ -64,6 +64,42 @@ function VocabularyView({
     });
     const [columnVisibility, setColumnVisibility] = useState(() => preferenceStore.loadPreferences().columnVisibility);
     const [columnWidths, setColumnWidths] = useState(() => preferenceStore.loadPreferences().columnWidths);
+
+    // --- THEME STATE ---
+    // --- THEME STATE ---
+    const [theme, setTheme] = useState(() => {
+        let initial = 'light';
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                initial = saved;
+            } else {
+                // First time: Check system, but LOCK IT IN immediately
+                initial = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                localStorage.setItem('theme', initial);
+            }
+
+            // IMMEDIATE APPLICATION (prevent flash)
+            if (initial === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        return initial;
+    });
+
+    useLayoutEffect(() => {
+        const root = window.document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
     const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -433,7 +469,7 @@ function VocabularyView({
     const isAudioActiveButHidden = playbackMode === 'playlist' && playbackQueue.length > 0 && isAudioBarManuallyHidden;
 
     return (
-        <div className="flex h-screen w-full bg-slate-100 font-sans text-slate-800 overflow-hidden">
+        <div className="flex h-screen w-full bg-slate-100 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-100 overflow-hidden">
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             {/* Sidebar: Hidden on mobile, visible on desktop */}
@@ -451,7 +487,7 @@ function VocabularyView({
                 </div>
             )}
 
-            <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
+            <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-900">
                 {/* MOBILE HEADER (Visible only on mobile) */}
                 <div className="md:hidden bg-slate-900 text-white px-3 py-1.5 flex items-center justify-between shadow-md z-20 h-11 shrink-0">
                     <div className="flex items-center gap-2">
@@ -486,7 +522,7 @@ function VocabularyView({
                         '--desktop-zoom': uiConfig.desktopTableZoom
                     }}
                 >
-                    <table className="w-full border-collapse bg-white text-sm table-fixed">
+                    <table className="w-full border-collapse bg-white dark:bg-slate-900 text-sm table-fixed">
                         <colgroup>
                             {columnOrder.map(colId => {
                                 const def = allColumns.find(c => c.id === colId);
@@ -580,7 +616,7 @@ function VocabularyView({
             {editConfirmationOpen && <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-amber-50 p-6 flex flex-col items-center text-center"><PenTool className="text-amber-600 mb-4" size={24} /><h3 className="text-xl font-bold">Enable Editing?</h3><p className="text-sm text-slate-500 mt-2">You are entering Edit Mode.<br />Changes are temporary until you click Save.</p></div><div className="p-4 bg-white flex justify-end gap-3"><button onClick={() => setEditConfirmationOpen(false)} className="flex-1 px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button><button onClick={startEditMode} className="flex-1 px-4 py-2.5 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600">Start Editing</button></div></div></div>}
             {unsavedChangesModal.open && <div className="fixed inset-0 z-[110] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"><div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95"><div className="bg-amber-50 p-6 flex flex-col items-center text-center border-b border-amber-100"><div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4"><AlertCircle className="text-amber-600" size={24} /></div><h3 className="text-xl font-bold text-slate-800">Unsaved Changes</h3><p className="text-sm text-slate-500 mt-2">You have unsaved edits in this session.<br />What would you like to do?</p></div><div className="p-4 bg-white flex flex-col gap-2"><button onClick={confirmExitWithSave} className="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"><SaveIcon size={16} /> Save & Continue</button><button onClick={confirmExitWithDiscard} className="w-full px-4 py-3 bg-white border-2 border-red-100 text-red-600 font-bold rounded-lg hover:bg-red-50 flex items-center justify-center gap-2"><Trash2 size={16} /> Discard Changes</button><button onClick={cancelEditModeAttempt} className="w-full px-4 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-lg">Cancel (Stay Here)</button></div></div></div>}
 
-            <ColumnManager isOpen={isColumnManagerOpen} onClose={() => setIsColumnManagerOpen(false)} allColumns={allColumns} columnOrder={columnOrder} setColumnOrder={setColumnOrder} columnVisibility={columnVisibility} setColumnVisibility={setColumnVisibility} />
+            <ColumnManager isOpen={isColumnManagerOpen} onClose={() => setIsColumnManagerOpen(false)} allColumns={allColumns} columnOrder={columnOrder} setColumnOrder={setColumnOrder} columnVisibility={columnVisibility} setColumnVisibility={setColumnVisibility} isDarkMode={theme === 'dark'} onToggleTheme={toggleTheme} />
 
             <ImportModal isOpen={importModalOpen} onClose={() => setImportModalOpen(false)} onImport={handleImport} />
 

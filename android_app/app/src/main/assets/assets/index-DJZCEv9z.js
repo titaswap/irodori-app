@@ -32350,21 +32350,21 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
     const isHiddenMask = hiddenColumns[colId];
     switch (colId) {
       case "selection":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `w-10 px-2 py-0.5 border-r border-white/5 text-center font-medium text-slate-500 text-xs`, children: index + 1 });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `w-10 px-2 py-0.5 border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] text-center font-medium text-slate-500 text-xs`, children: index + 1 });
       case "audio":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `w-12 px-2 py-0.5 border-r border-white/5 text-center ${cellBaseClass}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => onPlaySingle(item), className: `p-1.5 rounded-full transition-all duration-300 ${isActive ? "bg-primary text-white neon-glow" : "bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-white border border-white/5"}`, children: isActive && isPlaying ? /* @__PURE__ */ jsxRuntimeExports.jsx(Pause, { size: 14 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 14 }) }) });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `w-12 px-2 py-0.5 border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] text-center ${cellBaseClass}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => onPlaySingle(item), className: `p-1.5 rounded-full transition-all duration-300 ${isActive ? "bg-primary text-white neon-glow" : "bg-indigo-50 hover:bg-indigo-100 text-indigo-400 hover:text-indigo-600 dark:bg-white/5 dark:hover:bg-primary/20 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-white/5"}`, children: isActive && isPlaying ? /* @__PURE__ */ jsxRuntimeExports.jsx(Pause, { size: 14 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 14 }) }) });
       case "isMarked":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `w-12 px-2 py-0.5 border-r border-white/5 text-center ${cellBaseClass}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => onMark(item.localId), className: "p-0.5 hover:scale-110 transition-transform", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { size: 16, className: item.isMarked ? "text-red-500 fill-red-500/20 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-slate-600" }) }) });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `w-12 px-2 py-0.5 border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] text-center ${cellBaseClass}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => onMark(item.localId), className: "p-0.5 hover:scale-110 transition-transform", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { size: 16, className: item.isMarked ? "text-red-500 fill-red-500/20 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-slate-400 dark:text-slate-600" }) }) });
       default:
         const value = item[colId];
         const displayValue = typeof value === "object" && value !== null ? JSON.stringify(value) : String(value || "");
         const isRevealedLocal = revealedCells[colId] === item.localId;
         const shouldShowContent = !isHiddenMask || isRevealedLocal;
         const isPrimary = colId === "japanese" || colId === "hiragana" || colId === "Hiragana";
-        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `px-0 border-r border-white/5 ${!shouldShowContent && !isEditMode ? "bg-white/5 backdrop-blur-sm" : ""}`, children: !shouldShowContent && !isEditMode ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => onRevealCell(item.localId, colId), className: "w-full h-full px-2 py-0.5 text-transparent cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors group/cell", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EyeOff, { size: 16, className: "text-slate-300 dark:text-slate-600 group-hover/cell:text-slate-500 dark:group-hover/cell:text-slate-400" }) }) : isEditMode ? /* @__PURE__ */ jsxRuntimeExports.jsx("input", { className: `w-full h-full px-2 py-0.5 bg-transparent outline-none text-sm border-2 border-transparent focus:border-primary focus:bg-primary/10 transition-all text-text-main`, value: displayValue, onChange: (e) => onUpdateCell(item.localId, colId, e.target.value) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-full h-full px-2 py-0.5 flex items-center text-sm leading-tight ${isPrimary ? "font-bold text-white" : "text-slate-300"} ${isActive ? "text-primary-glow" : ""}`, children: displayValue }) });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { "data-col-id": colId, className: `px-0 border-r border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.02] ${!shouldShowContent && !isEditMode ? "bg-slate-100/50 dark:bg-white/5 backdrop-blur-sm" : ""}`, children: !shouldShowContent && !isEditMode ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => onRevealCell(item.localId, colId), className: "w-full h-full px-2 py-0.5 text-transparent cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors group/cell", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EyeOff, { size: 16, className: "text-slate-300 dark:text-slate-600 group-hover/cell:text-slate-500 dark:group-hover/cell:text-slate-400" }) }) : isEditMode ? /* @__PURE__ */ jsxRuntimeExports.jsx("input", { className: `w-full h-full px-2 py-0.5 bg-transparent outline-none text-sm border-2 border-transparent focus:border-primary focus:bg-primary/10 transition-all text-slate-900 dark:text-text-main`, value: displayValue, onChange: (e) => onUpdateCell(item.localId, colId, e.target.value) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-full h-full px-2 py-0.5 flex items-center text-sm leading-tight ${isPrimary ? "font-bold text-slate-800 dark:text-white" : "text-slate-600 dark:text-slate-300"} ${isActive ? "text-primary dark:text-primary-glow" : ""}`, children: displayValue }) });
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: `glossy-row group border-b border-white/5 transition-all duration-300 ${isSelected ? "bg-primary/20 shadow-[inset_0_0_20px_rgba(99,102,241,0.2)]" : isActive ? "bg-primary/10 border-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]" : ""}`, children: columnOrder.map((colId) => /* @__PURE__ */ jsxRuntimeExports.jsx(React.Fragment, { children: (!columnDefs.find((c) => c.id === colId)?.editOnly || isEditMode) && renderCellContent(colId) }, colId)) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: `glossy-row group border-b border-slate-200 dark:border-white/10 transition-all duration-300 ${isSelected ? "bg-primary/10 dark:bg-primary/20 shadow-[inset_0_0_20px_rgba(99,102,241,0.1)]" : isActive ? "bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.05)]" : ""}`, children: columnOrder.map((colId) => /* @__PURE__ */ jsxRuntimeExports.jsx(React.Fragment, { children: (!columnDefs.find((c) => c.id === colId)?.editOnly || isEditMode) && renderCellContent(colId) }, colId)) });
 });
 const AudioPlayerBar = ({
   playbackMode,
@@ -32503,17 +32503,17 @@ const DynamicHeader = ({
       onDrop: (e) => !isFixed && onDrop(e, colId),
       "data-col-id": colId,
       className: `
-        relative
-        px-4 py-5
-        bg-white/5
-        backdrop-blur-xl
-        border-b border-r border-white/10
-        text-[11px] font-bold uppercase tracking-[0.15em]
-        select-none
-        text-slate-400
-        ${!isFixed ? "cursor-move hover:bg-white/10 transition-colors" : "text-center"}
-        ${isEditMode ? "bg-amber-500/10 border-amber-500/30 text-amber-500" : ""}
-      `,
+          relative sticky top-0 z-30
+          px-3 py-2
+          bg-slate-50 dark:bg-[#030413]
+          border-b border-r border-slate-200 dark:border-white/10
+          shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]
+          text-[11px] font-bold uppercase tracking-[0.15em]
+          select-none
+          text-slate-600 dark:text-slate-400
+          ${!isFixed ? "cursor-move hover:bg-indigo-50/50 dark:hover:bg-white/10 transition-colors" : "text-center"}
+          ${isEditMode ? "bg-amber-50 dark:bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500" : ""}
+        `,
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
@@ -32542,12 +32542,12 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = "blue" })
   if (!items || items.length === 0) return null;
   const safeActive = Array.isArray(activeValues) ? activeValues : [];
   const colorClasses = {
-    blue: { active: "bg-blue-600 text-white shadow-md shadow-blue-200", inactive: "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-blue-300" },
-    indigo: { active: "bg-indigo-600 text-white shadow-md shadow-indigo-200", inactive: "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-indigo-300" }
+    blue: { active: "bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50", inactive: "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-400 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:border-blue-400 dark:hover:border-blue-600" },
+    indigo: { active: "bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-indigo-900/50", inactive: "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-400 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600" }
   };
   const styles = colorClasses[color] || colorClasses.blue;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 overflow-hidden px-1 select-none transition-all duration-300 h-7 border-b border-transparent", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[9px] font-bold text-slate-400 uppercase tracking-wider mr-0.5 w-[50px] shrink-0 text-right", children: label === "L" ? "Lesson" : "Can-do" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-0.5 w-[50px] shrink-0 text-right", children: label === "L" ? "Lesson" : "Can-do" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 overflow-x-auto items-center h-full no-scrollbar", style: { scrollbarWidth: "none", msOverflowStyle: "none" }, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("style", { children: ` .no-scrollbar::-webkit-scrollbar { display: none; } ` }),
       items.map(([val, count]) => {
@@ -32566,7 +32566,7 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = "blue" })
                 label,
                 val
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `text-[9px] opacity-70 ${isActive ? "bg-white/20 px-1 rounded-[2px]" : "text-slate-400 bg-slate-100 px-1 rounded-[2px]"}`, children: count }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `text-[9px] opacity-70 ${isActive ? "bg-white/20 px-1 rounded-[2px]" : "text-slate-500 dark:text-slate-500 bg-slate-300 dark:bg-slate-700 px-1 rounded-[2px]"}`, children: count }),
               isActive && /* @__PURE__ */ jsxRuntimeExports.jsx(X, { size: 10, className: "ml-0.5 opacity-80 hover:opacity-100" })
             ]
           },
@@ -32626,14 +32626,14 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
         },
         title: `${label} Filter`,
         className: `
-                    flex items-center justify-center gap-2 appearance-none 
+                    flex items-center justify-center gap-1.5 appearance-none 
                     transition-all duration-200
-                    text-sm font-semibold 
+                    text-[11px] md:text-xs font-semibold 
                     rounded-full
                     focus:outline-none 
                     ${isOpen ? "ring-2 ring-primary/50" : ""}
-                    h-9 min-w-[36px] md:min-w-[100px] md:px-4 md:justify-between px-0 relative overflow-hidden group
-                    ${!isAll ? "bg-primary text-white neon-glow" : "bg-primary/20 border border-primary/40 text-white hover:bg-primary/30"}
+                    h-7 min-w-[28px] md:min-w-[80px] px-2 md:justify-between relative overflow-hidden group
+                    ${!isAll ? "bg-primary text-white shadow-sm shadow-primary/20" : "bg-primary/10 border border-primary/20 text-primary dark:text-white hover:bg-primary/20"}
                 `,
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "md:hidden flex items-center justify-center gap-0.5", children: [
@@ -32693,7 +32693,7 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     )
   ] });
 };
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen }) => {
   const [showChipPanel, setShowChipPanel] = reactExports.useState(false);
   const containerRef = React.useRef(null);
   const [containerWidth, setContainerWidth] = reactExports.useState(0);
@@ -32718,18 +32718,18 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
   const baseReservedWidth = 90;
   const itemCost = 36;
   let available = containerWidth - baseReservedWidth;
-  const showMarked = isDesktop || available >= itemCost;
-  if (!isDesktop && showMarked) available -= itemCost;
-  const showPlay = isDesktop || !isEditMode && available >= itemCost;
-  if (!isDesktop && showPlay && !isEditMode) available -= itemCost;
-  const showShuffle = isDesktop || !isEditMode && available >= itemCost;
-  if (!isDesktop && showShuffle && !isEditMode) available -= itemCost;
-  const showChips = isDesktop || available >= itemCost;
-  if (!isDesktop && showChips) available -= itemCost;
-  const showRefresh = isDesktop || available >= itemCost;
-  if (!isDesktop && showRefresh) available -= itemCost;
-  const showColumns = isDesktop || available >= itemCost;
-  if (!isDesktop && showColumns) available -= itemCost;
+  const showMarked = !isDesktop || available >= itemCost;
+  if (isDesktop && showMarked) available -= itemCost;
+  const showPlay = !isDesktop || !isEditMode && available >= itemCost;
+  if (isDesktop && showPlay && !isEditMode) available -= itemCost;
+  const showShuffle = !isDesktop || !isEditMode && available >= itemCost;
+  if (isDesktop && showShuffle && !isEditMode) available -= itemCost;
+  const showChips = !isDesktop || available >= itemCost;
+  if (isDesktop && showChips) available -= itemCost;
+  const showRefresh = !isDesktop || available >= itemCost;
+  if (isDesktop && showRefresh) available -= itemCost;
+  const showColumns = !isDesktop || available >= itemCost;
+  if (isDesktop && showColumns) available -= itemCost;
   const lessonCounts = reactExports.useMemo(() => {
     const counts = {};
     vocabList.forEach((item) => {
@@ -32746,8 +32746,32 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
     });
     return Object.entries(counts).sort();
   }, [vocabList]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "glass-card !bg-slate-900/30 border-b border-white/10 flex flex-col flex-shrink-0 z-20 reflection-sweep sticky top-0 max-w-[100vw]", children: [
-    showChipPanel && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5 p-0.5 bg-slate-900/40 border-b border-white/10 overflow-hidden animate-in slide-in-from-top-2 duration-300", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-50 dark:bg-[#030413] border-b border-slate-300 dark:border-white/5 flex flex-col flex-shrink-0 z-20 sticky top-0 max-w-[100vw] shadow-sm", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "md:hidden flex items-center justify-between px-3 py-1 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg text-white", children: "あ" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold text-base tracking-tight leading-none", children: [
+          "Irodori",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-indigo-500", children: "AI" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-slate-400 font-mono text-right leading-none flex flex-col gap-0.5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-bold text-slate-700 dark:text-white max-w-[100px] truncate", children: currentFolderId === "root" ? "My Drive" : folders.find((f) => f.id === currentFolderId)?.name || "..." }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "opacity-80", children: [
+            showingCount,
+            " / ",
+            totalCount
+          ] })
+        ] }),
+        setIsMobileSidebarOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsMobileSidebarOpen(true), className: "p-1 -mr-1 text-slate-600 dark:text-slate-300", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-[3px]", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-0.5 bg-current rounded-full" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-0.5 bg-current rounded-full" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-0.5 bg-current rounded-full" })
+        ] }) })
+      ] })
+    ] }),
+    showChipPanel && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5 p-0.5 bg-slate-100 dark:bg-[#0a0c20]/50 border-b border-slate-300 dark:border-white/5 overflow-hidden animate-in slide-in-from-top-2 duration-300", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(FilterChipBar, { label: "L", items: lessonCounts, activeValues: filters.lesson, onToggle: (val) => {
         const curr = filters.lesson || [];
         const isSelected = curr.includes(val);
@@ -32761,49 +32785,49 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         onFilterChange({ ...filters, cando: newVals });
       }, color: "indigo" })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-transparent z-10 max-w-[100vw]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: containerRef, className: "flex items-center gap-1 p-3 overflow-x-auto no-scrollbar", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-transparent z-10 max-w-[100vw]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: containerRef, className: "flex items-center gap-1.5 p-0.5 md:p-3 overflow-x-auto", style: { scrollbarWidth: "none" }, children: [
       isSyncing && /* @__PURE__ */ jsxRuntimeExports.jsx(Loader, { size: 12, className: "text-blue-600 animate-spin mr-2 flex-shrink-0" }),
       hasUnsavedChanges && !isSyncing && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0", title: "Unsaved Changes" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(MultiSelectDropdown, { label: "Lesson", options: [...new Set(vocabList.map((v) => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)), selectedValues: filters.lesson, onChange: (val) => onFilterChange({ ...filters, lesson: val }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(MultiSelectDropdown, { label: "Can-do", options: [...new Set(vocabList.map((v) => String(v.cando)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)), selectedValues: filters.cando, onChange: (val) => onFilterChange({ ...filters, cando: val }) })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 flex-shrink-0", children: showMarked && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1.5 flex-shrink-0", children: showMarked && /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
           onClick: () => onViewModeChange("problem"),
-          className: `flex items-center justify-center gap-1 h-8 px-3 rounded-lg text-xs font-semibold transition-all active:scale-95 whitespace-nowrap border ${viewMode === "problem" ? "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10" : "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10"}`,
+          className: "flex items-center justify-center gap-1 h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95",
           title: "Toggle Marked View",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "material-symbols-outlined text-lg text-primary-glow mr-1", children: "info" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "material-symbols-outlined text-sm text-primary-glow mr-0.5", children: "info" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: viewMode === "problem" ? "inline" : "hidden md:inline", children: "Marked" })
           ]
         }
       ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-px bg-white/10 mx-1 flex-shrink-0" }),
-      !isEditMode && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center bg-indigo-950/30 rounded-lg p-1 border border-indigo-500/20 backdrop-blur-sm gap-1 flex-shrink-0", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-px bg-slate-200 dark:bg-white/5 mx-1 flex-shrink-0" }),
+      !isEditMode && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center bg-slate-200/60 dark:bg-[#0a0c20]/50 rounded-2xl p-0.5 border border-slate-300 dark:border-white/5 gap-0.5 flex-shrink-0", children: [
         showPlay && /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
             onClick: isPlaying ? onTogglePlay : onPlaylistStart,
             disabled: isSyncing,
-            className: `p-1.5 rounded-md transition-colors ${isPlaying ? "bg-primary/30 text-primary-glow" : "hover:bg-primary/30 text-primary-glow"}`,
+            className: "flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-transparent border border-slate-500 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-700 dark:hover:border-indigo-400/50",
             title: isPlaying ? "Pause" : "Start Playlist",
             children: isPlaying ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-0.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-1 h-3 bg-current rounded-full" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-1 h-3 bg-current rounded-full" })
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 20, className: "fill-current" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-0.5 h-2.5 bg-current rounded-full" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-0.5 h-2.5 bg-current rounded-full" })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 14, className: "fill-current" })
           }
         ),
-        showShuffle && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onShuffle, disabled: isSyncing, className: "p-1.5 hover:bg-primary/30 rounded-md text-primary-glow transition-colors", title: "Shuffle", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Shuffle, { size: 20 }) }),
-        showRefresh && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onRefresh, disabled: isSyncing, className: "p-1.5 hover:bg-primary/30 rounded-md text-primary-glow transition-colors", title: "Refresh", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { size: 20, className: isSyncing ? "animate-spin" : "" }) })
+        showShuffle && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onShuffle, disabled: isSyncing, className: "flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5", title: "Shuffle", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Shuffle, { size: 14 }) }),
+        showRefresh && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onRefresh, disabled: isSyncing, className: "flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5", title: "Refresh", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { size: 14, className: isSyncing ? "animate-spin" : "" }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 ml-1 flex-shrink-0", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
             onClick: () => onVisibilityToggle("bangla"),
-            className: `px-2.5 py-1.5 rounded-md text-xs font-bold relative overflow-hidden group transition-all ${hiddenColumns.bangla ? "bg-primary text-white neon-glow" : "border border-white/10 bg-white/5 text-slate-400 hover:text-white"}`,
+            className: `flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.bangla ? "bg-primary text-white shadow-sm shadow-primary/20" : "bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]"}`,
             title: !hiddenColumns.bangla ? "Hide Bangla" : "Show Bangla",
             children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative", children: "BN" })
           }
@@ -32812,7 +32836,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
           "button",
           {
             onClick: () => onVisibilityToggle("japanese"),
-            className: `px-2.5 py-1.5 rounded-md text-xs font-bold relative overflow-hidden group transition-all ${hiddenColumns.japanese ? "bg-primary text-white neon-glow" : "border border-white/10 bg-white/5 text-slate-400 hover:text-white"}`,
+            className: `flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.japanese ? "bg-primary text-white shadow-sm shadow-primary/20" : "bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]"}`,
             title: !hiddenColumns.japanese ? "Hide Japanese" : "Show Japanese",
             children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative", children: "JP" })
           }
@@ -32822,7 +32846,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         "button",
         {
           onClick: () => setShowChipPanel(!showChipPanel),
-          className: `flex-shrink-0 flex items-center justify-center gap-1 h-9 px-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ml-1 ${showChipPanel ? "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300" : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"}`,
+          className: "flex items-center justify-center gap-1 h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95",
           title: showChipPanel ? "Hide Chips" : "Show Chips",
           children: [
             showChipPanel ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 14 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 14 }),
@@ -32830,10 +32854,10 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
           ]
         }
       ),
-      showColumns && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsColumnManagerOpen(true), className: "ml-0.5 w-9 h-9 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors", title: "Columns", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Settings, { size: 16 }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex items-center gap-2 ml-auto mr-2 px-4 py-2 bg-slate-900/60 border border-primary/40 rounded-full shadow-lg backdrop-blur-md relative overflow-hidden", children: [
+      showColumns && /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsColumnManagerOpen(true), className: "flex items-center justify-center h-7 min-w-[28px] px-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]", title: "Columns", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Settings, { size: 14 }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex items-center gap-2 ml-auto mr-2 px-4 py-2 bg-slate-200/80 dark:bg-slate-900/60 border border-slate-400 dark:border-primary/40 rounded-full shadow-lg backdrop-blur-md relative overflow-hidden", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-primary-glow uppercase tracking-wider max-w-[200px] truncate", children: currentFolderId === "root" ? "My Drive" : folders.find((f) => f.id === currentFolderId)?.name || "..." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-indigo-600 dark:text-primary-glow uppercase tracking-wider max-w-[200px] truncate", children: currentFolderId === "root" ? "My Drive" : folders.find((f) => f.id === currentFolderId)?.name || "..." }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px h-3 bg-white/10" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-medium text-slate-400", children: [
           showingCount !== void 0 ? showingCount : filteredData.length,
@@ -32859,7 +32883,7 @@ const ColumnManager = ({ isOpen, onClose, allColumns, columnOrder, setColumnOrde
       [id]: !prev[id]
     }));
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh] border border-slate-200 dark:border-slate-700", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[120] bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh] border border-slate-200 dark:border-slate-700", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold text-slate-700 dark:text-slate-100", children: "Manage Columns" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleX, { size: 20, className: "text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" }) })
@@ -32947,7 +32971,7 @@ const ImportModal = ({ isOpen, onClose, onImport }) => {
     setImportText("");
     setParsedRows([]);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 border-b flex justify-between items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-slate-800", children: importStep === "input" ? "Step 1: Paste Data" : "Step 2: Map Columns" }),
@@ -33050,19 +33074,16 @@ const UserProfileMenu = ({ user, isMobile }) => {
 const Sidebar = ({ folders, currentFolderId, handleFolderChange, isMobile = false, user }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `${isMobile ? "w-full glass-card border-none" : "w-16 lg:w-64"} bg-transparent flex flex-col h-full flex-shrink-0 transition-all`, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `p-6 flex items-center ${isMobile ? "justify-start" : "justify-center lg:justify-start"} gap-3`, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-10 h-10 bg-primary neon-glow rounded-xl flex items-center justify-center relative overflow-hidden group shrink-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white font-bold text-xl relative z-10", children: "あ" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `${isMobile ? "block" : "hidden lg:block"} text-xl font-bold tracking-tight text-white drop-shadow-sm`, children: "IrodoriAI" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-lg border border-slate-300 dark:border-white/5 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-700 dark:text-white font-bold text-xl", children: "あ" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `${isMobile ? "block" : "hidden lg:block"} text-xl font-bold tracking-tight text-slate-900 dark:text-white drop-shadow-sm`, children: "IrodoriAI" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "flex-1 overflow-y-auto px-4 py-4 space-y-1.5 custom-scrollbar", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: `${isMobile ? "block" : "hidden lg:block"} text-[10px] uppercase font-bold text-slate-500 tracking-[0.2em] px-3 mb-3`, children: "My Workbooks" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: () => handleFolderChange("root"), className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${currentFolderId === "root" ? "bg-primary/20 text-white border border-primary/30 shadow-lg shadow-primary/10 reflection-sweep" : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent hover:border-white/5"}`, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: `${isMobile ? "block" : "hidden lg:block"} text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-[0.2em] px-3 mb-3`, children: "My Workbooks" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: () => handleFolderChange("root"), className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${currentFolderId === "root" ? "bg-primary/20 text-slate-900 dark:text-white border border-primary/30 shadow-lg shadow-primary/10 reflection-sweep" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white border border-transparent hover:border-slate-200 dark:hover:border-white/5"}`, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "material-symbols-outlined text-[20px] flex-shrink-0 group-hover:neon-glow transition-all", children: "library_books" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `${isMobile ? "block" : "hidden lg:block"} truncate`, children: "All Books" })
       ] }),
-      folders.filter((f) => f.parentId === "root").map((f) => /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: () => handleFolderChange(f.id), className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${currentFolderId === f.id ? "bg-primary/20 text-white border border-primary/30 shadow-lg shadow-primary/10 reflection-sweep" : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent hover:border-white/5"}`, children: [
+      folders.filter((f) => f.parentId === "root").map((f) => /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: () => handleFolderChange(f.id), className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${currentFolderId === f.id ? "bg-primary/20 text-slate-900 dark:text-white border border-primary/30 shadow-lg shadow-primary/10 reflection-sweep" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white border border-transparent hover:border-slate-200 dark:hover:border-white/5"}`, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "material-symbols-outlined text-[20px] flex-shrink-0 group-hover:neon-glow transition-all", children: "menu_book" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `${isMobile ? "block" : "hidden lg:block"} truncate text-left`, children: f.name })
       ] }, f.id))
@@ -33104,9 +33125,9 @@ const PaginationControls = ({
     }
     return pages;
   }, [currentPage, totalPages]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-row flex-wrap items-center justify-between gap-2 py-2 px-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] z-20 text-xs", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-row flex-wrap items-center justify-between gap-2 py-1.5 px-3 bg-white dark:bg-[#030413] border-t border-slate-200 dark:border-white/5 z-20 text-xs", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 group order-1", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "rows-per-page", className: "hidden sm:block text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-600 transition-colors", children: "Rows" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "rows-per-page", className: "hidden sm:block text-[10px] font-bold uppercase tracking-wider text-slate-500", children: "Rows" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "select",
@@ -33114,32 +33135,32 @@ const PaginationControls = ({
             id: "rows-per-page",
             value: itemsPerPage,
             onChange: (e) => onItemsPerPageChange(Number(e.target.value)),
-            className: "appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded pl-2 pr-6 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-slate-500 transition-all cursor-pointer shadow-sm",
+            className: "appearance-none bg-slate-100 dark:bg-slate-900/60 border border-slate-300 dark:border-white/5 text-slate-700 dark:text-slate-400 text-[11px] font-bold rounded-lg pl-2 pr-6 py-0.5 h-6 focus:outline-none focus:ring-0 cursor-pointer",
             children: perPageOptions.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: opt, children: opt }, opt))
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M19 9l-7 7-7-7" }) }) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M19 9l-7 7-7-7" }) }) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 order-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 mr-1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(1), disabled: currentPage === 1, title: "First Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronsLeft, { size: 14 }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(currentPage - 1), disabled: currentPage === 1, title: "Previous Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronLeft, { size: 14 }) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(1), disabled: currentPage === 1, title: "First Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronsLeft, { size: 12 }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(currentPage - 1), disabled: currentPage === 1, title: "Previous Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronLeft, { size: 12 }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1", children: pageNumbers.map((page, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(React.Fragment, { children: page === "..." ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400 dark:text-slate-600 px-0.5 select-none font-medium", children: "..." }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           onClick: () => onPageChange(page),
           className: `
-                    min-w-[28px] h-7 px-1.5 rounded text-xs font-bold transition-all duration-200 border
+                    min-w-[24px] h-6 px-1 rounded text-[11px] font-bold transition-all duration-200 border
                     ${currentPage === page ? "bg-indigo-600 dark:bg-indigo-700 text-white border-indigo-600 dark:border-indigo-700 shadow-sm shadow-indigo-200 dark:shadow-none" : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-800"}
                   `,
           children: page
         }
       ) }, index)) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 ml-1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(currentPage + 1), disabled: currentPage === totalPages, title: "Next Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { size: 14 }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(totalPages), disabled: currentPage === totalPages, title: "Last Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronsRight, { size: 14 }) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(currentPage + 1), disabled: currentPage === totalPages, title: "Next Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { size: 12 }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(NavButton, { onClick: () => onPageChange(totalPages), disabled: currentPage === totalPages, title: "Last Page", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronsRight, { size: 12 }) })
       ] })
     ] })
   ] });
@@ -33151,7 +33172,7 @@ const NavButton = ({ onClick, disabled, title, children }) => /* @__PURE__ */ js
     disabled,
     title,
     className: `
-      p-1.5 rounded transition-all duration-200 flex items-center justify-center border
+      p-1 h-6 w-6 rounded transition-all duration-200 flex items-center justify-center border
       ${disabled ? "text-slate-300 dark:text-slate-600 bg-slate-50 dark:bg-slate-800/50 border-transparent cursor-not-allowed" : "text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 hover:border-indigo-100 dark:hover:border-slate-600 active:scale-95"}
     `,
     children
@@ -34213,41 +34234,17 @@ function VocabularyView({
   }
   const isAudioBarVisible = playbackMode === "playlist" && playbackQueue.length > 0 && !isAudioBarManuallyHidden;
   const isAudioActiveButHidden = playbackMode === "playlist" && playbackQueue.length > 0 && isAudioBarManuallyHidden;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-screen w-full bg-transparent font-sans text-text-main overflow-hidden", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-screen w-full bg-slate-50 dark:bg-[#030413] font-sans text-slate-900 dark:text-text-main overflow-hidden", children: [
     toast && /* @__PURE__ */ jsxRuntimeExports.jsx(Toast, { message: toast.message, type: toast.type, onClose: () => setToast(null) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hidden md:flex h-full flex-shrink-0 glass-card border-r-0 border-y-0 border-l-0 rounded-none z-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Sidebar, { folders, currentFolderId, handleFolderChange, user }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hidden md:flex h-full flex-shrink-0 bg-white dark:bg-[#05071a] border-r border-slate-200 dark:border-white/5 z-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Sidebar, { folders, currentFolderId, handleFolderChange, user }) }),
     isMobileSidebarOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed inset-0 z-[100] md:hidden", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-slate-900/50 backdrop-blur-sm", onClick: () => setIsMobileSidebarOpen(false) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute left-0 top-0 bottom-0 w-64 bg-slate-900 shadow-2xl animate-in slide-in-from-left duration-200", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Sidebar, { folders, currentFolderId, handleFolderChange: (id) => {
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-slate-900/50 dark:bg-slate-900/50 backdrop-blur-sm", onClick: () => setIsMobileSidebarOpen(false) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-[#05071a] shadow-2xl animate-in slide-in-from-left duration-200", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Sidebar, { folders, currentFolderId, handleFolderChange: (id) => {
         handleFolderChange(id);
         setIsMobileSidebarOpen(false);
       }, isMobile: true, user }) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 flex flex-col min-w-0 bg-transparent relative", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "md:hidden bg-slate-900 text-white px-3 py-1.5 flex items-center justify-between shadow-md z-20 h-11 shrink-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg", children: "あ" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold text-base tracking-tight leading-none", children: [
-            "Irodori",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-indigo-400", children: "AI" })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-slate-300 font-mono text-right leading-none flex flex-col gap-0.5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-bold text-white max-w-[100px] truncate", children: currentFolderId === "root" ? "My Drive" : folders.find((f) => f.id === currentFolderId)?.name || "..." }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "opacity-80", children: [
-              showingCount,
-              " / ",
-              totalCount
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsMobileSidebarOpen(true), className: "md:hidden p-1 -mr-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-[3px]", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-0.5 bg-white rounded-full" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-0.5 bg-white rounded-full" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-0.5 bg-white rounded-full" })
-          ] }) })
-        ] })
-      ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 flex flex-col min-w-0 min-h-0 bg-transparent relative", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         AdvancedToolbar,
         {
@@ -34283,19 +34280,20 @@ function VocabularyView({
           isPlaying,
           onTogglePlay: togglePlayPause,
           showingCount,
-          totalCount
+          totalCount,
+          setIsMobileSidebarOpen
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "div",
         {
-          className: "flex-1 overflow-auto transition-all duration-300 mobile-zoom-table",
+          className: "flex-1 overflow-auto transition-all duration-300 w-full h-full mobile-zoom-table",
           style: {
             paddingBottom: isAudioBarVisible ? "96px" : "0px",
             "--mobile-zoom": uiConfig.mobileTableZoom,
             "--desktop-zoom": uiConfig.desktopTableZoom
           },
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "glass-card rounded-2xl overflow-hidden mx-6 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full border-collapse bg-transparent text-sm table-fixed", children: [
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mx-2 md:mx-6 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full border-collapse bg-transparent text-sm table-fixed bg-white dark:bg-[#080a1c]/60 border border-slate-300 dark:border-white/5 rounded-[1.5rem] shadow-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("colgroup", { children: columnOrder.map((colId) => {
               const def = allColumns.find((c) => c.id === colId);
               if (!def || def.editOnly && !isEditMode || columnVisibility[colId] === false) return null;
@@ -34309,7 +34307,7 @@ function VocabularyView({
               }
               return /* @__PURE__ */ jsxRuntimeExports.jsx("col", { id: `col-${colId}`, style: { width } }, colId);
             }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "sticky top-0 z-10 shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: columnOrder.map((colId) => {
+            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "z-10 shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: columnOrder.map((colId) => {
               const def = allColumns.find((c) => c.id === colId);
               return (!def?.editOnly || isEditMode) && /* @__PURE__ */ jsxRuntimeExports.jsx(
                 DynamicHeader,
@@ -34406,56 +34404,56 @@ function VocabularyView({
         }
       )
     ] }),
-    deleteModal.open && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 p-6 flex flex-col items-center text-center", children: [
+    deleteModal.open && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[100] bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 dark:bg-red-900/20 p-6 flex flex-col items-center text-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "text-red-600 mb-4", size: 24 }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold", children: "Delete?" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500 mt-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-slate-900 dark:text-white", children: "Delete?" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500 dark:text-slate-400 mt-2", children: [
           "Delete ",
           deleteModal.targetName,
           "?"
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-white flex justify-end gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setDeleteModal({ ...deleteModal, open: false }), className: "flex-1 px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-lg", children: "Cancel" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-white dark:bg-slate-800 flex justify-end gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setDeleteModal({ ...deleteModal, open: false }), className: "flex-1 px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg", children: "Cancel" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: executeDelete, className: "flex-1 px-4 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700", children: "Delete" })
       ] })
     ] }) }),
-    editConfirmationOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-amber-50 p-6 flex flex-col items-center text-center", children: [
+    editConfirmationOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[100] bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-amber-50 dark:bg-amber-900/20 p-6 flex flex-col items-center text-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(PenTool, { className: "text-amber-600 mb-4", size: 24 }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold", children: "Enable Editing?" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500 mt-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-slate-900 dark:text-white", children: "Enable Editing?" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500 dark:text-slate-400 mt-2", children: [
           "You are entering Edit Mode.",
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           "Changes are temporary until you click Save."
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-white flex justify-end gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setEditConfirmationOpen(false), className: "flex-1 px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-lg", children: "Cancel" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-white dark:bg-slate-800 flex justify-end gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setEditConfirmationOpen(false), className: "flex-1 px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg", children: "Cancel" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: startEditMode, className: "flex-1 px-4 py-2.5 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600", children: "Start Editing" })
       ] })
     ] }) }),
-    unsavedChangesModal.open && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[110] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-amber-50 p-6 flex flex-col items-center text-center border-b border-amber-100", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "text-amber-600", size: 24 }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-slate-800", children: "Unsaved Changes" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500 mt-2", children: [
+    unsavedChangesModal.open && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[110] bg-slate-900/70 dark:bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-amber-50 dark:bg-amber-900/20 p-6 flex flex-col items-center text-center border-b border-amber-100 dark:border-amber-900/30", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "text-amber-600", size: 24 }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-slate-800 dark:text-white", children: "Unsaved Changes" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500 dark:text-slate-400 mt-2", children: [
           "You have unsaved edits in this session.",
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           "What would you like to do?"
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-white flex flex-col gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-white dark:bg-slate-800 flex flex-col gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: confirmExitWithSave, className: "w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 flex items-center justify-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 16 }),
           " Save & Continue"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: confirmExitWithDiscard, className: "w-full px-4 py-3 bg-white border-2 border-red-100 text-red-600 font-bold rounded-lg hover:bg-red-50 flex items-center justify-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: confirmExitWithDiscard, className: "w-full px-4 py-3 bg-white dark:bg-slate-700 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 }),
           " Discard Changes"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: cancelEditModeAttempt, className: "w-full px-4 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-lg", children: "Cancel (Stay Here)" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: cancelEditModeAttempt, className: "w-full px-4 py-3 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg", children: "Cancel (Stay Here)" })
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ColumnManager, { isOpen: isColumnManagerOpen, onClose: () => setIsColumnManagerOpen(false), allColumns, columnOrder, setColumnOrder, columnVisibility, setColumnVisibility, isDarkMode: theme === "dark", onToggleTheme: toggleTheme }),
@@ -34900,8 +34898,10 @@ function App() {
     };
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-screen w-screen overflow-hidden bg-[#030712] text-white selection:bg-indigo-500/30", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full -z-10 pointer-events-none" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full -z-10 pointer-events-none" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed inset-0 overflow-hidden pointer-events-none", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full -z-10" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full -z-10" })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(UpdateNotification, {}),
     authLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-screen w-screen items-center justify-center text-white", children: "Loading IrodoriAI..." }) : !user ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-screen w-screen items-center justify-center bg-gray-900 flex-col gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl text-white font-bold", children: "Welcome to IrodoriAI" }),

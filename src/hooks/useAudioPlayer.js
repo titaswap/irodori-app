@@ -11,6 +11,7 @@ const initialState = {
     playlistRepeatCount: 0,
     // Single Context
     singleId: null,
+    singleRepeatCount: 0,
 };
 
 function audioReducer(state, action) {
@@ -31,12 +32,15 @@ function audioReducer(state, action) {
                 playbackMode: 'single',
                 isPlaying: true,
                 singleId: action.id,
+                singleRepeatCount: 0,
                 // Do NOT reset playlist fields
             };
         case 'STOP':
             return {
                 ...initialState
             };
+        case 'REPEAT_INCREMENT_SINGLE':
+            return { ...state, singleRepeatCount: state.singleRepeatCount + 1 };
         case 'PAUSE':
             return { ...state, isPlaying: false };
         case 'RESUME':
@@ -125,8 +129,16 @@ export const useAudioPlayer = (vocabList, filteredAndSortedData, showToast) => {
         if (!current.isPlaying) return;
 
         if (current.playbackMode === 'single') {
+            // Check repeat setting for single row
+            const repeatLimit = config.repeatPerItem || 1;
+            if (current.singleRepeatCount < repeatLimit - 1) {
+                stopAudio();
+                setTimeout(() => dispatch({ type: 'REPEAT_INCREMENT_SINGLE' }), 500);
+                return;
+            }
+            // Finished all repeats
             stopAudio();
-            dispatch({ type: 'PAUSE' }); // Pause single after it's done
+            dispatch({ type: 'PAUSE' });
             return;
         }
 
@@ -238,7 +250,7 @@ export const useAudioPlayer = (vocabList, filteredAndSortedData, showToast) => {
             stopAudio();
         };
 
-    }, [state.playlistIndex, state.singleId, state.isPlaying, state.playlistRepeatCount, state.playbackMode, state.playlistQueue, vocabList, handleAudioComplete]);
+    }, [state.playlistIndex, state.singleId, state.isPlaying, state.playlistRepeatCount, state.singleRepeatCount, state.playbackMode, state.playlistQueue, vocabList, handleAudioComplete]);
 
     // WRAPPERS to flag manual moves
     const onNextTrackWrapped = useCallback(() => {

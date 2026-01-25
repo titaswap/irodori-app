@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { auth, db } from './firebase'; // Singleton imports
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -7,6 +7,7 @@ import UpdateNotification from './components/UpdateNotification';
 import { mapToApp } from './utils/vocabularyUtils';
 import { fetchAllProgress } from './services/firestore/activityService';
 import { googleLogin } from "./auth/googleLogin";
+import { uiConfig } from './config/uiConfig';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 
@@ -401,7 +402,13 @@ function App() {
 
 
     return (
-        <div className="relative h-screen w-screen overflow-hidden bg-[#1e1e1e]">
+        <div className="relative h-screen w-screen overflow-hidden bg-[#030712] text-white selection:bg-indigo-500/30">
+            {/* Ambient Glows */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full -z-10"></div>
+                <div className="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full -z-10"></div>
+            </div>
+
             <UpdateNotification />
 
             {authLoading ? (

@@ -49,4 +49,4 @@ adb logcat -s IRODORI_WEBVIEW IRODORI_TTS
 
 
 adb uninstall com.irodori.ai
-adb install "E:\JFT\Irodori apps - Copy\android_app\app\build\outputs\apk\release\IrodoriAI.apk"
+adb install "E:\JFT\Irodori apps - Copy - Copy\android_app\app\build\outputs\apk\debug\IrodoriAI.apk"

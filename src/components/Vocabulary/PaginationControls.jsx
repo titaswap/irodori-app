@@ -44,10 +44,10 @@ const PaginationControls = ({
   }, [currentPage, totalPages]);
 
   return (
-    <div className="flex flex-row flex-wrap items-center justify-between gap-2 py-2 px-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] z-20 text-xs">
+    <div className="flex flex-row flex-wrap items-center justify-between gap-2 py-1.5 px-3 bg-white dark:bg-[#030413] border-t border-slate-200 dark:border-white/5 z-20 text-xs">
 
       <div className="flex items-center gap-2 group order-1">
-        <label htmlFor="rows-per-page" className="hidden sm:block text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-600 transition-colors">
+        <label htmlFor="rows-per-page" className="hidden sm:block text-[10px] font-bold uppercase tracking-wider text-slate-500">
           Rows
         </label>
         <div className="relative">
@@ -55,14 +55,14 @@ const PaginationControls = ({
             id="rows-per-page"
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded pl-2 pr-6 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-slate-500 transition-all cursor-pointer shadow-sm"
+            className="appearance-none bg-slate-100 dark:bg-slate-900/60 border border-slate-300 dark:border-white/5 text-slate-700 dark:text-slate-400 text-[11px] font-bold rounded-lg pl-2 pr-6 py-0.5 h-6 focus:outline-none focus:ring-0 cursor-pointer"
           >
             {perPageOptions.map(opt => (
               <option key={opt} value={opt}>{opt}</option>
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
           </div>
         </div>
       </div>
@@ -73,10 +73,10 @@ const PaginationControls = ({
         {/* Previous Group */}
         <div className="flex items-center gap-1 mr-1">
           <NavButton onClick={() => onPageChange(1)} disabled={currentPage === 1} title="First Page">
-            <ChevronsLeft size={14} />
+            <ChevronsLeft size={12} />
           </NavButton>
           <NavButton onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} title="Previous Page">
-            <ChevronLeft size={14} />
+            <ChevronLeft size={12} />
           </NavButton>
         </div>
 
@@ -90,7 +90,7 @@ const PaginationControls = ({
                 <button
                   onClick={() => onPageChange(page)}
                   className={`
-                    min-w-[28px] h-7 px-1.5 rounded text-xs font-bold transition-all duration-200 border
+                    min-w-[24px] h-6 px-1 rounded text-[11px] font-bold transition-all duration-200 border
                     ${currentPage === page
                       ? 'bg-indigo-600 dark:bg-indigo-700 text-white border-indigo-600 dark:border-indigo-700 shadow-sm shadow-indigo-200 dark:shadow-none'
                       : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-800'
@@ -107,10 +107,10 @@ const PaginationControls = ({
         {/* Next Group */}
         <div className="flex items-center gap-1 ml-1">
           <NavButton onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} title="Next Page">
-            <ChevronRight size={14} />
+            <ChevronRight size={12} />
           </NavButton>
           <NavButton onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages} title="Last Page">
-            <ChevronsRight size={14} />
+            <ChevronsRight size={12} />
           </NavButton>
         </div>
       </div>
@@ -126,7 +126,7 @@ const NavButton = ({ onClick, disabled, title, children }) => (
     disabled={disabled}
     title={title}
     className={`
-      p-1.5 rounded transition-all duration-200 flex items-center justify-center border
+      p-1 h-6 w-6 rounded transition-all duration-200 flex items-center justify-center border
       ${disabled
         ? 'text-slate-300 dark:text-slate-600 bg-slate-50 dark:bg-slate-800/50 border-transparent cursor-not-allowed'
         : 'text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 hover:border-indigo-100 dark:hover:border-slate-600 active:scale-95'

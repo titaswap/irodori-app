@@ -82,17 +82,17 @@ const DynamicHeader = ({
       // style={{ width: columnWidths[colId] || 160 }} // Managed by colgroup now
       data-col-id={colId}
       className={`
-        relative
-        px-2 py-1
-        bg-slate-50 dark:bg-slate-900/90
-        backdrop-blur-sm
-        border-b border-r border-slate-200 dark:border-slate-700
-        text-xs font-bold uppercase tracking-wider
-        select-none
-        text-slate-700 dark:text-slate-300
-        ${!isFixed ? 'cursor-move hover:bg-slate-100 dark:hover:bg-slate-800' : 'text-center'}
-        ${isEditMode ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' : ''}
-      `}
+          relative sticky top-0 z-30
+          px-3 py-2
+          bg-slate-50 dark:bg-[#030413]
+          border-b border-r border-slate-200 dark:border-white/10
+          shadow-sm
+          text-[11px] font-bold uppercase tracking-[0.15em]
+          select-none
+          text-slate-600 dark:text-slate-400
+          ${!isFixed ? 'cursor-move hover:bg-indigo-50/50 dark:hover:bg-white/10 transition-colors' : 'text-center'}
+          ${isEditMode ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500' : ''}
+        `}
     >
       <div
         className="flex items-center gap-1"

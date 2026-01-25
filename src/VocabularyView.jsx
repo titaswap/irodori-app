@@ -455,41 +455,25 @@ function VocabularyView({
     const isAudioActiveButHidden = playbackMode === 'playlist' && playbackQueue.length > 0 && isAudioBarManuallyHidden;
 
     return (
-        <div className="flex h-screen w-full bg-slate-100 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-100 overflow-hidden">
+        <div className="flex h-screen w-full bg-slate-50 dark:bg-[#030413] font-sans text-slate-900 dark:text-text-main overflow-hidden">
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             {/* Sidebar: Hidden on mobile, visible on desktop */}
-            <div className="hidden md:flex h-full flex-shrink-0">
+            <div className="hidden md:flex h-full flex-shrink-0 bg-white dark:bg-[#05071a] border-r border-slate-200 dark:border-white/5 z-20">
                 <Sidebar folders={folders} currentFolderId={currentFolderId} handleFolderChange={handleFolderChange} user={user} />
             </div>
 
             {/* Mobile Sidebar Overlay */}
             {isMobileSidebarOpen && (
                 <div className="fixed inset-0 z-[100] md:hidden">
-                    <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsMobileSidebarOpen(false)}></div>
-                    <div className="absolute left-0 top-0 bottom-0 w-64 bg-slate-900 shadow-2xl animate-in slide-in-from-left duration-200">
+                    <div className="absolute inset-0 bg-slate-900/50 dark:bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsMobileSidebarOpen(false)}></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-[#05071a] shadow-2xl animate-in slide-in-from-left duration-200">
                         <Sidebar folders={folders} currentFolderId={currentFolderId} handleFolderChange={(id) => { handleFolderChange(id); setIsMobileSidebarOpen(false); }} isMobile={true} user={user} />
                     </div>
                 </div>
             )}
 
-            <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-900">
-                {/* MOBILE HEADER (Visible only on mobile) */}
-                <div className="md:hidden bg-slate-900 text-white px-3 py-1.5 flex items-center justify-between shadow-md z-20 h-11 shrink-0">
-                    <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg">あ</div>
-                        <span className="font-bold text-base tracking-tight leading-none">Irodori<span className="text-indigo-400">AI</span></span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <div className="text-[10px] text-slate-300 font-mono text-right leading-none flex flex-col gap-0.5">
-                            <div className="font-bold text-white max-w-[100px] truncate">{currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}</div>
-                            <div className="opacity-80">{showingCount} / {totalCount}</div>
-                        </div>
-                        <button onClick={() => setIsMobileSidebarOpen(true)} className="md:hidden p-1 -mr-1"><div className="space-y-[3px]"><div className="w-4 h-0.5 bg-white rounded-full"></div><div className="w-4 h-0.5 bg-white rounded-full"></div><div className="w-4 h-0.5 bg-white rounded-full"></div></div></button>
-                    </div>
-                </div>
-
+            <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-transparent relative">
                 <AdvancedToolbar
                     currentFolderId={currentFolderId} folders={folders} vocabList={contextData} selectedIds={selectedIds} isEditMode={isEditMode} hasUnsavedChanges={hasUnsavedChanges} filters={filters} hiddenColumns={hiddenColumns} viewMode={viewMode}
                     onFolderChange={handleFolderChange} onDeleteRequest={requestDelete} onEditModeToggle={() => setEditConfirmationOpen(true)} onFilterChange={handleFilterChange} onViewModeChange={handleViewModeChange} onVisibilityToggle={toggleGlobalVisibility}
@@ -498,71 +482,74 @@ function VocabularyView({
                     isPlaying={isPlaying} onTogglePlay={togglePlayPause}
                     showingCount={showingCount}
                     totalCount={totalCount}
+                    setIsMobileSidebarOpen={setIsMobileSidebarOpen}
                 />
 
                 <div
-                    className="flex-1 overflow-auto transition-all duration-300 mobile-zoom-table"
+                    className="flex-1 overflow-auto transition-all duration-300 w-full h-full mobile-zoom-table"
                     style={{
                         paddingBottom: isAudioBarVisible ? '96px' : '0px',
                         '--mobile-zoom': uiConfig.mobileTableZoom,
                         '--desktop-zoom': uiConfig.desktopTableZoom
                     }}
                 >
-                    <table className="w-full border-collapse bg-white dark:bg-slate-900 text-sm table-fixed">
-                        <colgroup>
-                            {columnOrder.map(colId => {
-                                const def = allColumns.find(c => c.id === colId);
-                                if (!def || (def.editOnly && !isEditMode) || columnVisibility[colId] === false) return null;
-
-                                let width = columnWidths[colId];
-                                if (!width) {
-                                    const twMap = { 'w-10': 40, 'w-12': 48, 'w-16': 64, 'w-20': 80, 'w-24': 96, 'w-32': 128, 'w-40': 160, 'w-48': 192, 'w-64': 256 };
-                                    const match = def.width && typeof def.width === 'string' && def.width.match(/w-(\d+)/);
-                                    if (twMap[def.width]) width = twMap[def.width];
-                                    else if (match) width = parseInt(match[1]) * 4;
-                                    else width = 160;
-                                }
-                                return <col key={colId} id={`col-${colId}`} style={{ width: width }} />;
-                            })}
-                        </colgroup>
-                        <thead className="sticky top-0 z-10 shadow-sm">
-                            <tr>
+                    <div className="mx-2 md:mx-6 mb-6">
+                        <table className="w-full border-collapse bg-transparent text-sm table-fixed bg-white dark:bg-[#080a1c]/60 border border-slate-300 dark:border-white/5 rounded-[1.5rem] shadow-sm">
+                            <colgroup>
                                 {columnOrder.map(colId => {
                                     const def = allColumns.find(c => c.id === colId);
-                                    return (!def?.editOnly || isEditMode) && (
-                                        <DynamicHeader
-                                            key={colId}
-                                            colId={colId}
-                                            def={def}
-                                            isEditMode={isEditMode}
-                                            sortConfig={sortConfig}
-                                            onSort={handleSort}
-                                            columnVisibility={columnVisibility}
-                                            onDragStart={handleColumnDragStart}
-                                            onDragOver={handleColumnDragOver}
-                                            onDrop={handleColumnDrop}
-                                            onShuffle={handleShuffle}
-                                            columnWidths={columnWidths}
-                                            setColumnWidths={setColumnWidths}
-                                        />
-                                    );
-                                })}
-                            </tr>
-                        </thead>
-                        <tbody>{paginatedData.map((item, index) => {
-                            const isPlaylistActive = playbackMode === 'playlist' && isPlaying && playbackQueue[currentIndex] === item.localId;
-                            const isSingleActive = playbackMode === 'single' && isPlaying && currentSingleId === item.localId;
-                            const isActive = isPlaylistActive || isSingleActive;
+                                    if (!def || (def.editOnly && !isEditMode) || columnVisibility[colId] === false) return null;
 
-                            return (
-                                <SheetRow
-                                    key={item.localId} item={item} index={(currentPage - 1) * itemsPerPage + index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} isPlaying={isPlaying} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
-                                    onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={handlePlaySingle} onMark={toggleMark} onDeleteRequest={requestDelete}
-                                    isActive={isActive}
-                                />
-                            );
-                        })}</tbody>
-                    </table>
+                                    let width = columnWidths[colId];
+                                    if (!width) {
+                                        const twMap = { 'w-10': 40, 'w-12': 48, 'w-16': 64, 'w-20': 80, 'w-24': 96, 'w-32': 128, 'w-40': 160, 'w-48': 192, 'w-64': 256 };
+                                        const match = def.width && typeof def.width === 'string' && def.width.match(/w-(\d+)/);
+                                        if (twMap[def.width]) width = twMap[def.width];
+                                        else if (match) width = parseInt(match[1]) * 4;
+                                        else width = 160;
+                                    }
+                                    return <col key={colId} id={`col-${colId}`} style={{ width: width }} />;
+                                })}
+                            </colgroup>
+                            <thead className="z-10 shadow-sm">
+                                <tr>
+                                    {columnOrder.map(colId => {
+                                        const def = allColumns.find(c => c.id === colId);
+                                        return (!def?.editOnly || isEditMode) && (
+                                            <DynamicHeader
+                                                key={colId}
+                                                colId={colId}
+                                                def={def}
+                                                isEditMode={isEditMode}
+                                                sortConfig={sortConfig}
+                                                onSort={handleSort}
+                                                columnVisibility={columnVisibility}
+                                                onDragStart={handleColumnDragStart}
+                                                onDragOver={handleColumnDragOver}
+                                                onDrop={handleColumnDrop}
+                                                onShuffle={handleShuffle}
+                                                columnWidths={columnWidths}
+                                                setColumnWidths={setColumnWidths}
+                                            />
+                                        );
+                                    })}
+                                </tr>
+                            </thead>
+                            <tbody>{paginatedData.map((item, index) => {
+                                const isPlaylistActive = playbackMode === 'playlist' && isPlaying && playbackQueue[currentIndex] === item.localId;
+                                const isSingleActive = playbackMode === 'single' && isPlaying && currentSingleId === item.localId;
+                                const isActive = isPlaylistActive || isSingleActive;
+
+                                return (
+                                    <SheetRow
+                                        key={item.localId} item={item} index={(currentPage - 1) * itemsPerPage + index} columnOrder={columnOrder} columnDefs={allColumns} columnVisibility={columnVisibility} columnWidths={columnWidths} selectedIds={selectedIds} isPlaying={isPlaying} hiddenColumns={hiddenColumns} revealedCells={revealedCells} isEditMode={isEditMode}
+                                        onToggleSelection={toggleSelection} onUpdateCell={handleUpdateCell} onRevealCell={revealSingleCell} onPlaySingle={handlePlaySingle} onMark={toggleMark} onDeleteRequest={requestDelete}
+                                        isActive={isActive}
+                                    />
+                                );
+                            })}</tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <PaginationControls
@@ -599,9 +586,9 @@ function VocabularyView({
                 )}
             </div>
 
-            {deleteModal.open && <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-red-50 p-6 flex flex-col items-center text-center"><AlertCircle className="text-red-600 mb-4" size={24} /><h3 className="text-xl font-bold">Delete?</h3><p className="text-sm text-slate-500 mt-2">Delete {deleteModal.targetName}?</p></div><div className="p-4 bg-white flex justify-end gap-3"><button onClick={() => setDeleteModal({ ...deleteModal, open: false })} className="flex-1 px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button><button onClick={executeDelete} className="flex-1 px-4 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Delete</button></div></div></div>}
-            {editConfirmationOpen && <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-amber-50 p-6 flex flex-col items-center text-center"><PenTool className="text-amber-600 mb-4" size={24} /><h3 className="text-xl font-bold">Enable Editing?</h3><p className="text-sm text-slate-500 mt-2">You are entering Edit Mode.<br />Changes are temporary until you click Save.</p></div><div className="p-4 bg-white flex justify-end gap-3"><button onClick={() => setEditConfirmationOpen(false)} className="flex-1 px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button><button onClick={startEditMode} className="flex-1 px-4 py-2.5 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600">Start Editing</button></div></div></div>}
-            {unsavedChangesModal.open && <div className="fixed inset-0 z-[110] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"><div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95"><div className="bg-amber-50 p-6 flex flex-col items-center text-center border-b border-amber-100"><div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4"><AlertCircle className="text-amber-600" size={24} /></div><h3 className="text-xl font-bold text-slate-800">Unsaved Changes</h3><p className="text-sm text-slate-500 mt-2">You have unsaved edits in this session.<br />What would you like to do?</p></div><div className="p-4 bg-white flex flex-col gap-2"><button onClick={confirmExitWithSave} className="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"><SaveIcon size={16} /> Save & Continue</button><button onClick={confirmExitWithDiscard} className="w-full px-4 py-3 bg-white border-2 border-red-100 text-red-600 font-bold rounded-lg hover:bg-red-50 flex items-center justify-center gap-2"><Trash2 size={16} /> Discard Changes</button><button onClick={cancelEditModeAttempt} className="w-full px-4 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-lg">Cancel (Stay Here)</button></div></div></div>}
+            {deleteModal.open && <div className="fixed inset-0 z-[100] bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-red-50 dark:bg-red-900/20 p-6 flex flex-col items-center text-center"><AlertCircle className="text-red-600 mb-4" size={24} /><h3 className="text-xl font-bold text-slate-900 dark:text-white">Delete?</h3><p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Delete {deleteModal.targetName}?</p></div><div className="p-4 bg-white dark:bg-slate-800 flex justify-end gap-3"><button onClick={() => setDeleteModal({ ...deleteModal, open: false })} className="flex-1 px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">Cancel</button><button onClick={executeDelete} className="flex-1 px-4 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Delete</button></div></div></div>}
+            {editConfirmationOpen && <div className="fixed inset-0 z-[100] bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-amber-50 dark:bg-amber-900/20 p-6 flex flex-col items-center text-center"><PenTool className="text-amber-600 mb-4" size={24} /><h3 className="text-xl font-bold text-slate-900 dark:text-white">Enable Editing?</h3><p className="text-sm text-slate-500 dark:text-slate-400 mt-2">You are entering Edit Mode.<br />Changes are temporary until you click Save.</p></div><div className="p-4 bg-white dark:bg-slate-800 flex justify-end gap-3"><button onClick={() => setEditConfirmationOpen(false)} className="flex-1 px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">Cancel</button><button onClick={startEditMode} className="flex-1 px-4 py-2.5 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600">Start Editing</button></div></div></div>}
+            {unsavedChangesModal.open && <div className="fixed inset-0 z-[110] bg-slate-900/70 dark:bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"><div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95"><div className="bg-amber-50 dark:bg-amber-900/20 p-6 flex flex-col items-center text-center border-b border-amber-100 dark:border-amber-900/30"><div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-4"><AlertCircle className="text-amber-600" size={24} /></div><h3 className="text-xl font-bold text-slate-800 dark:text-white">Unsaved Changes</h3><p className="text-sm text-slate-500 dark:text-slate-400 mt-2">You have unsaved edits in this session.<br />What would you like to do?</p></div><div className="p-4 bg-white dark:bg-slate-800 flex flex-col gap-2"><button onClick={confirmExitWithSave} className="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"><SaveIcon size={16} /> Save & Continue</button><button onClick={confirmExitWithDiscard} className="w-full px-4 py-3 bg-white dark:bg-slate-700 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center gap-2"><Trash2 size={16} /> Discard Changes</button><button onClick={cancelEditModeAttempt} className="w-full px-4 py-3 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg">Cancel (Stay Here)</button></div></div></div>}
 
             <ColumnManager isOpen={isColumnManagerOpen} onClose={() => setIsColumnManagerOpen(false)} allColumns={allColumns} columnOrder={columnOrder} setColumnOrder={setColumnOrder} columnVisibility={columnVisibility} setColumnVisibility={setColumnVisibility} isDarkMode={theme === 'dark'} onToggleTheme={toggleTheme} />
 

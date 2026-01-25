@@ -5,6 +5,10 @@ export const uiConfig = {
     // Zoom level for the table on desktop devices (0.0 to 1.0)
     desktopTableZoom: 1.0,
 
+    // GLOBAL PAGE ZOOM (Affects Toolbar, Sidebar, Table, Everything)
+    mobilePageZoom: 1.0,
+    desktopPageZoom: 1.0,
+
     // Default Column Orders (IDs must match column IDs)
     // Applied ONLY if the user has no saved preference
     defaultDesktopColumnOrder: ['selection', 'audio', 'japanese', 'bangla', 'isMarked'],

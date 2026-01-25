@@ -30,33 +30,27 @@ const UserProfileMenu = ({ user, isMobile }) => {
     if (!user) return null;
 
     return (
-        <div className="relative p-4 mt-auto border-t border-slate-800" ref={menuRef}>
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-3 w-full p-2 rounded-full hover:bg-slate-800 transition-colors ${isOpen ? 'bg-slate-800' : ''}`}
-                title={user.email}
-            >
-                {/* Avatar */}
-                <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-600 bg-slate-700 flex items-center justify-center shrink-0">
-                    {user.photoURL ? (
-                        <img src={user.photoURL} alt="User" className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="text-slate-300 font-bold text-sm">
-                            {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
-                        </div>
-                    )}
-                </div>
+        <div className="p-4 border-t border-white/5" ref={menuRef}>
+            <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/10 glass-card">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center gap-3 w-full text-left"
+                    title={user.email}
+                >
+                    <div className="w-10 h-10 rounded-full bg-primary/30 border border-primary/40 flex items-center justify-center text-primary-glow font-bold shadow-inner shrink-0">
+                        {user.photoURL ? (
+                            <img src={user.photoURL} alt="User" className="w-full h-full object-cover rounded-full" />
+                        ) : (
+                            <span className="text-lg">{(user.displayName || user.email || 'U').charAt(0).toUpperCase()}</span>
+                        )}
+                    </div>
 
-                {/* Info (Visible on Mobile or Expanded Desktop if we had one, but strict req says "Avatar... click... popup") 
-                    Actually, Gmail style usually shows email/name on hover or inside the popup.
-                    For this sidebar, keeping it minimal (Avatar only on collapsed desktop?) 
-                    The current sidebar is fixed width w-16 or w-64.
-                */}
-                <div className={`flex-1 text-left overflow-hidden ${isMobile ? 'block' : 'hidden lg:block'}`}>
-                    <div className="text-sm font-medium text-white truncate">{user.displayName || 'User'}</div>
-                    <div className="text-xs text-slate-400 truncate">{user.email}</div>
-                </div>
-            </button>
+                    <div className={`flex-1 min-w-0 ${isMobile ? 'block' : 'hidden lg:block'}`}>
+                        <p className="text-sm font-semibold truncate text-slate-100">{user.displayName || 'User'}</p>
+                        <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
+                    </div>
+                </button>
+            </div>
 
             {/* Popup Menu */}
             {isOpen && (

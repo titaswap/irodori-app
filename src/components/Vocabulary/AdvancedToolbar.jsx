@@ -14,14 +14,14 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' })
     const safeActive = Array.isArray(activeValues) ? activeValues : [];
 
     const colorClasses = {
-        blue: { active: 'bg-blue-600 text-white shadow-md shadow-blue-200', inactive: 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-blue-300' },
-        indigo: { active: 'bg-indigo-600 text-white shadow-md shadow-indigo-200', inactive: 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-indigo-300' }
+        blue: { active: 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50', inactive: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-400 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:border-blue-400 dark:hover:border-blue-600' },
+        indigo: { active: 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-indigo-900/50', inactive: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-400 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600' }
     };
     const styles = colorClasses[color] || colorClasses.blue;
 
     return (
         <div className="flex items-center gap-2 overflow-hidden px-1 select-none transition-all duration-300 h-7 border-b border-transparent">
-            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mr-0.5 w-[50px] shrink-0 text-right">
+            <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-0.5 w-[50px] shrink-0 text-right">
                 {label === 'L' ? 'Lesson' : 'Can-do'}
             </div>
 
@@ -40,7 +40,7 @@ const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' })
                                 `}
                         >
                             <span>{label}{val}</span>
-                            <span className={`text-[9px] opacity-70 ${isActive ? 'bg-white/20 px-1 rounded-[2px]' : 'text-slate-400 bg-slate-100 px-1 rounded-[2px]'}`}>{count}</span>
+                            <span className={`text-[9px] opacity-70 ${isActive ? 'bg-white/20 px-1 rounded-[2px]' : 'text-slate-500 dark:text-slate-500 bg-slate-300 dark:bg-slate-700 px-1 rounded-[2px]'}`}>{count}</span>
                             {isActive && <X size={10} className="ml-0.5 opacity-80 hover:opacity-100" />}
                         </button>
                     );
@@ -111,16 +111,16 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
                 }}
                 title={`${label} Filter`}
                 className={`
-                    flex items-center justify-center gap-2 appearance-none 
+                    flex items-center justify-center gap-1.5 appearance-none 
                     transition-all duration-200
-                    text-xs font-bold 
-                    rounded-lg shadow-sm
+                    text-[11px] md:text-xs font-semibold 
+                    rounded-full
                     focus:outline-none 
-                    ${isOpen ? 'ring-2 ring-indigo-200' : ''}
-                    h-9 min-w-[36px] md:min-w-[100px] md:px-2 md:justify-between px-0
+                    ${isOpen ? 'ring-2 ring-primary/50' : ''}
+                    h-7 min-w-[28px] md:min-w-[80px] px-2 md:justify-between relative overflow-hidden group
                     ${!isAll
-                        ? 'bg-indigo-600 text-white border border-indigo-600 shadow-indigo-200 dark:shadow-none'
-                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-400'
+                        ? 'bg-primary text-white shadow-sm shadow-primary/20'
+                        : 'bg-primary/10 border border-primary/20 text-primary dark:text-white hover:bg-primary/20'
                     }
                 `}
             >
@@ -168,7 +168,7 @@ const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
     );
 };
 
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen }) => {
     const [showChipPanel, setShowChipPanel] = useState(false);
 
     const containerRef = React.useRef(null);
@@ -201,24 +201,24 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
 
     let available = containerWidth - baseReservedWidth;
 
-    const showMarked = isDesktop || available >= itemCost;
-    if (!isDesktop && showMarked) available -= itemCost;
+    const showMarked = !isDesktop || available >= itemCost;
+    if (isDesktop && showMarked) available -= itemCost;
 
-    const showPlay = isDesktop || (!isEditMode && available >= itemCost);
-    if (!isDesktop && showPlay && !isEditMode) available -= itemCost;
+    const showPlay = !isDesktop || (!isEditMode && available >= itemCost);
+    if (isDesktop && showPlay && !isEditMode) available -= itemCost;
 
-    const showShuffle = isDesktop || (!isEditMode && available >= itemCost);
-    if (!isDesktop && showShuffle && !isEditMode) available -= itemCost;
+    const showShuffle = !isDesktop || (!isEditMode && available >= itemCost);
+    if (isDesktop && showShuffle && !isEditMode) available -= itemCost;
 
-    const showChips = isDesktop || available >= itemCost;
-    if (!isDesktop && showChips) available -= itemCost;
+    const showChips = !isDesktop || available >= itemCost;
+    if (isDesktop && showChips) available -= itemCost;
 
-    const showRefresh = isDesktop || available >= itemCost;
+    const showRefresh = !isDesktop || available >= itemCost;
 
-    if (!isDesktop && showRefresh) available -= itemCost;
+    if (isDesktop && showRefresh) available -= itemCost;
 
-    const showColumns = isDesktop || available >= itemCost;
-    if (!isDesktop && showColumns) available -= itemCost;
+    const showColumns = !isDesktop || available >= itemCost;
+    if (isDesktop && showColumns) available -= itemCost;
 
     // Language Group Cost ~100px (3 buttons + label)
     // Always show languages as they are critical controls, relying on overflow-x-auto for mobile layout
@@ -240,16 +240,37 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
     }, [vocabList]);
 
     return (
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0 z-20 shadow-sm sticky top-0 max-w-[100vw]">
+        <div className="bg-slate-50 dark:bg-[#030413] border-b border-slate-300 dark:border-white/5 flex flex-col flex-shrink-0 z-20 sticky top-0 max-w-[100vw] shadow-sm">
+
+            {/* --- ROW 1: MOBILE ONLY (Logo & Menu) --- */}
+            <div className="md:hidden flex items-center justify-between px-3 py-1 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                <div className="flex items-center gap-1.5">
+                    <div className="w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg text-white">あ</div>
+                    <span className="font-bold text-base tracking-tight leading-none">Irodori<span className="text-indigo-500">AI</span></span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="text-[10px] text-slate-400 font-mono text-right leading-none flex flex-col gap-0.5">
+                        <div className="font-bold text-slate-700 dark:text-white max-w-[100px] truncate">{currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}</div>
+                        <div className="opacity-80">{showingCount} / {totalCount}</div>
+                    </div>
+                    {setIsMobileSidebarOpen && (
+                        <button onClick={() => setIsMobileSidebarOpen(true)} className="p-1 -mr-1 text-slate-600 dark:text-slate-300">
+                            <div className="space-y-[3px]"><div className="w-5 h-0.5 bg-current rounded-full"></div><div className="w-5 h-0.5 bg-current rounded-full"></div><div className="w-5 h-0.5 bg-current rounded-full"></div></div>
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* --- ROW 2: TOOLBAR (Scrollable) --- */}
             {showChipPanel && (
-                <div className="flex flex-col gap-0.5 p-0.5 bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 overflow-hidden animate-in slide-in-from-top-2 duration-300">
+                <div className="flex flex-col gap-0.5 p-0.5 bg-slate-100 dark:bg-[#0a0c20]/50 border-b border-slate-300 dark:border-white/5 overflow-hidden animate-in slide-in-from-top-2 duration-300">
                     <FilterChipBar label="L" items={lessonCounts} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
                     <FilterChipBar label="C" items={candoCounts} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
                 </div>
             )}
 
-            <div className="bg-white dark:bg-slate-900 z-10 border-b border-slate-200 dark:border-slate-800 shadow-sm max-w-[100vw]">
-                <div ref={containerRef} className="flex items-center gap-1 p-1 overflow-x-auto no-scrollbar pr-4">
+            <div className="bg-transparent z-10 max-w-[100vw]">
+                <div ref={containerRef} className="flex items-center gap-1.5 p-0.5 md:p-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
                     {/* Status Indicators (Folder Nav removed) */}
                     {isSyncing && <Loader size={12} className="text-blue-600 animate-spin mr-2 flex-shrink-0" />}
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
@@ -260,41 +281,41 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     </div>
 
                     {/* --- VIEW ACTIONS GROUP --- */}
-                    <div className="flex items-center bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg gap-0.5 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
                         {showMarked && (
                             <button
                                 onClick={() => onViewModeChange('problem')}
-                                className={`flex items-center justify-center gap-1 h-8 px-2.5 rounded-md text-xs font-bold transition-all active:scale-95 whitespace-nowrap ${viewMode === 'problem' ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10' : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                                className="flex items-center justify-center gap-1 h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95"
                                 title="Toggle Marked View"
                             >
-                                <AlertCircle size={14} className={viewMode === 'problem' ? "fill-red-100" : ""} />
+                                <span className="material-symbols-outlined text-sm text-primary-glow mr-0.5">info</span>
                                 <span className={viewMode === 'problem' ? "inline" : "hidden md:inline"}>Marked</span>
                             </button>
                         )}
                     </div>
 
-                    <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 flex-shrink-0"></div>
+                    <div className="h-5 w-px bg-slate-200 dark:bg-white/5 mx-1 flex-shrink-0"></div>
 
                     {/* --- PLAYBACK GROUP --- */}
                     {!isEditMode && (
-                        <div className="flex items-center bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg gap-0.5 flex-shrink-0">
+                        <div className="flex items-center bg-slate-200/60 dark:bg-[#0a0c20]/50 rounded-2xl p-0.5 border border-slate-300 dark:border-white/5 gap-0.5 flex-shrink-0">
                             {showPlay && (
                                 <button
                                     onClick={isPlaying ? onTogglePlay : onPlaylistStart}
                                     disabled={isSyncing}
-                                    className={`w-8 h-8 flex items-center justify-center rounded-md transition-all active:scale-95 disabled:opacity-50 ${isPlaying ? 'bg-slate-800 dark:bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm dark:hover:text-slate-200'}`}
+                                    className="flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-transparent border border-slate-500 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-700 dark:hover:border-indigo-400/50"
                                     title={isPlaying ? "Pause" : "Start Playlist"}
                                 >
-                                    {isPlaying ? <div className="flex gap-0.5"><div className="w-1 h-3 bg-current rounded-full"></div><div className="w-1 h-3 bg-current rounded-full"></div></div> : <Play size={14} className="ml-0.5 fill-current" />}
+                                    {isPlaying ? <div className="flex gap-0.5"><div className="w-0.5 h-2.5 bg-current rounded-full"></div><div className="w-0.5 h-2.5 bg-current rounded-full"></div></div> : <Play size={14} className="fill-current" />}
                                 </button>
                             )}
                             {showShuffle && (
-                                <button onClick={onShuffle} disabled={isSyncing} className="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 rounded-md hover:bg-white dark:hover:bg-slate-700 hover:text-purple-600 dark:hover:text-purple-400 hover:shadow-sm transition-all active:scale-95 disabled:opacity-50" title="Shuffle">
+                                <button onClick={onShuffle} disabled={isSyncing} className="flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Shuffle">
                                     <Shuffle size={14} />
                                 </button>
                             )}
                             {showRefresh && (
-                                <button onClick={onRefresh} disabled={isSyncing} className="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 rounded-md hover:bg-white dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-sm transition-all active:scale-95 disabled:opacity-50" title="Refresh">
+                                <button onClick={onRefresh} disabled={isSyncing} className="flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Refresh">
                                     <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
                                 </button>
                             )}
@@ -303,20 +324,20 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
 
                     {/* --- LANGUAGE TOGGLE (Segmented Control) --- */}
                     {showLanguages && (
-                        <div className="flex items-center ml-1 flex-shrink-0 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 gap-0">
+                        <div className="flex gap-1 ml-1 flex-shrink-0">
                             <button
                                 onClick={() => onVisibilityToggle('bangla')}
-                                className={`h-8 w-8 md:w-auto md:px-3 flex items-center justify-center rounded-md text-[10px] font-semibold transition-all duration-200 ${hiddenColumns.bangla ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-md hover:shadow-lg active:shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-transparent border-none'}`}
+                                className={`flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.bangla ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
                                 title={!hiddenColumns.bangla ? "Hide Bangla" : "Show Bangla"}
                             >
-                                BN
+                                <span className="relative">BN</span>
                             </button>
                             <button
                                 onClick={() => onVisibilityToggle('japanese')}
-                                className={`h-8 w-8 md:w-auto md:px-3 flex items-center justify-center rounded-md text-[10px] font-semibold transition-all duration-200 ${hiddenColumns.japanese ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-md hover:shadow-lg active:shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-transparent border-none'}`}
+                                className={`flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.japanese ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
                                 title={!hiddenColumns.japanese ? "Hide Japanese" : "Show Japanese"}
                             >
-                                JP
+                                <span className="relative">JP</span>
                             </button>
                         </div>
                     )}
@@ -325,7 +346,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     {showChips && (
                         <button
                             onClick={() => setShowChipPanel(!showChipPanel)}
-                            className={`flex-shrink-0 flex items-center justify-center gap-1 h-9 px-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ml-1 ${showChipPanel ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                            className="flex items-center justify-center gap-1 h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95"
                             title={showChipPanel ? "Hide Chips" : "Show Chips"}
                         >
                             {showChipPanel ? <ChevronDown size={14} /> : <ArrowRight size={14} />}
@@ -333,19 +354,20 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                         </button>
                     )}
                     {showColumns && (
-                        <button onClick={() => setIsColumnManagerOpen(true)} className="ml-0.5 w-9 h-9 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="Columns">
-                            <SettingsIcon size={16} />
+                        <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center justify-center h-7 min-w-[28px] px-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]" title="Columns">
+                            <SettingsIcon size={14} />
                         </button>
                     )}
                     {/* Desktop Folder Info (Right aligned) */}
-                    <div className="hidden md:flex items-center gap-2 ml-auto mr-2 text-[11px] bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
-                        <div className="font-bold text-slate-700 dark:text-slate-200 max-w-[200px] truncate">
+                    <div className="hidden md:flex items-center gap-2 ml-auto mr-2 px-4 py-2 bg-slate-200/80 dark:bg-slate-900/60 border border-slate-400 dark:border-primary/40 rounded-full shadow-lg backdrop-blur-md relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+                        <span className="text-xs font-bold text-indigo-600 dark:text-primary-glow uppercase tracking-wider max-w-[200px] truncate">
                             {currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}
-                        </div>
-                        <div className="text-slate-300 dark:text-slate-600">|</div>
-                        <div className="text-slate-600 dark:text-slate-400 font-medium">
-                            Showing <span className="text-slate-900 dark:text-slate-100 font-bold font-mono">{showingCount !== undefined ? showingCount : filteredData.length}</span> / <span className="font-mono">{totalCount !== undefined ? totalCount : vocabList.length}</span>
-                        </div>
+                        </span>
+                        <div className="w-px h-3 bg-white/10"></div>
+                        <span className="text-xs font-medium text-slate-400">
+                            {showingCount !== undefined ? showingCount : filteredData.length} / {totalCount !== undefined ? totalCount : vocabList.length}
+                        </span>
                     </div>
 
                 </div>

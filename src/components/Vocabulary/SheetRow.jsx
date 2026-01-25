@@ -58,7 +58,7 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
     };
 
     return (
-        <tr className={`glossy-row group border-b border-slate-200 dark:border-white/5 transition-all duration-300 ${isSelected ? 'bg-primary/10 dark:bg-primary/20 shadow-[inset_0_0_20px_rgba(99,102,241,0.1)]' : isActive ? 'bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.05)]' : ''}`}>
+        <tr className={`glossy-row group border-b border-slate-200 dark:border-white/10 transition-all duration-300 ${isSelected ? 'bg-primary/10 dark:bg-primary/20 shadow-[inset_0_0_20px_rgba(99,102,241,0.1)]' : isActive ? 'bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.05)]' : ''}`}>
             {columnOrder.map((colId) => (
                 <React.Fragment key={colId}>
                     {(!columnDefs.find(c => c.id === colId)?.editOnly || isEditMode) && renderCellContent(colId)}

@@ -86,7 +86,7 @@ const DynamicHeader = ({
           px-3 py-2
           bg-slate-50 dark:bg-[#030413]
           border-b border-r border-slate-200 dark:border-white/10
-          shadow-sm
+          shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]
           text-[11px] font-bold uppercase tracking-[0.15em]
           select-none
           text-slate-600 dark:text-slate-400

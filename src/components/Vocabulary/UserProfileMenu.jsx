@@ -46,7 +46,7 @@ const UserProfileMenu = ({ user, isMobile }) => {
                     </div>
 
                     <div className={`flex-1 min-w-0 ${isMobile ? 'block' : 'hidden lg:block'}`}>
-                        <p className="text-sm font-semibold truncate text-slate-100">{user.displayName || 'User'}</p>
+                        <p className="text-sm font-semibold truncate text-slate-900 dark:text-slate-100">{user.displayName || 'User'}</p>
                         <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
                     </div>
                 </button>

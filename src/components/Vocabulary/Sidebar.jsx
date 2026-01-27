@@ -4,7 +4,7 @@ import UserProfileMenu from './UserProfileMenu';
 
 const Sidebar = ({ folders, currentFolderId, handleFolderChange, isMobile = false, user }) => {
   return (
-    <div className={`${isMobile ? 'w-full glass-card border-none' : 'w-16 lg:w-64'} bg-transparent flex flex-col h-full flex-shrink-0 transition-all`}>
+    <div className={`${isMobile ? 'w-full glass-card border-none' : 'hidden md:flex w-16 lg:w-64'} bg-transparent flex flex-col h-full flex-shrink-0 transition-all`}>
       <div className={`p-6 flex items-center ${isMobile ? 'justify-start' : 'justify-center lg:justify-start'} gap-3`}>
         <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-lg border border-slate-300 dark:border-white/5 shrink-0">
           <span className="text-slate-700 dark:text-white font-bold text-xl">あ</span>

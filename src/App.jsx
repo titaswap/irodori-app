@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { auth, db } from './firebase'; // Singleton imports
+import { Loader } from 'lucide-react';
+import { auth } from './firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { handleEmailAuth as handleEmailAuthImported, ensureUserProfile, handleNativeLoginSuccess, handleNativeLoginError } from './app/handlers/authHandlers';
+import { loadLocalData, fetchSheetData, createApiService } from './app/services/dataService';
 import VocabularyView from './VocabularyView';
+import { TableHoverLockProvider } from './hooks/useTableHoverLock.jsx';
 import UpdateNotification from './components/UpdateNotification';
-import { mapToApp } from './utils/vocabularyUtils';
-import { fetchAllProgress } from './services/firestore/activityService';
 import { googleLogin } from "./auth/googleLogin";
-import { uiConfig } from './config/uiConfig';
+import { uiStateStorage } from './utils/uiStateStorage';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 
@@ -24,7 +25,12 @@ function App() {
 
     const [vocabList, setVocabList] = useState([]);
     const [folders, setFolders] = useState([]);
-    const [currentFolderId, setCurrentFolderId] = useState('root');
+    const [currentFolderId, setCurrentFolderId] = useState(() => uiStateStorage.loadCurrentFolder());
+
+    // Save folder selection
+    useEffect(() => {
+        uiStateStorage.saveCurrentFolder(currentFolderId);
+    }, [currentFolderId]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSyncing, setIsSyncing] = useState(false);
 
@@ -37,94 +43,17 @@ function App() {
     const [authError, setAuthError] = useState("");
     const [isAuthSubmitting, setIsAuthSubmitting] = useState(false); // New: Loading State
 
-    const handleEmailAuth = async (e) => {
-        e.preventDefault();
-        setAuthError("");
-        setIsAuthSubmitting(true);
+    const handleEmailAuth = (e) => handleEmailAuthImported(e, {
+        email,
+        password,
+        firstName,
+        isSignup,
+        setAuthError,
+        setIsAuthSubmitting,
+        auth
+    });
 
-        try {
-            const {
-                createUserWithEmailAndPassword,
-                signInWithEmailAndPassword,
-                updateProfile
-            } = await import("firebase/auth");
-
-            if (isSignup) {
-                if (!firstName.trim()) throw new Error("First Name is required.");
-
-                // 1. Create User
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
-
-                // 2. Update Auth Profile
-                await updateProfile(userCred.user, {
-                    displayName: firstName
-                });
-
-                // 3. Force Firestore Update (to ensure name is saved immediately)
-                const userRef = doc(db, "users", userCred.user.uid);
-                await setDoc(userRef, {
-                    displayName: firstName,
-                    email: email,
-                    uid: userCred.user.uid,
-                    provider: "password",
-                    deviceType: "android",
-                    createdAt: serverTimestamp(),
-                    lastLoginAt: serverTimestamp()
-                }, { merge: true });
-
-            } else {
-                await signInWithEmailAndPassword(auth, email, password);
-            }
-        } catch (error) {
-            console.error(error);
-            setAuthError(error.message.replace("Firebase: ", ""));
-        } finally {
-            setIsAuthSubmitting(false);
-        }
-    };
-
-    // Profile Management
-    const ensureUserProfile = async (firebaseUser) => {
-        const userRef = doc(db, "users", firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        // Detect Platform
-        // "Android" is the bridge name defined in MainActivity.java
-        const isAndroid = !!window.Android;
-
-        const userData = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-            provider: "google",
-            lastLoginAt: serverTimestamp(),
-            deviceType: isAndroid ? "android" : "web",
-            appVersion: __APP_VERSION__ // Defined in vite.config.js
-        };
-
-        if (!userSnap.exists()) {
-            try {
-                // New User: Create with firstLoginAt
-                await setDoc(userRef, {
-                    ...userData,
-                    firstLoginAt: serverTimestamp(),
-                    createdAt: serverTimestamp()
-                });
-                console.log("User profile created for", firebaseUser.uid);
-            } catch (error) {
-                console.error("Error creating user profile:", error);
-            }
-        } else {
-            // Existing User: Update (Merge) - preserves firstLoginAt and custom data
-            try {
-                await setDoc(userRef, userData, { merge: true });
-                console.log("User profile updated for", firebaseUser.uid);
-            } catch (error) {
-                console.error("Error updating user profile:", error);
-            }
-        }
-    };
+    // Profile management now handled by authHandlers.js
 
     // Auth Listener
     useEffect(() => {
@@ -137,10 +66,10 @@ function App() {
                 ensureUserProfile(currentUser).catch(err => console.warn("Profile sync skipped (offline):", err));
 
                 // 1. Try to load local data INSTANTLY
-                const hasLocalData = loadLocalData();
+                const hasLocalData = loadLocalDataWrapper();
 
                 // 2. Fetch fresh data in background (silent if we have local data, blocking only if completely empty)
-                fetchSheetData(hasLocalData);
+                fetchSheetDataWrapper(hasLocalData);
             } else {
                 // Logged Out
                 setUser(null);
@@ -152,167 +81,15 @@ function App() {
         return () => unsubscribe();
     }, []);
 
-    // Helper: Load from LocalStorage
-    const loadLocalData = () => {
-        const saved = localStorage.getItem('vocabList');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    setVocabList(parsed);
+    // Helper: Load from LocalStorage (now in dataService.js)
+    const loadLocalDataWrapper = () => loadLocalData(setVocabList, setFolders, setIsLoading);
 
-                    // Generate folders immediately
-                    const uniqueBooks = [...new Set(parsed.map(item => item.book))].filter(b => b);
-                    const savedFolders = uniqueBooks.map(bookName => ({
-                        id: bookName,
-                        name: bookName,
-                        parentId: 'root'
-                    }));
-                    setFolders(savedFolders);
-
-                    setIsLoading(false); // Unblock UI immediately
-                    return true;
-                }
-            } catch (e) {
-                console.error("Failed to parse saved data", e);
-            }
-        }
-        return false;
-    };
-
-    const apiService = {
-        // Send new items to Sheet
-        sendAdd: async (newItems) => {
-            // Prepare payload: array of objects matching sheet headers roughly
-            const payload = {
-                action: 'add',
-                items: newItems.map(item => ({
-                    hiragana: item.japanese,
-                    bangla: item.bangla,
-                    lesson: item.lesson,
-                    cando: item.cando,
-                    is_problem: item.isMarked,
-                }))
-            };
-
-            // Use no-cors? No, we likely want response. But if CORS fails, we can try with 'no-cors' but we won't get response.
-            // Assuming the script handles CORS (it should if set to "Anyone").
-            // Usually POST requires simple text/plain to avoid preflight if script not handling OPTIONS.
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-                // Note: omitting Content-Type 'application/json' sometimes helps with simple requests if script reads postData.contents
-                // But let's try standard first.
-            });
-        },
-
-        // Send updates for existing items
-        sendUpdate: async (updates) => {
-            const payload = {
-                action: 'update',
-                updates: updates // Array of objects with id and fields to update
-            };
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-        }
-    };
+    const apiService = createApiService();
 
 
 
-    const fetchSheetData = async (silent = false) => {
-        // If not silent (meaning no local data), show loader.
-        if (!silent && vocabList.length === 0) setIsLoading(true);
-
-        try {
-            // Set timeout for fetch to prevent infinite hanging on slow connections
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-            const response = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const json = await response.json();
-
-            let rawData = [];
-
-            // HANDLE NEW SCRIPT RESPONSE: { "Sheet1": [...], "Sheet2": [...] }
-            if (typeof json === 'object' && !Array.isArray(json) && !json.data) {
-                Object.keys(json).forEach(sheetName => {
-                    if (Array.isArray(json[sheetName])) {
-                        json[sheetName].forEach(row => {
-                            // Inject 'book' property from the key
-                            rawData.push({ ...row, book: sheetName });
-                        });
-                    }
-                });
-            } else {
-                // Fallback for legacy or flat list format
-                rawData = Array.isArray(json) ? json : (json.data || []);
-            }
-
-            if (rawData.length > 0) {
-                const mappedData = rawData.map((row, index) => mapToApp(row, index));
-
-                // --- DYNAMIC FOLDER GENERATION ---
-                const uniqueBooks = [...new Set(mappedData.map(item => item.book))].filter(b => b);
-                const dynamicFolders = uniqueBooks.map(bookName => ({
-                    id: bookName, // Use book name as ID for simplicity
-                    name: bookName,
-                    parentId: 'root'
-                }));
-
-                setFolders(dynamicFolders);
-                // --------------------------------
-
-                // Restore local marks (Legacy LocalStorage)
-                const saved = localStorage.getItem('vocabList');
-                if (saved) {
-                    try {
-                        const localMap = new Map(JSON.parse(saved).map(i => [i.localId, i]));
-                        mappedData.forEach(item => {
-                            const local = localMap.get(item.localId);
-                            if (local) {
-                                item.isMarked = local.isMarked;
-                            }
-                        });
-                    } catch (e) { console.error("Merge error", e); }
-                }
-
-                // Phase 8.2: Overlay Firestore Progress
-                // Run in background, don't block render if possible (though we are in async)
-                try {
-                    const firestoreProgress = await fetchAllProgress();
-                    if (firestoreProgress && Object.keys(firestoreProgress).length > 0) {
-                        mappedData.forEach(item => {
-                            // We match by REAL ID (item.id), not localId
-                            if (item.id && firestoreProgress[item.id]) {
-                                const p = firestoreProgress[item.id];
-                                // Overwrite only if defined in Firestore
-                                if (p.isMarked !== undefined) item.isMarked = p.isMarked;
-                            }
-                        });
-                        console.log("[App] Merged Firestore progress into vocabList");
-                    }
-                } catch (e) {
-                    console.error("[App] Failed to merge Firestore progress", e);
-                }
-
-                setVocabList(mappedData);
-            } else {
-                console.error("Unexpected data format:", json);
-            }
-        } catch (error) {
-            console.warn("Fetch skipped or failed (offline/timeout):", error);
-            // If we are in silent mode (have local data), this is fine.
-            // If we are NOT in silent mode, we might be stuck loading?
-            // Ensure we stop loading state.
-        } finally {
-            setIsLoading(false);
-        }
+    const fetchSheetDataWrapper = async (silent = false) => {
+        await fetchSheetData(silent, vocabList, setIsLoading, setVocabList, setFolders);
     };
 
     // Save to LocalStorage whenever list changes
@@ -376,24 +153,8 @@ function App() {
             window.Android.onWebReady();
         }
 
-        window.onNativeLoginSuccess = async (idToken) => {
-            console.log("Native Token Received. Length:", idToken ? idToken.length : 0);
-            try {
-                const { GoogleAuthProvider, signInWithCredential } = await import("firebase/auth");
-                const credential = GoogleAuthProvider.credential(idToken);
-                console.log("Signing in with Credential...");
-                const userCred = await signInWithCredential(auth, credential);
-                console.log("Firebase Auth SUCCESS. User:", userCred.user.uid);
-            } catch (error) {
-                console.error("Firebase Auth FAILED:", error);
-                alert("Auth Error: " + error.code + " - " + error.message);
-            }
-        };
-
-        window.onNativeLoginError = (errorMsg) => {
-            console.error("Native Login Error from Java:", errorMsg);
-            alert("Login Failed: " + errorMsg);
-        }
+        window.onNativeLoginSuccess = (idToken) => handleNativeLoginSuccess(idToken, auth);
+        window.onNativeLoginError = handleNativeLoginError;
 
         return () => {
             // Cleanup if needed
@@ -402,9 +163,9 @@ function App() {
 
 
     return (
-        <div className="relative h-screen w-screen overflow-hidden bg-[#030712] text-white selection:bg-indigo-500/30">
+        <div className="relative h-screen w-screen overflow-hidden bg-white dark:bg-[#030712] text-slate-900 dark:text-white selection:bg-indigo-500/30">
             {/* Ambient Glows */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+            <div className="fixed inset-0 overflow-hidden pointer-events-none hidden dark:block">
                 <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full -z-10"></div>
                 <div className="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full -z-10"></div>
             </div>
@@ -412,8 +173,9 @@ function App() {
             <UpdateNotification />
 
             {authLoading ? (
-                <div className="flex h-screen w-screen items-center justify-center text-white">
-                    Loading IrodoriAI...
+                <div className="flex flex-col h-screen w-screen items-center justify-center bg-[#030712] text-white z-50">
+                    <Loader className="animate-spin mb-4 text-indigo-500" size={32} />
+                    <div className="text-lg font-medium tracking-wide">Loading IrodoriAI...</div>
                 </div>
             ) : !user ? (
                 <div className="flex h-screen w-screen items-center justify-center bg-gray-900 flex-col gap-4">
@@ -651,21 +413,23 @@ function App() {
                     {/* Fallback for WebView if popup blocked? Usually works with Chrome Custom Tabs */}
                 </div>
             ) : (
-                <VocabularyView
-                    vocabList={vocabList}
-                    setVocabList={setVocabList}
-                    folders={folders}
-                    setFolders={setFolders}
-                    currentFolderId={currentFolderId}
-                    setCurrentFolderId={setCurrentFolderId}
-                    isLoading={isLoading}
-                    setIsLoading={setIsLoading}
-                    isSyncing={isSyncing}
-                    setIsSyncing={setIsSyncing}
-                    apiService={apiService}
-                    fetchSheetData={fetchSheetData}
-                    user={user}
-                />
+                <TableHoverLockProvider>
+                    <VocabularyView
+                        vocabList={vocabList}
+                        setVocabList={setVocabList}
+                        folders={folders}
+                        setFolders={setFolders}
+                        currentFolderId={currentFolderId}
+                        setCurrentFolderId={setCurrentFolderId}
+                        isLoading={isLoading}
+                        setIsLoading={setIsLoading}
+                        isSyncing={isSyncing}
+                        setIsSyncing={setIsSyncing}
+                        apiService={apiService}
+                        fetchSheetData={fetchSheetDataWrapper}
+                        user={user}
+                    />
+                </TableHoverLockProvider>
             )}
         </div>
     );

@@ -10,11 +10,13 @@ export const INTERNAL_KEYS = new Set([
 
     // System / logic fields
     'isMarked',
+    'tags',  // Prevent tags from being rendered as dynamic column (handled by TagCell)
 ]);
 
 export const FIXED_SYSTEM_COLUMNS = [
     { id: 'isMarked', label: '❗', width: 'w-12', type: 'action', },
-    { id: 'audio', label: '🔊', width: 'w-12', type: 'action', }
+    { id: 'audio', label: '🔊', width: 'w-12', type: 'action', },
+    { id: 'tags', label: 'TAG', width: 'w-32', type: 'tags', },
 ];
 
 export const SELECTION_COLUMN = { id: 'selection', label: '#', width: 'w-10', type: 'system', fixed: 'left' };
@@ -71,12 +73,22 @@ export const mapToApp = (row, index) => {
     if (!item.cando) item.cando = String(row.cando || '1');
     if (!item.bangla) item.bangla = String(row.bangla || ''); // Fallback for specific UI components if they rely on it
 
+    // Ensure tags is always an array (never convert to single 'tag')
+    if (Array.isArray(row.tags)) {
+        item.tags = row.tags;
+    } else if (typeof row.tag === 'string' && row.tag.trim()) {
+        // Migration: convert old single 'tag' to 'tags' array
+        item.tags = [row.tag.trim()];
+    } else {
+        item.tags = [];
+    }
+
     return item;
 };
 
 export const getChangedFields = (original, current) => {
     const changes = {}; let hasChanges = false;
-    const keys = ['japanese', 'bangla', 'lesson', 'cando', 'isMarked']; // Removed stats
+    const keys = ['japanese', 'bangla', 'lesson', 'cando', 'isMarked', 'tag']; // Removed stats
     keys.forEach(key => {
         if (JSON.stringify(original[key]) !== JSON.stringify(current[key])) {
             if (key === 'japanese') changes.hiragana = current[key];

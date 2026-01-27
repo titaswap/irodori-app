@@ -81,9 +81,18 @@ if (window.speechSynthesis && AUDIO_SETTINGS.PRELOAD_VOICE) {
 }
 
 export const playJapaneseAudio = (text, onEnd) => {
+    // Capture session ID at scheduling time
+    const schedulingSessionId = playbackSessionId;
+
     if (AUDIO_SETTINGS.YIELD_TO_UI) {
         // yield to main thread so UI updates (button click state) happen first
         setTimeout(() => {
+            // logic check: If stopAudio() was called during yield, playbackSessionId will have changed.
+            // Abort playback to respect the stop command.
+            if (playbackSessionId !== schedulingSessionId) {
+                console.log("[audioPlayer] Playback aborted due to intervening Stop/Event");
+                return;
+            }
             _playJapaneseAudioInternal(text, onEnd);
         }, 0);
     } else {

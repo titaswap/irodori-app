@@ -34,6 +34,14 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
             data = data.filter(i => String(i.cando) === String(filters.cando));
         }
 
+        // Tag filter: Show rows with ANY selected tag (OR logic)
+        if (Array.isArray(filters.tags) && filters.tags.length > 0) {
+            data = data.filter(item => {
+                const itemTags = Array.isArray(item.tags) ? item.tags : [];
+                return filters.tags.some(selectedTag => itemTags.includes(selectedTag));
+            });
+        }
+
         if (viewMode === 'problem') data = data.filter(i => i.isMarked);
         else if (viewMode === 'weak') data = data.filter(i => i.isMarked); // Stats removed, fallback to marked
 

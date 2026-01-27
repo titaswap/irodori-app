@@ -116,6 +116,18 @@
       transform: translateY(-0.5px);
   }
 
+  /* Table Hover Lock - Neutralize row hover when dropdown is open */
+  .table-hover-locked .glossy-row:hover {
+      background: inherit !important;
+      box-shadow: inherit !important;
+      transform: none !important;
+  }
+  .dark .table-hover-locked .glossy-row:hover {
+      background: inherit !important;
+      box-shadow: inherit !important;
+      transform: none !important;
+  }
+
   .neon-text {
       text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
   }

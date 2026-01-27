@@ -1,174 +1,12 @@
-
 import React, { useState, useMemo } from 'react';
 import {
-    Folder, Loader, PenTool, Target, ArrowRight, ChevronDown,
-    Eye, EyeOff, AlertCircle, BarChart2, Undo, Save as SaveIcon,
-    Lock, Shuffle, Brain, Play, RefreshCw, Settings as SettingsIcon, Grid, MoreVertical
+    Loader, ArrowRight, ChevronDown,
+    Shuffle, Play, RefreshCw, Settings as SettingsIcon
 } from 'lucide-react';
-// import { ProgressTrendChart, WeaknessCard } from './StatsWidgets'; // REMOVED
-import { X } from 'lucide-react';
+import { FilterChipBar } from './Toolbar/FilterChipBar';
+import { MultiSelectDropdown } from './Toolbar/MultiSelectDropdown';
 
-const FilterChipBar = ({ label, items, activeValues, onToggle, color = 'blue' }) => {
-    // items: [[value, count], ...]
-    if (!items || items.length === 0) return null;
-    const safeActive = Array.isArray(activeValues) ? activeValues : [];
-
-    const colorClasses = {
-        blue: { active: 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50', inactive: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-400 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:border-blue-400 dark:hover:border-blue-600' },
-        indigo: { active: 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-indigo-900/50', inactive: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-400 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600' }
-    };
-    const styles = colorClasses[color] || colorClasses.blue;
-
-    return (
-        <div className="flex items-center gap-2 overflow-hidden px-1 select-none transition-all duration-300 h-7 border-b border-transparent">
-            <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-0.5 w-[50px] shrink-0 text-right">
-                {label === 'L' ? 'Lesson' : 'Can-do'}
-            </div>
-
-            <div className="flex gap-1 overflow-x-auto items-center h-full no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <style>{` .no-scrollbar::-webkit-scrollbar { display: none; } `}</style>
-                {items.map(([val, count]) => {
-                    const isActive = safeActive.includes(val);
-                    return (
-                        <button
-                            key={val}
-                            onClick={() => onToggle(val)}
-                            title={`${label === 'L' ? 'Lesson' : 'Can-do'} ${val} – ${count} words`}
-                            className={`
-                                    flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all whitespace-nowrap border shrink-0
-                                    ${isActive ? styles.active : styles.inactive}
-                                `}
-                        >
-                            <span>{label}{val}</span>
-                            <span className={`text-[9px] opacity-70 ${isActive ? 'bg-white/20 px-1 rounded-[2px]' : 'text-slate-500 dark:text-slate-500 bg-slate-300 dark:bg-slate-700 px-1 rounded-[2px]'}`}>{count}</span>
-                            {isActive && <X size={10} className="ml-0.5 opacity-80 hover:opacity-100" />}
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
-};
-
-// --- MULTI-SELECT DROPDOWN COMPONENT ---
-const MultiSelectDropdown = ({ label, options, selectedValues, onChange }) => {
-    // selectedValues is now expected to be an array.
-    // If it's 'all' (legacy) or empty array, it means All.
-    const safeSelected = Array.isArray(selectedValues) ? selectedValues : [];
-    const isAll = safeSelected.length === 0;
-
-    const [isOpen, setIsOpen] = useState(false);
-    const containerRef = React.useRef(null);
-
-    const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
-    const dropdownRef = React.useRef(null);
-
-    React.useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target) && (!dropdownRef.current || !dropdownRef.current.contains(event.target))) {
-                setIsOpen(false);
-            }
-        };
-        const handleScroll = (e) => {
-            // If dragging scrollbar or scrolling inside dropdown, ignore
-            if (dropdownRef.current && dropdownRef.current.contains(e.target)) return;
-            if (isOpen) setIsOpen(false);
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        window.addEventListener('scroll', handleScroll, true); // Capture scroll to close
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            window.removeEventListener('scroll', handleScroll, true);
-        };
-    }, [isOpen]);
-
-    const toggleOption = (val) => {
-        let newSelected;
-        if (safeSelected.includes(val)) {
-            newSelected = safeSelected.filter(v => v !== val);
-        } else {
-            newSelected = [...safeSelected, val];
-        }
-        onChange(newSelected);
-    };
-
-    const toggleAll = () => {
-        onChange([]);
-    };
-
-    const summary = isAll ? "All" : safeSelected.length === 1 ? safeSelected[0] : `${safeSelected.length} selected`;
-
-    return (
-        <div className="relative group flex-shrink-0" ref={containerRef}>
-            <button
-                onClick={(e) => {
-                    if (!isOpen) {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
-                    }
-                    setIsOpen(!isOpen);
-                }}
-                title={`${label} Filter`}
-                className={`
-                    flex items-center justify-center gap-1.5 appearance-none 
-                    transition-all duration-200
-                    text-[11px] md:text-xs font-semibold 
-                    rounded-full
-                    focus:outline-none 
-                    ${isOpen ? 'ring-2 ring-primary/50' : ''}
-                    h-7 min-w-[28px] md:min-w-[80px] px-2 md:justify-between relative overflow-hidden group
-                    ${!isAll
-                        ? 'bg-primary text-white shadow-sm shadow-primary/20'
-                        : 'bg-primary/10 border border-primary/20 text-primary dark:text-white hover:bg-primary/20'
-                    }
-                `}
-            >
-                <div className="md:hidden flex items-center justify-center gap-0.5">
-                    <span className="text-[11px] uppercase">{label.charAt(0)}</span>
-                    <ChevronDown size={10} strokeWidth={3} className={`transition-transform ${isOpen ? 'rotate-180' : ''} opacity-80`} />
-                </div>
-                <span className="hidden md:block truncate max-w-[100px]">{label}: {summary}</span>
-                <ChevronDown size={12} className={`hidden md:block transition-transform ${isOpen ? 'rotate-180' : ''} ${!isAll ? 'text-indigo-200' : 'text-slate-400'}`} />
-            </button>
-            {isOpen && (
-                <div
-                    ref={dropdownRef}
-                    style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left }}
-                    className="w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-[9999] max-h-64 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left"
-                >
-                    <div
-                        onClick={() => { toggleAll(); setIsOpen(false); }}
-                        className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-bold ${isAll ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
-                    >
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isAll ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
-                            {isAll && <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>}
-                        </div>
-                        All
-                    </div>
-                    <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
-                    {options.map(opt => {
-                        const isSelected = safeSelected.includes(opt);
-                        return (
-                            <div
-                                key={opt}
-                                onClick={() => toggleOption(opt)}
-                                className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-medium ${isSelected ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
-                            >
-                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
-                                    {isSelected && <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                                </div>
-                                {label} {opt}
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-        </div>
-    );
-};
-
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags }) => {
     const [showChipPanel, setShowChipPanel] = useState(false);
 
     const containerRef = React.useRef(null);
@@ -229,15 +67,19 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
 
     const lessonCounts = useMemo(() => {
         const counts = {};
-        vocabList.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
+        filteredData.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
         return Object.entries(counts).sort((a, b) => (parseInt(a[0]) || 999) - (parseInt(b[0]) || 999));
-    }, [vocabList]);
+    }, [filteredData]);
 
     const candoCounts = useMemo(() => {
         const counts = {};
-        vocabList.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
-        return Object.entries(counts).sort();
-    }, [vocabList]);
+        filteredData.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
+        return Object.entries(counts).sort((a, b) => {
+            const numA = parseInt(a[0].replace(/\D/g, '')) || 0;
+            const numB = parseInt(b[0].replace(/\D/g, '')) || 0;
+            return numA - numB;
+        });
+    }, [filteredData]);
 
     return (
         <div className="bg-slate-50 dark:bg-[#030413] border-b border-slate-300 dark:border-white/5 flex flex-col flex-shrink-0 z-20 sticky top-0 max-w-[100vw] shadow-sm">
@@ -272,12 +114,25 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
             <div className="bg-transparent z-10 max-w-[100vw]">
                 <div ref={containerRef} className="flex items-center gap-1.5 p-0.5 md:p-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
                     {/* Status Indicators (Folder Nav removed) */}
-                    {isSyncing && <Loader size={12} className="text-blue-600 animate-spin mr-2 flex-shrink-0" />}
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
 
                     <div className="flex gap-1">
-                        <MultiSelectDropdown label="Lesson" options={[...new Set(vocabList.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
-                        <MultiSelectDropdown label="Can-do" options={[...new Set(vocabList.map(v => String(v.cando)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
+                        <MultiSelectDropdown label="Lesson" options={[...new Set(filteredData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
+                        <MultiSelectDropdown label="Can-do" options={[...new Set(filteredData.map(v => String(v.cando)))].sort((a, b) => {
+                            const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                            const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                            return numA - numB;
+                        })} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
+                        <MultiSelectDropdown
+                            label="Tag"
+                            options={allTags && allTags.length > 0 ? allTags : [...new Set(filteredData.flatMap(v => Array.isArray(v.tags) ? v.tags : []))].filter(Boolean).sort()}
+                            selectedValues={filters.tags}
+                            onChange={(val) => onFilterChange({ ...filters, tags: val })}
+                            enableTagManagement={true}
+                            onCreateTag={createTag}
+                            onRenameTag={renameTag}
+                            onDeleteTag={deleteTag}
+                        />
                     </div>
 
                     {/* --- VIEW ACTIONS GROUP --- */}
@@ -285,7 +140,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                         {showMarked && (
                             <button
                                 onClick={() => onViewModeChange('problem')}
-                                className="flex items-center justify-center gap-1 h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95"
+                                className={`flex items-center justify-center gap-1 h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${viewMode === 'problem' ? 'bg-primary text-white shadow-sm shadow-primary/20 border-transparent' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'} active:scale-95`}
                                 title="Toggle Marked View"
                             >
                                 <span className="material-symbols-outlined text-sm text-primary-glow mr-0.5">info</span>
@@ -303,19 +158,19 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                                 <button
                                     onClick={isPlaying ? onTogglePlay : onPlaylistStart}
                                     disabled={isSyncing}
-                                    className="flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-transparent border border-slate-500 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-700 dark:hover:border-indigo-400/50"
+                                    className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-transparent border border-slate-500 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-700 dark:hover:border-indigo-400/50"
                                     title={isPlaying ? "Pause" : "Start Playlist"}
                                 >
                                     {isPlaying ? <div className="flex gap-0.5"><div className="w-0.5 h-2.5 bg-current rounded-full"></div><div className="w-0.5 h-2.5 bg-current rounded-full"></div></div> : <Play size={14} className="fill-current" />}
                                 </button>
                             )}
                             {showShuffle && (
-                                <button onClick={onShuffle} disabled={isSyncing} className="flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Shuffle">
+                                <button onClick={onShuffle} disabled={isSyncing} className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Shuffle">
                                     <Shuffle size={14} />
                                 </button>
                             )}
                             {showRefresh && (
-                                <button onClick={onRefresh} disabled={isSyncing} className="flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Refresh">
+                                <button onClick={onRefresh} disabled={isSyncing} className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Refresh">
                                     <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
                                 </button>
                             )}
@@ -327,14 +182,14 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                         <div className="flex gap-1 ml-1 flex-shrink-0">
                             <button
                                 onClick={() => onVisibilityToggle('bangla')}
-                                className={`flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.bangla ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
+                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.bangla ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
                                 title={!hiddenColumns.bangla ? "Hide Bangla" : "Show Bangla"}
                             >
                                 <span className="relative">BN</span>
                             </button>
                             <button
                                 onClick={() => onVisibilityToggle('japanese')}
-                                className={`flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.japanese ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
+                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.japanese ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
                                 title={!hiddenColumns.japanese ? "Hide Japanese" : "Show Japanese"}
                             >
                                 <span className="relative">JP</span>
@@ -346,7 +201,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     {showChips && (
                         <button
                             onClick={() => setShowChipPanel(!showChipPanel)}
-                            className="flex items-center justify-center gap-1 h-7 min-w-[28px] px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95"
+                            className="flex items-center justify-center gap-1 h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95"
                             title={showChipPanel ? "Hide Chips" : "Show Chips"}
                         >
                             {showChipPanel ? <ChevronDown size={14} /> : <ArrowRight size={14} />}
@@ -354,7 +209,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                         </button>
                     )}
                     {showColumns && (
-                        <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center justify-center h-7 min-w-[28px] px-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]" title="Columns">
+                        <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]" title="Columns">
                             <SettingsIcon size={14} />
                         </button>
                     )}

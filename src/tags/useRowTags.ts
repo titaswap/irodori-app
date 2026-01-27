@@ -60,7 +60,7 @@ export const useRowTags = (vocabList: any[], setVocabList: any, showToast?: any)
 
             // Confirmed Sync: Re-fetch latest state to ensure UI is perfectly synced
             // This is the ONLY place that should update the UI for row tags
-            const freshProgress = await fetchItemProgress(item.id);
+            const freshProgress: any = await fetchItemProgress(item.id);
             
             // Check if freshProgress exists. If not (e.g. removed last tag), use empty array
             const newTags = (freshProgress && Array.isArray(freshProgress.tags)) ? freshProgress.tags : [];

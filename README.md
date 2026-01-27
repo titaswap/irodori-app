@@ -50,3 +50,36 @@ adb logcat -s IRODORI_WEBVIEW IRODORI_TTS
 
 adb uninstall com.irodori.ai
 adb install "E:\JFT\Irodori apps - Copy - Copy\android_app\app\build\outputs\apk\debug\IrodoriAI.apk"
+
+
+
+
+
+
+``````````````````
+✅ IDEAL DEPLOYMENT ORDER (RECOMMENDED)
+🔁 Big Picture Order
+
+Code → Git → Build → Web Deploy → Android Build → APK/AAB Deploy
+
+1️⃣ Code final
+2️⃣ Git commit & push
+3️⃣ Web build
+4️⃣ Firebase deploy (web)
+5️⃣ Android build
+6️⃣ Signed APK / AAB deploy
+
+1= 
+
+✅ OPTION 1 (Recommended): PowerShell command
+Remove-Item -Recurse -Force dist
+Remove-Item -Recurse -Force .firebase
+
+✅ OPTION 2: CMD compatible (classic Windows)
+rmdir /s /q dist
+rmdir /s /q .firebasegit add .
+
+
+2= 
+npm run build
+git add .

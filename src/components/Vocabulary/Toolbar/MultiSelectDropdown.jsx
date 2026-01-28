@@ -17,8 +17,8 @@ export const MultiSelectDropdown = ({
     enableTagManagement = false,
     onCreateTag,
     onRenameTag,
-    onDeleteTag
-}) => {
+    onDeleteTag,
+    icon: Icon }) => {
     const safeSelected = Array.isArray(selectedValues) ? selectedValues : [];
     const isAll = safeSelected.length === 0;
 
@@ -205,7 +205,11 @@ export const MultiSelectDropdown = ({
                 `}
             >
                 <div className="md:hidden flex items-center justify-center gap-0.5">
-                    <span className="text-[11px] uppercase">{label.charAt(0)}</span>
+                    {Icon ? (
+                        <Icon size={14} className="opacity-90" />
+                    ) : (
+                        <span className="text-[11px] uppercase">{label.charAt(0)}</span>
+                    )}
                     <ChevronDown size={10} strokeWidth={3} className={`transition-transform ${isOpen ? 'rotate-180' : ''} opacity-80`} />
                 </div>
                 <span className="hidden md:block truncate max-w-[100px]">{label}: {summary}</span>
@@ -221,7 +225,7 @@ export const MultiSelectDropdown = ({
                         onClick={() => { toggleAll(); setIsOpen(false); }}
                         className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-bold ${isAll ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                     >
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isAll ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
+                        <div className={`w-4 h-4 rounded border !border-solid flex items-center justify-center ${isAll ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
                             {isAll && <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>}
                         </div>
                         All
@@ -244,7 +248,7 @@ export const MultiSelectDropdown = ({
                                             onClick={() => toggleOption(opt)}
                                             className="flex items-center gap-2 flex-1 cursor-pointer"
                                         >
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
+                                            <div className={`w-4 h-4 rounded border !border-solid flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
                                                 {isSelected && <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                                             </div>
                                             <span className="truncate">{displayName}</span>

@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import {
     Loader, ArrowRight, ChevronDown,
-    Shuffle, Play, RefreshCw, Settings as SettingsIcon
+    Shuffle, Play, RefreshCw, Settings as SettingsIcon,
+    Tag
 } from 'lucide-react';
 import { FilterChipBar } from './Toolbar/FilterChipBar';
 import { MultiSelectDropdown } from './Toolbar/MultiSelectDropdown';
@@ -91,6 +92,37 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         });
     }, [baseData]);
 
+    const tagCounts = useMemo(() => {
+        const counts = {};
+        const names = {};
+        if (Array.isArray(baseData)) {
+            baseData.forEach(item => {
+                const tags = Array.isArray(item.tags) ? item.tags : [];
+                tags.forEach(t => {
+                    // Handle both string tags and object tags {id, name} or {tagId, name}
+                    let id, name;
+                    if (typeof t === 'object' && t !== null) {
+                        id = t.tagId || t.id;
+                        name = t.name || id;
+                    } else {
+                        id = String(t);
+                        name = String(t);
+                    }
+
+                    if (id) {
+                        counts[id] = (counts[id] || 0) + 1;
+                        // Keep the last seen name, or prefer one that isn't ID if possible (not implemented here, simple overwrite)
+                        if (!names[id] || names[id] === id) {
+                            names[id] = name;
+                        }
+                    }
+                });
+            });
+        }
+        // Return array of [id, count, name] sorted by count desc
+        return Object.entries(counts).map(([id, count]) => [id, count, names[id]]).sort((a, b) => b[1] - a[1]);
+    }, [baseData]);
+
 
 
     return (
@@ -120,6 +152,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                 <div className="flex flex-col gap-0.5 p-0.5 bg-slate-100 dark:bg-[#0a0c20]/50 border-b border-slate-300 dark:border-white/5 overflow-hidden animate-in slide-in-from-top-2 duration-300">
                     <FilterChipBar label="L" items={lessonCounts} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
                     <FilterChipBar label="C" items={candoCounts} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
+                    <FilterChipBar label="T" items={tagCounts} activeValues={filters.tags} onToggle={(val) => { const curr = filters.tags || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, tags: newVals }); }} color="blue" />
                 </div>
             )}
 
@@ -129,14 +162,15 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
 
                     <div className="flex gap-1">
-                        <MultiSelectDropdown label="Lesson" options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
+                        <MultiSelectDropdown label="Lesson" options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).map(v => ({ tagId: v, name: `Lesson ${v}` }))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
                         <MultiSelectDropdown label="Can-do" options={[...new Set(baseData.map(v => String(v.cando)))].sort((a, b) => {
                             const numA = parseInt(a.replace(/\D/g, '')) || 0;
                             const numB = parseInt(b.replace(/\D/g, '')) || 0;
                             return numA - numB;
-                        })} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
+                        }).map(v => ({ tagId: v, name: `Can-do ${v}` }))} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
                         <MultiSelectDropdown
                             label="Tag"
+                            icon={Tag}
                             options={allTags && allTags.length > 0 ? allTags : [...new Set(baseData.flatMap(v => Array.isArray(v.tags) ? v.tags : []))].filter(Boolean).sort()}
                             selectedValues={filters.tags}
                             onChange={(val) => onFilterChange({ ...filters, tags: val })}

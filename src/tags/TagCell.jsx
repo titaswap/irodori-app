@@ -12,7 +12,7 @@ import { hasTag } from './tagHelpers';
  * IMPORTANT: item.tags now contains tag snapshots {id, name}
  * allTags is an array of {tagId, name, color, ...} objects from global registry
  */
-const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagName, isAuthenticated }) => {
+const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagName, isAuthenticated, isActive }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const inputRef = useRef(null);
@@ -168,7 +168,7 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
         <td
             ref={cellRef}
             data-col-id="tags"
-            className="px-2 py-0.5 border-r border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.02] relative cursor-pointer"
+            className={`px-2 py-0.5 border-r border-slate-200 dark:border-white/5 ${isActive ? '!bg-[#e5f5f1] dark:!bg-transparent' : 'bg-white/40 dark:bg-white/[0.02]'} relative cursor-pointer`}
             onClick={handleCellClick}
             onDoubleClick={handleCellDoubleClick}
         >
@@ -207,7 +207,7 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
                             </span>
                         ))
                     ) : (
-                        <span className="text-xs text-slate-400 dark:text-slate-600">—</span>
+                        <span className={`text-xs ${isActive ? 'text-slate-500 dark:text-indigo-300' : 'text-slate-400 dark:text-slate-600'}`}>—</span>
                     )}
                 </div>
             )}

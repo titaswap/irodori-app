@@ -55,10 +55,10 @@ const PaginationControls = ({
             id="rows-per-page"
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="appearance-none bg-slate-100 dark:bg-slate-900/60 border border-slate-300 dark:border-white/5 text-slate-700 dark:text-slate-400 text-[11px] font-bold rounded-lg pl-2 pr-6 py-0.5 h-6 focus:outline-none focus:ring-0 cursor-pointer"
+            className="appearance-none bg-slate-100 dark:bg-[#0f172a] border border-slate-300 dark:border-[#1e293b] text-slate-700 dark:text-[#cbd5f5] dark:hover:bg-[rgba(99,102,241,0.18)] text-[11px] font-bold rounded-lg pl-2 pr-6 py-0.5 h-6 focus:outline-none focus:ring-0 cursor-pointer transition-colors shadow-sm"
           >
             {perPageOptions.map(opt => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt} className="dark:bg-[#0f172a] dark:text-[#cbd5f5] hover:dark:bg-[rgba(99,102,241,0.28)]">{opt}</option>
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">

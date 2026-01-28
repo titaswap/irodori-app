@@ -65,21 +65,33 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
 
 
 
+
+    // Base data for dropdown options (independent of current filters)
+    const baseData = useMemo(() => {
+        let data = vocabList || [];
+        if (currentFolderId !== 'root') {
+            data = data.filter(i => i.folderId === currentFolderId);
+        }
+        return data;
+    }, [vocabList, currentFolderId]);
+
     const lessonCounts = useMemo(() => {
         const counts = {};
-        filteredData.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
+        baseData.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
         return Object.entries(counts).sort((a, b) => (parseInt(a[0]) || 999) - (parseInt(b[0]) || 999));
-    }, [filteredData]);
+    }, [baseData]);
 
     const candoCounts = useMemo(() => {
         const counts = {};
-        filteredData.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
+        baseData.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
         return Object.entries(counts).sort((a, b) => {
             const numA = parseInt(a[0].replace(/\D/g, '')) || 0;
             const numB = parseInt(b[0].replace(/\D/g, '')) || 0;
             return numA - numB;
         });
-    }, [filteredData]);
+    }, [baseData]);
+
+
 
     return (
         <div className="bg-slate-50 dark:bg-[#030413] border-b border-slate-300 dark:border-white/5 flex flex-col flex-shrink-0 z-20 sticky top-0 max-w-[100vw] shadow-sm">
@@ -117,15 +129,15 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
 
                     <div className="flex gap-1">
-                        <MultiSelectDropdown label="Lesson" options={[...new Set(filteredData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
-                        <MultiSelectDropdown label="Can-do" options={[...new Set(filteredData.map(v => String(v.cando)))].sort((a, b) => {
+                        <MultiSelectDropdown label="Lesson" options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
+                        <MultiSelectDropdown label="Can-do" options={[...new Set(baseData.map(v => String(v.cando)))].sort((a, b) => {
                             const numA = parseInt(a.replace(/\D/g, '')) || 0;
                             const numB = parseInt(b.replace(/\D/g, '')) || 0;
                             return numA - numB;
                         })} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
                         <MultiSelectDropdown
                             label="Tag"
-                            options={allTags && allTags.length > 0 ? allTags : [...new Set(filteredData.flatMap(v => Array.isArray(v.tags) ? v.tags : []))].filter(Boolean).sort()}
+                            options={allTags && allTags.length > 0 ? allTags : [...new Set(baseData.flatMap(v => Array.isArray(v.tags) ? v.tags : []))].filter(Boolean).sort()}
                             selectedValues={filters.tags}
                             onChange={(val) => onFilterChange({ ...filters, tags: val })}
                             enableTagManagement={true}

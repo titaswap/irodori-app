@@ -98,6 +98,8 @@ export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabLi
                         if (item.id && firestoreProgress[item.id]) {
                             const p = firestoreProgress[item.id];
                             if (p.isMarked !== undefined) item.isMarked = p.isMarked;
+                            // Tags are now snapshot objects {id, name} for instant display
+                            // No resolution needed - use directly from Firestore
                             if (p.tags !== undefined) item.tags = Array.isArray(p.tags) ? p.tags : [];
                         }
                     });

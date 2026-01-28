@@ -38,7 +38,15 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         if (Array.isArray(filters.tags) && filters.tags.length > 0) {
             data = data.filter(item => {
                 const itemTags = Array.isArray(item.tags) ? item.tags : [];
-                return filters.tags.some(selectedTag => itemTags.includes(selectedTag));
+                return filters.tags.some(selectedTag => {
+                    // Check if selectedTag (tagId) exists in itemTags
+                    return itemTags.some(tag => {
+                        // Handle legacy string format
+                        if (typeof tag === 'string') return tag === selectedTag;
+                        // Handle new snapshot object format {id, name}
+                        return tag.id === selectedTag;
+                    });
+                });
             });
         }
 

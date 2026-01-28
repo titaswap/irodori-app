@@ -82,4 +82,21 @@ rmdir /s /q .firebasegit add .
 
 2= 
 npm run build
+
+3=
+git status
 git add .
+git commit -m "Fix tag add sync + Firestore stable"
+git push
+
+4= 
+firebase deploy
+firebase deploy --only hosting
+
+🟢 এখন Web DONE
+
+এখন Android এ যাও
+
+5= npm run build
+
+

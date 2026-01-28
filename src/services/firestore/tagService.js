@@ -22,12 +22,17 @@ import {
     serverTimestamp
 } from "firebase/firestore";
 import { getUserId } from "../userService";
+import { batchUpdateTagNameInProgress, batchRemoveTagFromProgress } from './activityService';
 
 /**
  * Generate a unique tag ID (using Firestore document IDs).
  * @returns {string} A unique ID
  */
-const generateTagId = () => {
+/**
+ * Generate a unique tag ID (using Firestore document IDs).
+ * @returns {string} A unique ID
+ */
+export const generateTagId = () => {
     return `tag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 
@@ -70,9 +75,10 @@ export const fetchAllTags = async () => {
  * Create a new global tag.
  * @param {string} name - The tag name
  * @param {string} color - Optional color code (default: #3b82f6)
+ * @param {string} specificId - Optional specific ID to use (for optimistic updates)
  * @returns {Promise<string|null>} The created tagId, or null if failed
  */
-export const createTag = async (name, color = "#3b82f6") => {
+export const createTag = async (name, color = "#3b82f6", specificId = null) => {
     const db = getDb();
     if (!db) return null;
 
@@ -94,7 +100,7 @@ export const createTag = async (name, color = "#3b82f6") => {
     }
 
     try {
-        const tagId = generateTagId();
+        const tagId = specificId || generateTagId();
         const tagData = {
             name: trimmedName,
             color: color,
@@ -115,8 +121,8 @@ export const createTag = async (name, color = "#3b82f6") => {
 
 /**
  * Rename a global tag.
- * Updates the tag name and updatedAt timestamp.
- * All rows referencing this tagId will automatically reflect the new name.
+ * Updates the tag name in the global registry AND all progress documents.
+ * This ensures tag snapshots in progress documents stay in sync.
  * 
  * @param {string} tagId - The tag ID to rename
  * @param {string} newName - The new tag name
@@ -144,13 +150,18 @@ export const renameTag = async (tagId, newName) => {
     }
 
     try {
+        // Step 1: Update global tag registry
         const tagRef = doc(db, "users", userId, "tags", tagId);
         await updateDoc(tagRef, {
             name: trimmedName,
             updatedAt: serverTimestamp()
         });
+        console.log(`[TagService] Updated global tag ${tagId} to "${trimmedName}"`);
 
-        console.log(`[TagService] Renamed tag ${tagId} to "${trimmedName}"`);
+        // Step 2: Batch update all progress documents with this tag
+        const updateCount = await batchUpdateTagNameInProgress(tagId, trimmedName);
+        console.log(`[TagService] ✓ Rename complete: Updated tag in ${updateCount} progress documents`);
+
         return true;
     } catch (e) {
         console.error("[TagService] Failed to rename tag", e);
@@ -160,7 +171,8 @@ export const renameTag = async (tagId, newName) => {
 
 /**
  * Delete a global tag.
- * Also removes the tagId from ALL progress documents that reference it.
+ * Removes the tag from the global registry AND all progress documents.
+ * This ensures no orphaned tag snapshots remain.
  * 
  * @param {string} tagId - The tag ID to delete
  * @returns {Promise<boolean>} True if successful, false otherwise
@@ -173,7 +185,7 @@ export const deleteTag = async (tagId) => {
     if (!userId) {
         const error = new Error("User not authenticated");
         console.error("[TagService] Cannot delete tag: User not authenticated");
-        throw error; // Throw so UI knows it failed (was returning false before)
+        throw error;
     }
 
     if (!tagId) {
@@ -182,54 +194,16 @@ export const deleteTag = async (tagId) => {
     }
 
     try {
-        const batch = writeBatch(db);
+        // Step 1: Batch remove tag from all progress documents
+        const removeCount = await batchRemoveTagFromProgress(tagId);
+        console.log(`[TagService] Removed tag from ${removeCount} progress documents`);
 
-        // 1. Delete the tag document itself
+        // Step 2: Delete the tag from global registry
         const tagRef = doc(db, "users", userId, "tags", tagId);
-        batch.delete(tagRef);
-        console.log(`[TagService] Batch: DELETE users/${userId}/tags/${tagId}`);
+        await deleteDoc(tagRef);
+        console.log(`[TagService] Deleted global tag ${tagId}`);
 
-        // 2. Remove tagId from all progress documents that reference it
-        const progressRef = collection(db, "users", userId, "progress");
-        console.log(`[TagService] Fetching progress docs to remove tagId ${tagId}...`);
-        const snapshot = await getDocs(progressRef);
-        console.log(`[TagService] Found ${snapshot.size} progress documents`);
-
-        let updateCount = 0;
-        const docsToUpdate = [];
-
-        // Collect all documents that need updates
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            const hasTagsArray = Array.isArray(data.tags);
-
-            if (hasTagsArray && data.tags.includes(tagId)) {
-                const newTags = data.tags.filter(id => id !== tagId);
-                docsToUpdate.push({
-                    docId: docSnap.id,
-                    newTags: newTags
-                });
-                console.log(`[TagService] Will update progress/${docSnap.id}: remove tagId from tags=[${newTags.join(",")}]`);
-            }
-        });
-
-        // Add batch updates
-        docsToUpdate.forEach(({ docId, newTags }) => {
-            const docRef = doc(db, "users", userId, "progress", docId);
-            batch.update(docRef, {
-                tags: newTags,
-                updatedAt: serverTimestamp()
-            });
-            updateCount++;
-            console.log(`[TagService] Batch: UPDATE users/${userId}/progress/${docId}`);
-        });
-
-        console.log(`[TagService] Batch ready: 1 delete + ${updateCount} updates`);
-
-        // Commit the batch
-        console.log(`[TagService] Committing batch...`);
-        await batch.commit();
-        console.log(`[TagService] ✓ SUCCESS: Deleted tag and updated ${updateCount} progress documents`);
+        console.log(`[TagService] ✓ Delete complete: Removed tag and cleaned up ${removeCount} progress documents`);
         return true;
 
     } catch (e) {

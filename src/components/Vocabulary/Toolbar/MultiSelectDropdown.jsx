@@ -167,7 +167,17 @@ export const MultiSelectDropdown = ({
         }
     };
 
-    const summary = isAll ? "All" : safeSelected.length === 1 ? safeSelected[0] : `${safeSelected.length} selected`;
+    // Helper: Get display name for a selected value key
+    const getSelectedDisplayName = (valKey) => {
+        const option = options.find(o => getValueKey(o) === valKey);
+        return option ? getDisplayName(option) : valKey;
+    };
+
+    const summary = isAll
+        ? "All"
+        : safeSelected.length === 1
+            ? getSelectedDisplayName(safeSelected[0])
+            : `${safeSelected.length} selected`;
 
     return (
         <div className="relative group flex-shrink-0" ref={containerRef}>
@@ -205,7 +215,7 @@ export const MultiSelectDropdown = ({
                 <div
                     ref={dropdownRef}
                     style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left }}
-                    className="w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-[9999] max-h-80 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left"
+                    className="w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-[9999] max-h-80 overflow-y-auto overflow-x-hidden p-1 animate-in fade-in zoom-in-95 duration-100 origin-top-left"
                 >
                     <div
                         onClick={() => { toggleAll(); setIsOpen(false); }}
@@ -313,7 +323,7 @@ export const MultiSelectDropdown = ({
                                             if (e.key === 'Escape') { setShowCreateInput(false); setNewTagValue(''); }
                                         }}
                                         placeholder="New tag name..."
-                                        className="flex-1 px-2 py-1 text-xs border border-indigo-300 dark:border-indigo-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                                        className="flex-1 min-w-0 px-2 py-1 text-xs border border-indigo-300 dark:border-indigo-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                                         autoFocus
                                     />
                                     <button

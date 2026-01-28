@@ -88,7 +88,8 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
         prevProps.columnOrder === nextProps.columnOrder &&
         prevProps.columnVisibility === nextProps.columnVisibility &&
         prevProps.revealedCells === nextProps.revealedCells &&
-        prevProps.hiddenColumns === nextProps.hiddenColumns
+        prevProps.hiddenColumns === nextProps.hiddenColumns &&
+        prevProps.allTags === nextProps.allTags
     );
 });
 

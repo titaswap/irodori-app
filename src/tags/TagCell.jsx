@@ -4,28 +4,40 @@ import TagDropdown from './TagDropdown';
 import { hasTag } from './tagHelpers';
 
 /**
- * TagCell - Multi-tag cell with add/remove functionality using tagIds
+ * TagCell - Multi-tag cell with add/remove functionality using tag snapshots
  * - Double-click to add tags
  * - Click existing tag to remove it
  * - Supports multiple tags per row
  * 
- * IMPORTANT: item.tags now contains tagIds (not tag names)
- * allTags is an array of {tagId, name, color, ...} objects
+ * IMPORTANT: item.tags now contains tag snapshots {id, name}
+ * allTags is an array of {tagId, name, color, ...} objects from global registry
  */
 const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagName, isAuthenticated }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
     const inputRef = useRef(null);
     const cellRef = useRef(null);
 
-    // Current tagIds array
-    const currentTagIds = Array.isArray(item.tags) ? item.tags : [];
+    // Current tags are snapshot objects {id, name}
+    const currentTags = Array.isArray(item.tags) ? item.tags : [];
 
-    // Helper: Get display name for a tagId
-    const getDisplayName = (tagId) => {
-        const tag = allTags.find(t => t.tagId === tagId);
-        return tag ? tag.name : 'Unknown';
+    // Extract tagIds for checking if a tag is already added
+    const currentTagIds = currentTags.map(tag => {
+        // Handle both old format (string) and new format (object)
+        if (typeof tag === 'string') return tag;
+        return tag.id;
+    });
+
+    // Helper: Get display name for a tag (directly from snapshot)
+    const getDisplayName = (tag) => {
+        // Handle both old format (string) and new format (object)
+        if (typeof tag === 'string') {
+            // Old format: try to resolve from allTags
+            const globalTag = allTags.find(t => t.tagId === tag);
+            return globalTag ? globalTag.name : 'Unknown';
+        }
+        // New format: use snapshot name directly
+        return tag.name || 'Unknown';
     };
 
     // Handle click outside to close editor
@@ -49,6 +61,22 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
         }
     }, [isEditing]);
 
+    // Derived state for suggestions
+    // This ensures that when allTags updates (e.g. after creation), 
+    // the suggestions update immediately without local state caching.
+    const suggestions = React.useMemo(() => {
+        if (!inputValue.trim()) {
+            return allTags;
+        }
+        return searchTags(inputValue);
+    }, [allTags, inputValue, searchTags]);
+
+    // Force re-render verification (as requested)
+    /*     console.log(
+            "[TagCell render] tags:",
+            allTags.map(t => t.name)
+        ); */
+
     // Full event isolation from row handlers
     const handleCellClick = (e) => {
         e.stopPropagation();
@@ -65,7 +93,6 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
 
         setIsEditing(true);
         setInputValue('');
-        setSuggestions(allTags);
     };
 
     const handleInputChange = (e) => {
@@ -73,47 +100,39 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
         setInputValue(value);
 
         // Update suggestions based on input (search in tag names)
-        if (value.trim()) {
-            const filtered = searchTags(value);
-            setSuggestions(filtered);
-        } else {
-            setSuggestions(allTags);
-        }
+        // Derived state handles this automatically now
     };
 
     const handleSelectTag = (tagObj) => {
-        // tagObj should be {tagId, name, ...}
-        if (!tagObj.tagId) {
+        // tagObj should be {tagId, name, ...} from global registry
+        if (!tagObj.tagId || !tagObj.name) {
             console.warn('[TagCell] Invalid tag object:', tagObj);
             return;
         }
 
-        // Toggle tag by ID
-        toggleRowTag(item.localId, tagObj.tagId);
+        // Toggle tag by ID and NAME (for snapshot storage)
+        toggleRowTag(item.localId, tagObj.tagId, tagObj.name);
 
         // Clear input but keep dropdown open for multi-select
         setInputValue('');
-        setSuggestions(allTags);
     };
 
     const handleCreateTag = async (tagName) => {
-        // Create new tag in store - returns tagId
+        // Create new tag in global registry - returns tagId
         const newTagId = await createTag(tagName);
 
         if (newTagId) {
-            // Add to item using the tagId
-            toggleRowTag(item.localId, newTagId);
+            // Add to item using the tagId and tagName
+            toggleRowTag(item.localId, newTagId, tagName);
 
             // Clear input but keep dropdown open
             setInputValue('');
-            setSuggestions(allTags);
         }
     };
 
     const handleCancel = () => {
         setIsEditing(false);
         setInputValue('');
-        setSuggestions([]);
     };
 
     const handleKeyDown = (e) => {
@@ -135,9 +154,14 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
     };
 
     // Handle tag badge click - remove tag
-    const handleTagClick = (e, tagId) => {
+    const handleTagClick = (e, tag) => {
         e.stopPropagation();
-        toggleRowTag(item.localId, tagId);
+
+        // Extract tagId and tagName from snapshot
+        const tagId = typeof tag === 'string' ? tag : tag.id;
+        const tagName = typeof tag === 'string' ? (allTags.find(t => t.tagId === tag)?.name || tag) : tag.name;
+
+        toggleRowTag(item.localId, tagId, tagName);
     };
 
     return (
@@ -165,20 +189,21 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
                         onSelect={handleSelectTag}
                         onCreate={handleCreateTag}
                         currentTags={currentTagIds}
+                        parentRef={cellRef}
                         position={{ top: '100%', left: 0 }}
                     />
                 </>
             ) : (
                 <div className="flex flex-wrap items-center gap-1 min-h-[24px]">
-                    {currentTagIds.length > 0 ? (
-                        currentTagIds.map((tagId, idx) => (
+                    {currentTags.length > 0 ? (
+                        currentTags.map((tag, idx) => (
                             <span
                                 key={idx}
-                                onClick={(e) => handleTagClick(e, tagId)}
+                                onClick={(e) => handleTagClick(e, tag)}
                                 className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-800/50 transition-colors"
                                 title="Click to remove"
                             >
-                                {getDisplayName(tagId)}
+                                {getDisplayName(tag)}
                             </span>
                         ))
                     ) : (

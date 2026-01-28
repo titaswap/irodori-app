@@ -29,6 +29,8 @@ android_app/app/build/
 android_app/build/
 android_app/app/build/outputs/
 android_app/app/build/intermediates/
+dist/
+android_app/app/src/main/assets/
 
 # APKs
 *.apk

@@ -15,7 +15,8 @@ import {
     createTag as createTagFS,
     renameTag as renameTagFS,
     deleteTag as deleteTagFS,
-    convertStringTagsToIds
+    convertStringTagsToIds,
+    generateTagId
 } from '../services/firestore/tagService';
 
 /**
@@ -118,24 +119,31 @@ export const useTags = (vocabList, setVocabList, user) => {
             return null;
         }
 
-        try {
-            console.log(`[Tags] Creating tag "${trimmed}"`);
-            const newTagId = await createTagFS(trimmed);
+        // OFFLINE-FIRST: Optimistic Update
+        // 1. Generate ID locally
+        const newTagId = generateTagId();
 
-            if (newTagId) {
-                // Fetch updated tags list
-                const updatedTags = await fetchAllTags();
-                setAllTags(updatedTags);
-                console.log(`[Tags] Tag "${trimmed}" created successfully with ID ${newTagId}`);
-                return newTagId;
-            } else {
-                console.error("[Tags] Failed to create tag in Firestore");
-                return null;
-            }
-        } catch (err) {
-            console.error("[Tags] Error creating tag", err);
-            return null;
-        }
+        // 2. Create tag object
+        const newTag = {
+            tagId: newTagId,
+            name: trimmed,
+            color: "#3b82f6",
+            createdAt: { seconds: Date.now() / 1000 },
+            updatedAt: { seconds: Date.now() / 1000 }
+        };
+
+        // 3. Update global state IMMEDIATELY
+        console.log(`[Tags] Optimistic Create: "${trimmed}" ID: ${newTagId}`);
+        setAllTags(prev => [...prev, newTag]);
+
+        // 4. Fire Firestore write in background (Do NOT await)
+        // Pass the specific ID we generated
+        createTagFS(trimmed, "#3b82f6", newTagId)
+            .then(() => console.log(`[Tags] Firestore Sync Success: Created ${newTagId}`))
+            .catch(err => console.warn(`[Tags] Firestore Sync Deferred (Offline/Error): ${err.message}`));
+
+        // 5. Return success immediately
+        return newTagId;
     }, [allTags]);
 
     /**
@@ -168,24 +176,23 @@ export const useTags = (vocabList, setVocabList, user) => {
             return false;
         }
 
-        try {
-            console.log(`[Tags] Renaming tag ${oldTagId} to "${trimmed}"`);
-            const success = await renameTagFS(oldTagId, trimmed);
+        // OFFLINE-FIRST: Optimistic Update
+        console.log(`[Tags] Optimistic Rename: ${oldTagId} -> "${trimmed}"`);
 
-            if (success) {
-                // Fetch updated tags list
-                const updatedTags = await fetchAllTags();
-                setAllTags(updatedTags);
-                console.log(`[Tags] Tag ${oldTagId} renamed successfully`);
-                return true;
-            } else {
-                console.error("[Tags] Failed to rename tag in Firestore");
-                return false;
-            }
-        } catch (err) {
-            console.error("[Tags] Error renaming tag", err);
-            return false;
-        }
+        // 1. Update global state IMMEDIATELY
+        setAllTags(prev => prev.map(t =>
+            t.tagId === oldTagId
+                ? { ...t, name: trimmed, updatedAt: { seconds: Date.now() / 1000 } }
+                : t
+        ));
+
+        // 2. Fire Firestore write in background (Do NOT await)
+        renameTagFS(oldTagId, trimmed)
+            .then(() => console.log(`[Tags] Firestore Sync Success: Renamed ${oldTagId}`))
+            .catch(err => console.warn(`[Tags] Firestore Sync Deferred (Offline/Error): ${err.message}`));
+
+        // 3. Return success immediately
+        return true;
     }, [allTags]);
 
     /**
@@ -202,39 +209,44 @@ export const useTags = (vocabList, setVocabList, user) => {
             return false;
         }
 
-        try {
-            console.log(`[Tags] Deleting tag ${tagId}`);
-            const success = await deleteTagFS(tagId);
+        // OFFLINE-FIRST: Optimistic Update
+        console.log(`[Tags] Optimistic Delete: ${tagId}`);
 
-            if (success) {
-                // 1. Update list of global tags
-                const updatedTags = await fetchAllTags();
-                setAllTags(updatedTags);
+        // 1. Update global state IMMEDIATELY
+        setAllTags(prev => prev.filter(t => t.tagId !== tagId));
 
-                // 2. Update local vocabList to remove this tag from all rows
-                // This updates the UI immediately so we don't see "Unknown" tags
-                if (setVocabList) {
-                    setVocabList(prevList => prevList.map(item => {
-                        if (Array.isArray(item.tags) && item.tags.includes(tagId)) {
-                            return {
-                                ...item,
-                                tags: item.tags.filter(t => t !== tagId)
-                            };
+        // 2. Update local vocabList IMMEDIATELY
+        if (setVocabList) {
+            setVocabList(prevList => prevList.map(item => {
+                if (Array.isArray(item.tags)) {
+                    const filteredTags = item.tags.filter(tag => {
+                        // Handle old format (string)
+                        if (typeof tag === 'string') {
+                            return tag !== tagId;
                         }
-                        return item;
-                    }));
-                }
+                        // Handle new format (snapshot object)
+                        return tag.id !== tagId;
+                    });
 
-                console.log(`[Tags] Tag ${tagId} deleted successfully and removed from local view`);
-                return true;
-            } else {
-                console.error("[Tags] Failed to delete tag in Firestore");
-                return false;
-            }
-        } catch (err) {
-            console.error("[Tags] Error deleting tag", err);
-            return false;
+                    // Only update if tags changed
+                    if (filteredTags.length !== item.tags.length) {
+                        return {
+                            ...item,
+                            tags: filteredTags
+                        };
+                    }
+                }
+                return item;
+            }));
         }
+
+        // 3. Fire Firestore write in background (Do NOT await)
+        deleteTagFS(tagId)
+            .then(() => console.log(`[Tags] Firestore Sync Success: Deleted ${tagId}`))
+            .catch(err => console.warn(`[Tags] Firestore Sync Deferred (Offline/Error): ${err.message}`));
+
+        // 4. Return success immediately
+        return true;
     }, [setVocabList]);
 
     /**

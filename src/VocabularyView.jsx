@@ -71,6 +71,7 @@ function VocabularyView({
                 handleFolderChange={ctrl.handleFolderChange}
                 isMobile={ctrl.isMobileSidebarOpen}
                 user={user}
+                onClose={() => ctrl.setIsMobileSidebarOpen(false)}
             />
 
             <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-[#0a0d1f]">

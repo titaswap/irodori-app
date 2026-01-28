@@ -99,6 +99,6 @@ firebase deploy --only hosting
 
 5= npm run build
 
-clean buid deploy firebase a deploy git deploy apk deploy koro
+clean buid deploy firebase a deploy git deploy apk deploy (singed kora ache) koro
 
 

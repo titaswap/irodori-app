@@ -13,7 +13,7 @@ export const useAudioPlayer = (vocabList, filteredAndSortedData, showToast) => {
     const [state, dispatch] = useReducer(audioReducer, initialState);
     // Initialize config from localStorage
     const [audioConfig, setAudioConfig] = useState(() => {
-        const DEFAULT_CONFIG = { speed: 1.0, repeatMode: '1x', repeatPerItem: 1, includeBangla: false, autoPlaySingle: false };
+        const DEFAULT_CONFIG = { speed: 1.0, repeatMode: '1x', repeatPerItem: 1, includeBangla: false, autoPlaySingle: true };
         try {
             const saved = localStorage.getItem('irodori_audio_config');
             if (saved) return { ...DEFAULT_CONFIG, ...JSON.parse(saved) };

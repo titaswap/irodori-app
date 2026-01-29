@@ -10,7 +10,7 @@ import { useTableHoverLock } from '../hooks/useTableHoverLock.jsx';
  * suggestions: array of {tagId, name, color, ...} objects
  * currentTags: array of tagIds that are already selected
  */
-const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags = [], position, parentRef }) => {
+const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags = [], position, parentRef, onClose }) => {
     const { lock, unlock } = useTableHoverLock();
     const trimmedInput = inputValue?.trim() || '';
     const [coords, setCoords] = useState(null);
@@ -37,13 +37,128 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
 
         if (parentRef && parentRef.current) {
             const rect = parentRef.current.getBoundingClientRect();
+
+            // Smart placement: decide whether to open above or below
+            const DROPDOWN_HEIGHT = 192; // max-h-48 = 192px
+            const GAP = 6; // Vertical spacing between cell and dropdown
+
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+
+            let top;
+            if (spaceBelow >= DROPDOWN_HEIGHT) {
+                // Enough space below - open downward (default)
+                top = rect.bottom + window.scrollY + GAP;
+            } else if (spaceAbove >= DROPDOWN_HEIGHT) {
+                // Not enough space below but enough above - open upward
+                top = rect.top + window.scrollY - DROPDOWN_HEIGHT - GAP;
+            } else {
+                // Not enough space either way - choose side with more space
+                if (spaceBelow > spaceAbove) {
+                    top = rect.bottom + window.scrollY + GAP;
+                } else {
+                    top = rect.top + window.scrollY - DROPDOWN_HEIGHT - GAP;
+                }
+            }
+
             setCoords({
-                top: rect.bottom + window.scrollY + 4,
+                top: top,
                 left: rect.left + window.scrollX,
                 width: rect.width
             });
         }
     }, [position, parentRef]);
+
+    // Handle scroll and resize - reposition dropdown to follow cell
+    useEffect(() => {
+        if (!parentRef?.current) return;
+
+        // Find the scrollable parent container
+        const findScrollableParent = (element) => {
+            let parent = element?.parentElement;
+            while (parent) {
+                const overflow = window.getComputedStyle(parent).overflow;
+                const overflowY = window.getComputedStyle(parent).overflowY;
+                if (
+                    overflow === 'auto' ||
+                    overflow === 'scroll' ||
+                    overflowY === 'auto' ||
+                    overflowY === 'scroll' ||
+                    parent.classList.contains('overflow-auto')
+                ) {
+                    return parent;
+                }
+                parent = parent.parentElement;
+            }
+            return null;
+        };
+
+        // Update dropdown position to follow the cell
+        const updatePosition = () => {
+            if (!parentRef?.current) return;
+
+            const rect = parentRef.current.getBoundingClientRect();
+
+            // Check if cell is in viewport (with some tolerance)
+            const isInViewport = rect.bottom > 0 &&
+                rect.top < window.innerHeight &&
+                rect.right > 0 &&
+                rect.left < window.innerWidth;
+
+            if (!isInViewport) {
+                // Cell left viewport - close dropdown
+                if (onClose) {
+                    onClose();
+                }
+            } else {
+                // Smart placement: decide whether to open above or below
+                const DROPDOWN_HEIGHT = 192; // max-h-48 = 192px
+                const GAP = 6; // Vertical spacing between cell and dropdown
+
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const spaceAbove = rect.top;
+
+                let top;
+                if (spaceBelow >= DROPDOWN_HEIGHT) {
+                    // Enough space below - open downward (default)
+                    top = rect.bottom + window.scrollY + GAP;
+                } else if (spaceAbove >= DROPDOWN_HEIGHT) {
+                    // Not enough space below but enough above - open upward
+                    top = rect.top + window.scrollY - DROPDOWN_HEIGHT - GAP;
+                } else {
+                    // Not enough space either way - choose side with more space
+                    if (spaceBelow > spaceAbove) {
+                        top = rect.bottom + window.scrollY + GAP;
+                    } else {
+                        top = rect.top + window.scrollY - DROPDOWN_HEIGHT - GAP;
+                    }
+                }
+
+                // Update position to follow cell
+                setCoords({
+                    top: top,
+                    left: rect.left + window.scrollX,
+                    width: rect.width
+                });
+            }
+        };
+
+        const scrollableContainer = findScrollableParent(parentRef.current);
+
+        if (scrollableContainer) {
+            scrollableContainer.addEventListener('scroll', updatePosition, { passive: true });
+        }
+
+        // Also handle window resize
+        window.addEventListener('resize', updatePosition, { passive: true });
+
+        return () => {
+            if (scrollableContainer) {
+                scrollableContainer.removeEventListener('scroll', updatePosition);
+            }
+            window.removeEventListener('resize', updatePosition);
+        };
+    }, [parentRef, onClose]);
 
     if ((suggestions.length === 0 && !showCreateOption) || !coords) {
         return null;

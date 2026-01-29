@@ -191,6 +191,7 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
                         currentTags={currentTagIds}
                         parentRef={cellRef}
                         position={{ top: '100%', left: 0 }}
+                        onClose={handleCancel}
                     />
                 </>
             ) : (

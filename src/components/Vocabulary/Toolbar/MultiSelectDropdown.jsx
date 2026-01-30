@@ -18,9 +18,16 @@ export const MultiSelectDropdown = ({
     onCreateTag,
     onRenameTag,
     onDeleteTag,
+    // Row count props (for all dropdowns)
+    countMap = {},
+    onlyTaggedCount = 0,
     icon: Icon }) => {
     const safeSelected = Array.isArray(selectedValues) ? selectedValues : [];
     const isAll = safeSelected.length === 0;
+
+    // Special filter mode: "Only Tagged" - shows only rows with at least one tag
+    const ONLY_TAGGED_MODE = '__ONLY_TAGGED__';
+    const isOnlyTagged = safeSelected.length === 1 && safeSelected[0] === ONLY_TAGGED_MODE;
 
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
@@ -78,6 +85,10 @@ export const MultiSelectDropdown = ({
 
     const toggleAll = () => {
         onChange([]);
+    };
+
+    const toggleOnlyTagged = () => {
+        onChange([ONLY_TAGGED_MODE]);
     };
 
     const handleStartEdit = (optKey, e) => {
@@ -175,9 +186,11 @@ export const MultiSelectDropdown = ({
 
     const summary = isAll
         ? "All"
-        : safeSelected.length === 1
-            ? getSelectedDisplayName(safeSelected[0])
-            : `${safeSelected.length} selected`;
+        : isOnlyTagged
+            ? "Only Tagged"
+            : safeSelected.length === 1
+                ? getSelectedDisplayName(safeSelected[0])
+                : `${safeSelected.length} selected`;
 
     return (
         <div className="relative group flex-shrink-0" ref={containerRef}>
@@ -230,6 +243,23 @@ export const MultiSelectDropdown = ({
                         </div>
                         All
                     </div>
+
+                    {/* Only Tagged option - only for Tag dropdown */}
+                    {enableTagManagement && (
+                        <div
+                            onClick={() => { toggleOnlyTagged(); setIsOpen(false); }}
+                            className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-xs font-bold ${isOnlyTagged ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                        >
+                            <div className={`w-4 h-4 rounded border !border-solid flex items-center justify-center ${isOnlyTagged ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
+                                {isOnlyTagged && <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>}
+                            </div>
+                            <span className="flex-1">Only Tagged</span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${isOnlyTagged ? 'bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>
+                                {onlyTaggedCount}
+                            </span>
+                        </div>
+                    )}
+
                     <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
                     {options.map(opt => {
                         const optKey = getValueKey(opt);
@@ -251,7 +281,11 @@ export const MultiSelectDropdown = ({
                                             <div className={`w-4 h-4 rounded border !border-solid flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'}`}>
                                                 {isSelected && <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                                             </div>
-                                            <span className="truncate">{displayName}</span>
+                                            <span className="truncate flex-1">{displayName}</span>
+                                            {/* Row count badge */}
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${isSelected ? 'bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>
+                                                {countMap[optKey] || 0}
+                                            </span>
                                         </div>
                                         {enableTagManagement && (
                                             <div className="flex items-center gap-1 flex-shrink-0">

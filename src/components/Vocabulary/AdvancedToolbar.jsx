@@ -123,6 +123,74 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         return Object.entries(counts).map(([id, count]) => [id, count, names[id]]).sort((a, b) => b[1] - a[1]);
     }, [baseData]);
 
+    // Calculate tag counts from filtered data (respects active filters)
+    // This is used for displaying row counts in the tag dropdown
+    const filteredTagCounts = useMemo(() => {
+        const tagCountMap = {};
+        let onlyTaggedCount = 0;
+
+        if (Array.isArray(filteredData)) {
+            filteredData.forEach(item => {
+                const itemTags = Array.isArray(item.tags) ? item.tags : [];
+
+                // Count for "Only Tagged" option
+                if (itemTags.length > 0) {
+                    onlyTaggedCount++;
+                }
+
+                // Count for each individual tag
+                itemTags.forEach(tag => {
+                    // Handle both string tags and object tags {id, name} or {tagId, name}
+                    let tagId;
+                    if (typeof tag === 'object' && tag !== null) {
+                        tagId = tag.tagId || tag.id;
+                    } else {
+                        tagId = String(tag);
+                    }
+
+                    if (tagId) {
+                        tagCountMap[tagId] = (tagCountMap[tagId] || 0) + 1;
+                    }
+                });
+            });
+        }
+
+        return { tagCountMap, onlyTaggedCount };
+    }, [filteredData]);
+
+    // Calculate lesson counts from filtered data (respects active filters)
+    // This is used for displaying row counts in the lesson dropdown
+    const filteredLessonCounts = useMemo(() => {
+        const lessonCountMap = {};
+
+        if (Array.isArray(filteredData)) {
+            filteredData.forEach(item => {
+                const lesson = String(item.lesson);
+                if (lesson) {
+                    lessonCountMap[lesson] = (lessonCountMap[lesson] || 0) + 1;
+                }
+            });
+        }
+
+        return lessonCountMap;
+    }, [filteredData]);
+
+    // Calculate can-do counts from filtered data (respects active filters)
+    // This is used for displaying row counts in the can-do dropdown
+    const filteredCandoCounts = useMemo(() => {
+        const candoCountMap = {};
+
+        if (Array.isArray(filteredData)) {
+            filteredData.forEach(item => {
+                const cando = String(item.cando);
+                if (cando) {
+                    candoCountMap[cando] = (candoCountMap[cando] || 0) + 1;
+                }
+            });
+        }
+
+        return candoCountMap;
+    }, [filteredData]);
 
 
     return (
@@ -162,12 +230,24 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
 
                     <div className="flex gap-1">
-                        <MultiSelectDropdown label="Lesson" options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).map(v => ({ tagId: v, name: `Lesson ${v}` }))} selectedValues={filters.lesson} onChange={(val) => onFilterChange({ ...filters, lesson: val })} />
-                        <MultiSelectDropdown label="Can-do" options={[...new Set(baseData.map(v => String(v.cando)))].sort((a, b) => {
-                            const numA = parseInt(a.replace(/\D/g, '')) || 0;
-                            const numB = parseInt(b.replace(/\D/g, '')) || 0;
-                            return numA - numB;
-                        }).map(v => ({ tagId: v, name: `Can-do ${v}` }))} selectedValues={filters.cando} onChange={(val) => onFilterChange({ ...filters, cando: val })} />
+                        <MultiSelectDropdown
+                            label="Lesson"
+                            options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).map(v => ({ tagId: v, name: `Lesson ${v}` }))}
+                            selectedValues={filters.lesson}
+                            onChange={(val) => onFilterChange({ ...filters, lesson: val })}
+                            countMap={filteredLessonCounts}
+                        />
+                        <MultiSelectDropdown
+                            label="Can-do"
+                            options={[...new Set(baseData.map(v => String(v.cando)))].sort((a, b) => {
+                                const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                                const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                                return numA - numB;
+                            }).map(v => ({ tagId: v, name: `Can-do ${v}` }))}
+                            selectedValues={filters.cando}
+                            onChange={(val) => onFilterChange({ ...filters, cando: val })}
+                            countMap={filteredCandoCounts}
+                        />
                         <MultiSelectDropdown
                             label="Tag"
                             icon={Tag}
@@ -178,6 +258,8 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                             onCreateTag={createTag}
                             onRenameTag={renameTag}
                             onDeleteTag={deleteTag}
+                            countMap={filteredTagCounts.tagCountMap}
+                            onlyTaggedCount={filteredTagCounts.onlyTaggedCount}
                         />
                     </div>
 

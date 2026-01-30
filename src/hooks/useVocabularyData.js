@@ -35,19 +35,32 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         }
 
         // Tag filter: Show rows with ANY selected tag (OR logic)
+        // Special mode: "__ONLY_TAGGED__" shows only rows with at least one tag
         if (Array.isArray(filters.tags) && filters.tags.length > 0) {
-            data = data.filter(item => {
-                const itemTags = Array.isArray(item.tags) ? item.tags : [];
-                return filters.tags.some(selectedTag => {
-                    // Check if selectedTag (tagId) exists in itemTags
-                    return itemTags.some(tag => {
-                        // Handle legacy string format
-                        if (typeof tag === 'string') return tag === selectedTag;
-                        // Handle new snapshot object format {id, name}
-                        return tag.id === selectedTag;
+            const ONLY_TAGGED_MODE = '__ONLY_TAGGED__';
+
+            // Check if "Only Tagged" mode is active
+            if (filters.tags.length === 1 && filters.tags[0] === ONLY_TAGGED_MODE) {
+                // Show only rows that have at least one tag
+                data = data.filter(item => {
+                    const itemTags = Array.isArray(item.tags) ? item.tags : [];
+                    return itemTags.length > 0;
+                });
+            } else {
+                // Normal tag filtering: show rows with ANY selected tag
+                data = data.filter(item => {
+                    const itemTags = Array.isArray(item.tags) ? item.tags : [];
+                    return filters.tags.some(selectedTag => {
+                        // Check if selectedTag (tagId) exists in itemTags
+                        return itemTags.some(tag => {
+                            // Handle legacy string format
+                            if (typeof tag === 'string') return tag === selectedTag;
+                            // Handle new snapshot object format {id, name}
+                            return tag.id === selectedTag;
+                        });
                     });
                 });
-            });
+            }
         }
 
         if (viewMode === 'problem') data = data.filter(i => i.isMarked);

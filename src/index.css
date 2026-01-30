@@ -143,6 +143,33 @@
       box-shadow: 0 0 5px rgba(139, 92, 246, 0.5), inset 0 0 5px rgba(139, 92, 246, 0.2);
   }
   
+  /* Bottom Sheet Animations */
+  .animate-fadeIn {
+      animation: fadeIn 0.2s ease-out;
+  }
+  
+  .animate-slideUp {
+      animation: slideUp 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+      from {
+          opacity: 0;
+      }
+      to {
+          opacity: 1;
+      }
+  }
+  
+  @keyframes slideUp {
+      from {
+          transform: translateY(100%);
+      }
+      to {
+          transform: translateY(0);
+      }
+  }
+  
   .reflection-sweep {
       position: relative;
       overflow: hidden;

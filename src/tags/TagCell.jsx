@@ -1,6 +1,8 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import TagDropdown from './TagDropdown';
+import TagBottomSheet from './TagBottomSheet';
 import { hasTag } from './tagHelpers';
 
 /**
@@ -104,17 +106,20 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
     };
 
     const handleSelectTag = (tagObj) => {
+        console.log('[TagCell] handleSelectTag called with:', tagObj);
         // tagObj should be {tagId, name, ...} from global registry
         if (!tagObj.tagId || !tagObj.name) {
             console.warn('[TagCell] Invalid tag object:', tagObj);
             return;
         }
 
+        console.log('[TagCell] Toggling tag:', tagObj.tagId, tagObj.name, 'for row:', item.localId);
         // Toggle tag by ID and NAME (for snapshot storage)
         toggleRowTag(item.localId, tagObj.tagId, tagObj.name);
 
         // Clear input but keep dropdown open for multi-select
         setInputValue('');
+        console.log('[TagCell] Tag toggled successfully');
     };
 
     const handleCreateTag = async (tagName) => {
@@ -183,16 +188,33 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
                         placeholder="Type to search or create..."
                         className="w-full h-full px-2 py-0.5 bg-transparent outline-none text-sm border-2 border-primary focus:bg-primary/10 transition-all text-slate-900 dark:text-text-main rounded"
                     />
-                    <TagDropdown
-                        suggestions={suggestions}
-                        inputValue={inputValue}
-                        onSelect={handleSelectTag}
-                        onCreate={handleCreateTag}
-                        currentTags={currentTagIds}
-                        parentRef={cellRef}
-                        position={{ top: '100%', left: 0 }}
-                        onClose={handleCancel}
-                    />
+                    {/* Platform-specific UI: Bottom sheet for Android APK, Dropdown for web/desktop */}
+                    {(() => {
+                        const ua = navigator.userAgent.toLowerCase();
+                        const isAndroidAPK = ua.includes('android') && ua.includes('wv');
+
+                        return isAndroidAPK ? (
+                            <TagBottomSheet
+                                suggestions={suggestions}
+                                inputValue={inputValue}
+                                onSelect={handleSelectTag}
+                                onCreate={handleCreateTag}
+                                currentTags={currentTagIds}
+                                onClose={handleCancel}
+                            />
+                        ) : (
+                            <TagDropdown
+                                suggestions={suggestions}
+                                inputValue={inputValue}
+                                onSelect={handleSelectTag}
+                                onCreate={handleCreateTag}
+                                currentTags={currentTagIds}
+                                parentRef={cellRef}
+                                position={{ top: '100%', left: 0 }}
+                                onClose={handleCancel}
+                            />
+                        );
+                    })()}
                 </>
             ) : (
                 <div className="flex flex-wrap items-center gap-1 min-h-[24px]">

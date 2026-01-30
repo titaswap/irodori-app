@@ -14,6 +14,13 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
     const { lock, unlock } = useTableHoverLock();
     const trimmedInput = inputValue?.trim() || '';
     const [coords, setCoords] = useState(null);
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+    // Detect Android WebView environment
+    const isAndroidWebView = () => {
+        const ua = navigator.userAgent.toLowerCase();
+        return ua.includes('android') && ua.includes('wv');
+    };
 
     // Check if there's an exact match by name
     const hasExactMatch = suggestions.some(tag =>
@@ -26,6 +33,24 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
         lock();
         return () => unlock();
     }, [lock, unlock]);
+
+    // Detect keyboard open/close on mobile using visualViewport
+    // Skip on Android WebView - keyboard signals are unreliable there
+    useEffect(() => {
+        if (!window.visualViewport || isAndroidWebView()) return;
+
+        const handleViewportChange = () => {
+            // Keyboard is open when visualViewport height is less than window height
+            const keyboardOpen = window.visualViewport.height < window.innerHeight;
+            setIsKeyboardOpen(keyboardOpen);
+        };
+
+        // Initial check
+        handleViewportChange();
+
+        window.visualViewport.addEventListener('resize', handleViewportChange);
+        return () => window.visualViewport.removeEventListener('resize', handleViewportChange);
+    }, []);
 
     // Calculate position for portal - useLayoutEffect to prevent flicker
     useLayoutEffect(() => {
@@ -42,7 +67,10 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
             const DROPDOWN_HEIGHT = 192; // max-h-48 = 192px
             const GAP = 6; // Vertical spacing between cell and dropdown
 
-            const spaceBelow = window.innerHeight - rect.bottom;
+            // Use visualViewport height if available (mobile keyboard support)
+            const availableHeight = window.visualViewport?.height || window.innerHeight;
+
+            const spaceBelow = availableHeight - rect.bottom;
             const spaceAbove = rect.top;
 
             let top;
@@ -58,6 +86,18 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
                     top = rect.bottom + window.scrollY + GAP;
                 } else {
                     top = rect.top + window.scrollY - DROPDOWN_HEIGHT - GAP;
+                }
+            }
+
+            // Android WebView: Clamp to visible viewport to prevent hiding behind keyboard
+            if (isAndroidWebView() && window.visualViewport) {
+                const viewport = window.visualViewport;
+                const viewportBottom = viewport.offsetTop + viewport.height;
+                const dropdownBottom = top - window.scrollY + DROPDOWN_HEIGHT;
+
+                if (dropdownBottom > viewportBottom) {
+                    // Dropdown would go below visible viewport - clamp it
+                    top = viewportBottom - DROPDOWN_HEIGHT - GAP + window.scrollY;
                 }
             }
 
@@ -97,6 +137,11 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
         const updatePosition = () => {
             if (!parentRef?.current) return;
 
+            // FREEZE position when keyboard is open (mobile modal state)
+            // Prevents focus loss loop: keyboard open → resize → reposition → focus lost
+            // Skip this freeze on Android WebView - keyboard signals are unreliable there
+            if (isKeyboardOpen && !isAndroidWebView()) return;
+
             const rect = parentRef.current.getBoundingClientRect();
 
             // Check if cell is in viewport (with some tolerance)
@@ -115,7 +160,10 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
                 const DROPDOWN_HEIGHT = 192; // max-h-48 = 192px
                 const GAP = 6; // Vertical spacing between cell and dropdown
 
-                const spaceBelow = window.innerHeight - rect.bottom;
+                // Use visualViewport height if available (mobile keyboard support)
+                const availableHeight = window.visualViewport?.height || window.innerHeight;
+
+                const spaceBelow = availableHeight - rect.bottom;
                 const spaceAbove = rect.top;
 
                 let top;
@@ -131,6 +179,18 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
                         top = rect.bottom + window.scrollY + GAP;
                     } else {
                         top = rect.top + window.scrollY - DROPDOWN_HEIGHT - GAP;
+                    }
+                }
+
+                // Android WebView: Clamp to visible viewport to prevent hiding behind keyboard
+                if (isAndroidWebView() && window.visualViewport) {
+                    const viewport = window.visualViewport;
+                    const viewportBottom = viewport.offsetTop + viewport.height;
+                    const dropdownBottom = top - window.scrollY + DROPDOWN_HEIGHT;
+
+                    if (dropdownBottom > viewportBottom) {
+                        // Dropdown would go below visible viewport - clamp it
+                        top = viewportBottom - DROPDOWN_HEIGHT - GAP + window.scrollY;
                     }
                 }
 
@@ -152,13 +212,23 @@ const TagDropdown = ({ suggestions, inputValue, onSelect, onCreate, currentTags 
         // Also handle window resize
         window.addEventListener('resize', updatePosition, { passive: true });
 
+        // Android WebView: Add visualViewport geometrychange listener
+        // This handles viewport changes when keyboard opens/closes
+        if (isAndroidWebView() && window.visualViewport) {
+            window.visualViewport.addEventListener('geometrychange', updatePosition);
+        }
+
         return () => {
             if (scrollableContainer) {
                 scrollableContainer.removeEventListener('scroll', updatePosition);
             }
             window.removeEventListener('resize', updatePosition);
+
+            if (isAndroidWebView() && window.visualViewport) {
+                window.visualViewport.removeEventListener('geometrychange', updatePosition);
+            }
         };
-    }, [parentRef, onClose]);
+    }, [parentRef, onClose, isKeyboardOpen]);
 
     if ((suggestions.length === 0 && !showCreateOption) || !coords) {
         return null;

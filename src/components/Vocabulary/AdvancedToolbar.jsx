@@ -76,13 +76,22 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         return data;
     }, [vocabList, currentFolderId]);
 
-    const lessonCounts = useMemo(() => {
+    // Lesson counts from base data (unfiltered)
+    const lessonCountsArray = useMemo(() => {
         const counts = {};
         baseData.forEach(item => { const l = item.lesson || '?'; counts[l] = (counts[l] || 0) + 1; });
         return Object.entries(counts).sort((a, b) => (parseInt(a[0]) || 999) - (parseInt(b[0]) || 999));
     }, [baseData]);
 
-    const candoCounts = useMemo(() => {
+    // Lesson counts as object map for dropdown
+    const lessonCounts = useMemo(() => {
+        const counts = {};
+        lessonCountsArray.forEach(([val, count]) => { counts[val] = count; });
+        return counts;
+    }, [lessonCountsArray]);
+
+    // Can-do counts from base data (unfiltered)
+    const candoCountsArray = useMemo(() => {
         const counts = {};
         baseData.forEach(item => { const c = item.cando || '?'; counts[c] = (counts[c] || 0) + 1; });
         return Object.entries(counts).sort((a, b) => {
@@ -91,6 +100,13 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
             return numA - numB;
         });
     }, [baseData]);
+
+    // Can-do counts as object map for dropdown
+    const candoCounts = useMemo(() => {
+        const counts = {};
+        candoCountsArray.forEach(([val, count]) => { counts[val] = count; });
+        return counts;
+    }, [candoCountsArray]);
 
     const tagCounts = useMemo(() => {
         const counts = {};
@@ -158,39 +174,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         return { tagCountMap, onlyTaggedCount };
     }, [filteredData]);
 
-    // Calculate lesson counts from filtered data (respects active filters)
-    // This is used for displaying row counts in the lesson dropdown
-    const filteredLessonCounts = useMemo(() => {
-        const lessonCountMap = {};
 
-        if (Array.isArray(filteredData)) {
-            filteredData.forEach(item => {
-                const lesson = String(item.lesson);
-                if (lesson) {
-                    lessonCountMap[lesson] = (lessonCountMap[lesson] || 0) + 1;
-                }
-            });
-        }
-
-        return lessonCountMap;
-    }, [filteredData]);
-
-    // Calculate can-do counts from filtered data (respects active filters)
-    // This is used for displaying row counts in the can-do dropdown
-    const filteredCandoCounts = useMemo(() => {
-        const candoCountMap = {};
-
-        if (Array.isArray(filteredData)) {
-            filteredData.forEach(item => {
-                const cando = String(item.cando);
-                if (cando) {
-                    candoCountMap[cando] = (candoCountMap[cando] || 0) + 1;
-                }
-            });
-        }
-
-        return candoCountMap;
-    }, [filteredData]);
 
 
     return (
@@ -218,8 +202,8 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
             {/* --- ROW 2: TOOLBAR (Scrollable) --- */}
             {showChipPanel && (
                 <div className="flex flex-col gap-0.5 p-0.5 bg-slate-100 dark:bg-[#0a0c20]/50 border-b border-slate-300 dark:border-white/5 overflow-hidden animate-in slide-in-from-top-2 duration-300">
-                    <FilterChipBar label="L" items={lessonCounts} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
-                    <FilterChipBar label="C" items={candoCounts} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
+                    <FilterChipBar label="L" items={lessonCountsArray} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
+                    <FilterChipBar label="C" items={candoCountsArray} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
                     <FilterChipBar label="T" items={tagCounts} activeValues={filters.tags} onToggle={(val) => { const curr = filters.tags || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, tags: newVals }); }} color="blue" />
                 </div>
             )}
@@ -235,7 +219,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                             options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).map(v => ({ tagId: v, name: `Lesson ${v}` }))}
                             selectedValues={filters.lesson}
                             onChange={(val) => onFilterChange({ ...filters, lesson: val })}
-                            countMap={filteredLessonCounts}
+                            countMap={lessonCounts}
                         />
                         <MultiSelectDropdown
                             label="Can-do"
@@ -246,7 +230,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                             }).map(v => ({ tagId: v, name: `Can-do ${v}` }))}
                             selectedValues={filters.cando}
                             onChange={(val) => onFilterChange({ ...filters, cando: val })}
-                            countMap={filteredCandoCounts}
+                            countMap={candoCounts}
                         />
                         <MultiSelectDropdown
                             label="Tag"

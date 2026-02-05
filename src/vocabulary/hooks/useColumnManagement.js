@@ -4,7 +4,8 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { loadFolderConfig, saveFolderConfig } from '../../services/firestore/preferenceService';
+import { loadFolderConfig, saveFolderConfig, migrateBookFolderConfig } from '../../services/firestore/preferenceService';
+import { isBookFolder } from '../../utils/columnConfigMapper';
 
 export function useColumnManagement({
     allColumns,
@@ -36,7 +37,12 @@ export function useColumnManagement({
             setColumnVisibility({});
             setColumnWidths({}); // Correctly reset widths to prevent leakage
 
-            // B. Fetch Folder Config
+            // B. Migrate Book folder configs if needed (backward compatibility)
+            if (isBookFolder(currentFolderId)) {
+                await migrateBookFolderConfig();
+            }
+
+            // C. Fetch Folder Config
             const savedConfig = await loadFolderConfig(currentFolderId);
 
             if (!isMounted) return;

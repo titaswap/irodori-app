@@ -7,35 +7,31 @@
  */
 
 import { getDb } from './firestoreClient';
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getUserId } from "../userService";
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { getUserId } from '../userService';
+import { getColumnConfigKey } from '../../utils/columnConfigMapper';
 
 /**
  * Load all user preferences (config) from Firestore.
  * @returns {Promise<Object|null>} The stored config object or null.
  */
 export const loadUserConfig = async () => {
-    const db = getDb();
-    if (!db) return null;
-
-    const userId = getUserId();
-    if (!userId) {
-        console.warn("[Firestore] No user ID available. Skipping load.");
-        return null;
-    }
-
     try {
-        console.log(`[Firestore] Fetching config for ${userId}`);
+        const db = getDb();
+        if (!db) return null;
+
+        const userId = getUserId();
+        if (!userId) return null; // Silent skip if offline/not logged in
+
         const docRef = doc(db, "users", userId, "preferences", "config");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
             return docSnap.data();
-        } else {
-            return null;
         }
+        return null;
     } catch (e) {
-        console.error("[Firestore] Failed to load config", e);
+        // Silent fail - offline or network error
         return null;
     }
 };
@@ -45,21 +41,17 @@ export const loadUserConfig = async () => {
  * @param {Object} changes - e.g., { rowsPerPage: 100, columnOrder: [...] }
  */
 export const saveUserConfig = async (changes) => {
-    const db = getDb();
-    if (!db) return;
-
-    const userId = getUserId();
-    if (!userId) {
-        console.warn("[Firestore] No user ID available. Skipping save.");
-        return;
-    }
-
     try {
-        console.log(`[Firestore] Saving config for ${userId}`, changes);
+        const db = getDb();
+        if (!db) return;
+
+        const userId = getUserId();
+        if (!userId) return; // Silent skip if offline/not logged in
+
         const docRef = doc(db, "users", userId, "preferences", "config");
         await setDoc(docRef, changes, { merge: true });
     } catch (e) {
-        console.error("[Firestore] Failed to save config", e);
+        // Silent fail - offline or network error
     }
 };
 
@@ -68,24 +60,25 @@ export const saveUserConfig = async (changes) => {
  * Path: users/{uid}/tableConfig/{folderId}
  */
 export const loadFolderConfig = async (folderId) => {
-    const db = getDb();
-    if (!db) return null;
-
-    const userId = getUserId();
-    if (!userId || !folderId) return null;
-
     try {
-        console.log(`[Firestore] Fetching table config for ${folderId}`);
-        const docRef = doc(db, "users", userId, "tableConfig", folderId);
+        const db = getDb();
+        if (!db) return null;
+
+        const userId = getUserId();
+        if (!userId || !folderId) return null; // Silent skip if offline/not logged in
+
+        const configKey = getColumnConfigKey(folderId);
+        if (!configKey) return null;
+
+        const docRef = doc(db, "users", userId, "tableConfig", configKey);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
             return docSnap.data();
-        } else {
-            return null;
         }
+        return null;
     } catch (e) {
-        console.error(`[Firestore] Failed to load table config for ${folderId}`, e);
+        // Silent fail - offline or network error
         return null;
     }
 };
@@ -95,18 +88,84 @@ export const loadFolderConfig = async (folderId) => {
  * Path: users/{uid}/tableConfig/{folderId}
  */
 export const saveFolderConfig = async (folderId, config) => {
-    const db = getDb();
-    if (!db) return;
-
-    const userId = getUserId();
-    if (!userId || !folderId) return;
-
     try {
-        // Debounce logic could be here, but usually handled by hook
-        const docRef = doc(db, "users", userId, "tableConfig", folderId);
+        const db = getDb();
+        if (!db) return;
+
+        const userId = getUserId();
+        if (!userId || !folderId) return; // Silent skip if offline/not logged in
+
+        const configKey = getColumnConfigKey(folderId);
+        if (!configKey) return;
+
+        const docRef = doc(db, "users", userId, "tableConfig", configKey);
         await setDoc(docRef, config, { merge: true });
     } catch (e) {
-        console.error(`[Firestore] Failed to save table config for ${folderId}`, e);
+        // Silent fail - offline or network error
+    }
+};
+
+/**
+ * Migrate existing Book folder configs to BOOK_SHARED
+ * Called once on first load if BOOK_SHARED doesn't exist
+ * Provides backward compatibility for existing users
+ */
+export const migrateBookFolderConfig = async () => {
+    try {
+        const db = getDb();
+        if (!db) return;
+
+        const userId = getUserId();
+        if (!userId) return; // Silent skip if offline/not logged in
+
+        // Check if BOOK_SHARED already exists
+        const sharedRef = doc(db, "users", userId, "tableConfig", "BOOK_SHARED");
+        const sharedSnap = await getDoc(sharedRef);
+
+        if (sharedSnap.exists()) {
+            return; // Already migrated
+        }
+
+        // Try to find config from any Book folder
+        const bookFolders = ['Book 1', 'Book 2', 'Book 3', 'Book 4', 'Book 5'];
+
+        for (const bookFolder of bookFolders) {
+            const bookRef = doc(db, "users", userId, "tableConfig", bookFolder);
+            const bookSnap = await getDoc(bookRef);
+
+            if (bookSnap.exists()) {
+                // Copy config to BOOK_SHARED
+                await setDoc(sharedRef, bookSnap.data());
+                return;
+            }
+        }
+    } catch (e) {
+        // Silent fail - offline or network error
+    }
+};
+
+/**
+ * Reset column configuration for a folder
+ * For Book folders, this resets ALL Book folders (deletes BOOK_SHARED)
+ * For other folders, only that folder's config is reset
+ * 
+ * @param {string} folderId - The folder ID to reset
+ */
+export const resetFolderConfig = async (folderId) => {
+    try {
+        const db = getDb();
+        if (!db) return;
+
+        const userId = getUserId();
+        if (!userId || !folderId) return; // Silent skip if offline/not logged in
+
+        const configKey = getColumnConfigKey(folderId);
+        if (!configKey) return;
+
+        const docRef = doc(db, "users", userId, "tableConfig", configKey);
+        await deleteDoc(docRef);
+    } catch (e) {
+        // Silent fail - offline or network error
     }
 };
 
@@ -116,7 +175,6 @@ export const loadRowsPerPage = async () => {
     return config?.rowsPerPage || null;
 };
 export const saveRowsPerPage = async (val) => saveUserConfig({ rowsPerPage: val });
-
 
 // Deprecated placeholders (kept for interface compatibility if needed later)
 export const fetchUserPreferences = async () => null;

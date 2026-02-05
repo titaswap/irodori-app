@@ -58,8 +58,9 @@ export const fetchAllProgress = async () => {
  * Update progress for a single item.
  * @param {string} itemId 
  * @param {Object} partialData - e.g. { isMarked: true }
+ * @param {boolean} skipQueue - If true, skip queue (used during queue replay)
  */
-export const updateProgress = async (itemId, partialData) => {
+export const updateProgress = async (itemId, partialData, skipQueue = false) => {
     const db = getDb();
     if (!db) return;
 
@@ -69,12 +70,36 @@ export const updateProgress = async (itemId, partialData) => {
         return;
     }
 
+    let operationId = null;
+
+    // 1. Enqueue operation FIRST (unless replaying from queue)
+    if (!skipQueue) {
+        const { enqueueOperation, dequeueOperation } = await import('../offlineSyncQueue');
+        operationId = enqueueOperation('updateProgress', {
+            itemId,
+            data: partialData,
+            userId
+        });
+    }
+
+    // 2. Attempt immediate Firestore write
     try {
         console.log(`[Firestore] Updating progress for ${itemId}`, partialData);
         const docRef = doc(db, "users", userId, "progress", itemId);
         await setDoc(docRef, { ...partialData, updatedAt: new Date().toISOString() }, { merge: true });
+
+        // 3. Success → Remove from queue
+        if (operationId) {
+            const { dequeueOperation } = await import('../offlineSyncQueue');
+            dequeueOperation(operationId);
+            console.log(`[Firestore] ✓ updateProgress succeeded, dequeued ${operationId}`);
+        }
     } catch (e) {
-        console.error("[Firestore] Failed to update progress", e);
+        if (operationId) {
+            console.warn(`[Firestore] ✗ updateProgress failed, queued as ${operationId}`, e.message);
+        } else {
+            console.error("[Firestore] Failed to update progress (queue replay)", e);
+        }
         throw e; // Rethrow to let UI handle optimism revert
     }
 };
@@ -86,8 +111,9 @@ export const updateProgress = async (itemId, partialData) => {
  * @param {string} itemId - The item ID
  * @param {string} tagId - The tag ID
  * @param {string} tagName - The tag name
+ * @param {boolean} skipQueue - If true, skip queue (used during queue replay)
  */
-export const addTagIdToProgress = async (itemId, tagId, tagName) => {
+export const addTagIdToProgress = async (itemId, tagId, tagName, skipQueue = false) => {
     const db = getDb();
     if (!db) return;
 
@@ -107,6 +133,20 @@ export const addTagIdToProgress = async (itemId, tagId, tagName) => {
 
     const tagSnapshot = { id: tagId, name: tagName };
 
+    let operationId = null;
+
+    // 1. Enqueue operation FIRST (unless replaying from queue)
+    if (!skipQueue) {
+        const { enqueueOperation } = await import('../offlineSyncQueue');
+        operationId = enqueueOperation('addTag', {
+            itemId,
+            tagId,
+            tagName,
+            userId
+        });
+    }
+
+    // 2. Attempt immediate Firestore write
     try {
         console.log(`[Firestore] Adding tag snapshot to progress/${itemId}:`, tagSnapshot);
         const docRef = doc(db, "users", userId, "progress", itemId);
@@ -115,6 +155,13 @@ export const addTagIdToProgress = async (itemId, tagId, tagName) => {
             updatedAt: new Date().toISOString()
         });
         console.log(`[Firestore] Successfully added tag snapshot to ${itemId}`);
+
+        // 3. Success → Remove from queue
+        if (operationId) {
+            const { dequeueOperation } = await import('../offlineSyncQueue');
+            dequeueOperation(operationId);
+            console.log(`[Firestore] ✓ addTag succeeded, dequeued ${operationId}`);
+        }
     } catch (e) {
         console.warn(`[Firestore] updateDoc failed for ${itemId}, error: ${e.code}. trying setDoc...`, e);
         // If document doesn't exist, create it with setDoc
@@ -126,12 +173,25 @@ export const addTagIdToProgress = async (itemId, tagId, tagName) => {
                     updatedAt: new Date().toISOString()
                 });
                 console.log(`[Firestore] Created new progress doc for ${itemId} with tag snapshot`);
+
+                // Success → Remove from queue
+                if (operationId) {
+                    const { dequeueOperation } = await import('../offlineSyncQueue');
+                    dequeueOperation(operationId);
+                    console.log(`[Firestore] ✓ addTag succeeded (setDoc), dequeued ${operationId}`);
+                }
             } catch (innerError) {
                 console.error("[Firestore] Failed to create new progress doc", innerError);
+                if (operationId) {
+                    console.warn(`[Firestore] ✗ addTag failed, queued as ${operationId}`, innerError.message);
+                }
                 throw innerError;
             }
         } else {
             console.error("[Firestore] Failed to add tag snapshot (updateDoc)", e);
+            if (operationId) {
+                console.warn(`[Firestore] ✗ addTag failed, queued as ${operationId}`, e.message);
+            }
             throw e;
         }
     }
@@ -142,8 +202,9 @@ export const addTagIdToProgress = async (itemId, tagId, tagName) => {
  * Handles snapshot objects {id, name} instead of just tagIds
  * @param {string} itemId - The item ID
  * @param {string} tagId - The tag ID to remove
+ * @param {boolean} skipQueue - If true, skip queue (used during queue replay)
  */
-export const removeTagIdFromProgress = async (itemId, tagId) => {
+export const removeTagIdFromProgress = async (itemId, tagId, skipQueue = false) => {
     const db = getDb();
     if (!db) return;
 
@@ -156,6 +217,19 @@ export const removeTagIdFromProgress = async (itemId, tagId) => {
         throw error;
     }
 
+    let operationId = null;
+
+    // 1. Enqueue operation FIRST (unless replaying from queue)
+    if (!skipQueue) {
+        const { enqueueOperation } = await import('../offlineSyncQueue');
+        operationId = enqueueOperation('removeTag', {
+            itemId,
+            tagId,
+            userId
+        });
+    }
+
+    // 2. Attempt immediate Firestore write
     try {
         console.log(`[Firestore] Removing tag snapshot with id "${tagId}" from progress/${itemId}`);
         const docRef = doc(db, "users", userId, "progress", itemId);
@@ -164,6 +238,13 @@ export const removeTagIdFromProgress = async (itemId, tagId) => {
         const docSnap = await getDoc(docRef);
         if (!docSnap.exists()) {
             console.warn(`[Firestore] Progress doc ${itemId} does not exist`);
+
+            // Success (no-op) → Remove from queue
+            if (operationId) {
+                const { dequeueOperation } = await import('../offlineSyncQueue');
+                dequeueOperation(operationId);
+                console.log(`[Firestore] ✓ removeTag succeeded (doc not found), dequeued ${operationId}`);
+            }
             return;
         }
 
@@ -181,8 +262,18 @@ export const removeTagIdFromProgress = async (itemId, tagId) => {
             updatedAt: new Date().toISOString()
         });
         console.log(`[Firestore] Successfully removed tag snapshot from ${itemId}`);
+
+        // 3. Success → Remove from queue
+        if (operationId) {
+            const { dequeueOperation } = await import('../offlineSyncQueue');
+            dequeueOperation(operationId);
+            console.log(`[Firestore] ✓ removeTag succeeded, dequeued ${operationId}`);
+        }
     } catch (e) {
         console.error("[Firestore] Failed to remove tag snapshot", e);
+        if (operationId) {
+            console.warn(`[Firestore] ✗ removeTag failed, queued as ${operationId}`, e.message);
+        }
         throw e;
     }
 };

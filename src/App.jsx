@@ -70,6 +70,12 @@ function App() {
 
                 // 2. Fetch fresh data in background (silent if we have local data, blocking only if completely empty)
                 fetchSheetDataWrapper(hasLocalData);
+
+                // 3. Process offline sync queue (CRITICAL for offline persistence)
+                const { processSyncQueue } = await import('./services/offlineSyncQueue');
+                processSyncQueue().catch(err =>
+                    console.warn("[App] Offline sync queue processing failed:", err)
+                );
             } else {
                 // Logged Out
                 setUser(null);
@@ -140,9 +146,19 @@ function App() {
         };
     }, []);
 
+    // Network Reconnect Listener (CRITICAL for offline sync)
+    useEffect(() => {
+        const handleOnline = async () => {
+            console.log("[App] Network reconnected, processing offline sync queue...");
+            const { processSyncQueue } = await import('./services/offlineSyncQueue');
+            processSyncQueue().catch(err =>
+                console.warn("[App] Offline sync queue processing failed:", err)
+            );
+        };
 
-
-
+        window.addEventListener('online', handleOnline);
+        return () => window.removeEventListener('online', handleOnline);
+    }, []);
 
 
     // Listen for Native Login Success (Android)

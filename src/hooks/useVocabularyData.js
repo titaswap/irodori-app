@@ -34,6 +34,22 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
             data = data.filter(i => String(i.cando) === String(filters.cando));
         }
 
+        // Book filter (for sheets that have book column)
+        // IMPORTANT: Use 'Book' (uppercase) for row-level data, fall back to 'book' (lowercase)
+        if (Array.isArray(filters.book) && filters.book.length > 0) {
+            const filterStrings = filters.book.map(String);
+            data = data.filter(i => {
+                const bookValue = i.Book !== undefined ? i.Book : i.book;
+                return filterStrings.includes(String(bookValue));
+            });
+        }
+        else if (filters.book !== 'all' && !Array.isArray(filters.book)) {
+            data = data.filter(i => {
+                const bookValue = i.Book !== undefined ? i.Book : i.book;
+                return String(bookValue) === String(filters.book);
+            });
+        }
+
         // Tag filter: Show rows with ANY selected tag (OR logic)
         // Special mode: "__ONLY_TAGGED__" shows only rows with at least one tag
         if (Array.isArray(filters.tags) && filters.tags.length > 0) {

@@ -21,6 +21,11 @@ service cloud.firestore {
         allow read, write: if isUser(uid);
       }
 
+      // Folder-scoped table configuration (per-folder column settings)
+      match /tableConfig/{folderId} {
+        allow read, write: if isUser(uid);
+      }
+
       // Activity log
       match /activity/{activityId} {
         allow read, write: if isUser(uid);

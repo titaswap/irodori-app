@@ -25,6 +25,7 @@ function VocabularyView({
     vocabList,
     setVocabList,
     folders,
+    headersBySheet,
     currentFolderId,
     setCurrentFolderId,
     isLoading,
@@ -39,6 +40,7 @@ function VocabularyView({
         vocabList,
         setVocabList,
         folders,
+        headersBySheet,
         currentFolderId,
         setCurrentFolderId,
         isLoading,
@@ -79,6 +81,7 @@ function VocabularyView({
                     currentFolderId={ctrl.currentFolderId}
                     folders={ctrl.folders}
                     vocabList={ctrl.vocabList}
+                    headersBySheet={headersBySheet}
                     isEditMode={ctrl.isEditMode}
                     hasUnsavedChanges={ctrl.hasUnsavedChanges}
                     filters={ctrl.filters}

@@ -9,6 +9,7 @@ import { INTERNAL_KEYS, FIXED_SYSTEM_COLUMNS, SELECTION_COLUMN } from '../../uti
 
 export function useVocabularyViewModel({
     vocabList,
+    headersBySheet,
     currentFolderId,
     displayData,
     currentPage,
@@ -27,26 +28,47 @@ export function useVocabularyViewModel({
         return vocabList.filter(v => v.folderId === currentFolderId);
     }, [vocabList, currentFolderId]);
 
-    // 2. All Columns Generation
+    // 2. All Columns Generation (Per-Folder Schema)
     const allColumns = useMemo(() => {
         let dynamicCols = [];
-        if (vocabList && vocabList.length > 0) {
+
+        // Get headers for current folder from headersBySheet
+        let currentHeaders = [];
+
+        if (currentFolderId === 'root') {
+            // Root folder: Show union of all headers from all sheets
+            const allHeadersSet = new Set();
+            Object.values(headersBySheet).forEach(headers => {
+                if (Array.isArray(headers)) {
+                    headers.forEach(h => allHeadersSet.add(h));
+                }
+            });
+            currentHeaders = Array.from(allHeadersSet);
+        } else {
+            // Specific folder: Show only that sheet's headers
+            currentHeaders = headersBySheet[currentFolderId] || [];
+        }
+
+        // Fallback: If no headers from headersBySheet, extract from first item (backward compatibility)
+        if (currentHeaders.length === 0 && vocabList && vocabList.length > 0) {
             const first = vocabList[0];
             const keys = Object.keys(first);
-
-            dynamicCols = keys
+            currentHeaders = keys
                 .filter(key => !INTERNAL_KEYS.has(key))
-                .filter(key => key !== 'japanese' || !first._isSyntheticJapanese)
-                .map(key => ({
-                    id: key,
-                    label: key,
-                    width: 'min-w-[140px]',
-                    type: 'text',
-                    sortable: true
-                }));
+                .filter(key => key !== 'japanese' || !first._isSyntheticJapanese);
         }
+
+        // Map headers to column definitions
+        dynamicCols = currentHeaders.map(key => ({
+            id: key,
+            label: key,
+            width: 'min-w-[140px]',
+            type: 'text',
+            sortable: true
+        }));
+
         return [SELECTION_COLUMN, ...dynamicCols, ...FIXED_SYSTEM_COLUMNS];
-    }, [vocabList]);
+    }, [vocabList, currentFolderId, headersBySheet]);
 
     // 3. Pagination Logic
     const paginatedData = useMemo(() => {

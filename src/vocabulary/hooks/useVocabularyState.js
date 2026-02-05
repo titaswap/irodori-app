@@ -26,25 +26,14 @@ export function useVocabularyState() {
     const [revealedCells, setRevealedCells] = useState({ japanese: null, bangla: null });
 
     // Dynamic Column State
-    const [columnOrder, setColumnOrder] = useState(() => {
-        const saved = preferenceStore.loadPreferences().columnOrder;
-        if (saved && saved.length > 0) return saved;
+    // Dynamic Column State - Initialized to empty, managed by useColumnManagement per folder
+    const [columnOrder, setColumnOrder] = useState([]);
 
-        const isMobile = window.innerWidth <= 768;
-        return isMobile ? (uiConfig.defaultMobileColumnOrder || []) : (uiConfig.defaultDesktopColumnOrder || []);
-    });
+    const [columnVisibility, setColumnVisibility] = useState({});
 
-    const [columnVisibility, setColumnVisibility] = useState(() => uiStateStorage.loadHiddenColumns());
 
-    useEffect(() => {
-        uiStateStorage.saveHiddenColumns(columnVisibility);
-    }, [columnVisibility]);
 
-    const [columnWidths, setColumnWidths] = useState(() => preferenceStore.loadPreferences().columnWidths);
-
-    useEffect(() => {
-        preferenceStore.savePreferences({ columnWidths });
-    }, [columnWidths]);
+    const [columnWidths, setColumnWidths] = useState({});
 
     // Theme State
     const [theme, setTheme] = useState(() => {
@@ -89,6 +78,7 @@ export function useVocabularyState() {
     const [filters, setFilters] = useState(() => ({
         lesson: uiStateStorage.loadLessonFilter(),
         cando: uiStateStorage.loadCandoFilter(),
+        book: uiStateStorage.loadBookFilter(),
         tags: tagFilterStorage.load()
     }));
 
@@ -99,6 +89,10 @@ export function useVocabularyState() {
     useEffect(() => {
         uiStateStorage.saveCandoFilter(filters.cando);
     }, [filters.cando]);
+
+    useEffect(() => {
+        uiStateStorage.saveBookFilter(filters.book);
+    }, [filters.book]);
 
     const [searchTerm] = useState('');
     const [viewMode, setViewMode] = useState(() => uiStateStorage.loadViewMode());
@@ -132,14 +126,7 @@ export function useVocabularyState() {
         preferenceStore.savePreferences({ itemsPerPage });
     }, [itemsPerPage]);
 
-    // Column Order Persistence
-    useEffect(() => {
-        preferenceStore.savePreferences({ columnOrder });
-    }, [columnOrder]);
 
-    useEffect(() => {
-        preferenceStore.savePreferences({ columnVisibility });
-    }, [columnVisibility]);
 
     return {
         // Edit Mode

@@ -63,6 +63,53 @@ export const saveUserConfig = async (changes) => {
     }
 };
 
+/**
+ * Load folder-specific table configuration (columns, widths, visibility).
+ * Path: users/{uid}/tableConfig/{folderId}
+ */
+export const loadFolderConfig = async (folderId) => {
+    const db = getDb();
+    if (!db) return null;
+
+    const userId = getUserId();
+    if (!userId || !folderId) return null;
+
+    try {
+        console.log(`[Firestore] Fetching table config for ${folderId}`);
+        const docRef = doc(db, "users", userId, "tableConfig", folderId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data();
+        } else {
+            return null;
+        }
+    } catch (e) {
+        console.error(`[Firestore] Failed to load table config for ${folderId}`, e);
+        return null;
+    }
+};
+
+/**
+ * Save folder-specific table configuration.
+ * Path: users/{uid}/tableConfig/{folderId}
+ */
+export const saveFolderConfig = async (folderId, config) => {
+    const db = getDb();
+    if (!db) return;
+
+    const userId = getUserId();
+    if (!userId || !folderId) return;
+
+    try {
+        // Debounce logic could be here, but usually handled by hook
+        const docRef = doc(db, "users", userId, "tableConfig", folderId);
+        await setDoc(docRef, config, { merge: true });
+    } catch (e) {
+        console.error(`[Firestore] Failed to save table config for ${folderId}`, e);
+    }
+};
+
 // --- Refactored Aliases (to maintain compatibility if strictly needed, but better to update Store) ---
 export const loadRowsPerPage = async () => {
     const config = await loadUserConfig();

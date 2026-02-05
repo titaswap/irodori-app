@@ -7,7 +7,7 @@ import {
 import { FilterChipBar } from './Toolbar/FilterChipBar';
 import { MultiSelectDropdown } from './Toolbar/MultiSelectDropdown';
 
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags }) => {
     const [showChipPanel, setShowChipPanel] = useState(false);
 
     const containerRef = React.useRef(null);
@@ -76,6 +76,36 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         return data;
     }, [vocabList, currentFolderId]);
 
+    // Determine which filters to show based on active sheet schema
+    const availableFilters = useMemo(() => {
+        let headers = [];
+
+        if (currentFolderId === 'root') {
+            // Root folder: Show union of all filters
+            const allHeadersSet = new Set();
+            Object.values(headersBySheet || {}).forEach(sheetHeaders => {
+                if (Array.isArray(sheetHeaders)) {
+                    sheetHeaders.forEach(h => allHeadersSet.add(h));
+                }
+            });
+            headers = Array.from(allHeadersSet);
+        } else {
+            // Specific folder: Show only that sheet's filters
+            headers = (headersBySheet && headersBySheet[currentFolderId]) || [];
+        }
+
+        // Normalize headers to lowercase for checking
+        const lowerHeaders = headers.map(h => String(h).toLowerCase());
+
+        return {
+            hasLesson: lowerHeaders.includes('lesson'),
+            hasCando: lowerHeaders.includes('cando'),
+            hasBook: lowerHeaders.includes('book'),
+            // Always show tags
+            hasTags: true
+        };
+    }, [currentFolderId, headersBySheet]);
+
     // Lesson counts from base data (unfiltered)
     const lessonCountsArray = useMemo(() => {
         const counts = {};
@@ -107,6 +137,33 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
         candoCountsArray.forEach(([val, count]) => { counts[val] = count; });
         return counts;
     }, [candoCountsArray]);
+
+    // Book counts from base data (unfiltered)
+    // IMPORTANT: Use 'Book' (uppercase) for row-level data (e.g., Kanji folder with numeric Book values)
+    // Fall back to 'book' (lowercase) for folder-level data (e.g., other folders)
+    const bookCountsArray = useMemo(() => {
+        if (!availableFilters.hasBook) return [];
+
+        const counts = {};
+        baseData.forEach(item => {
+            // Prioritize uppercase 'Book' (row-level data) over lowercase 'book' (folder name)
+            const bookValue = item.Book !== undefined ? item.Book : item.book;
+            const b = bookValue || '?';
+            counts[b] = (counts[b] || 0) + 1;
+        });
+        return Object.entries(counts).sort((a, b) => {
+            const numA = parseInt(a[0].replace(/\D/g, '')) || 0;
+            const numB = parseInt(b[0].replace(/\D/g, '')) || 0;
+            return numA - numB;
+        });
+    }, [baseData, availableFilters.hasBook]);
+
+    // Book counts as object map for dropdown
+    const bookCounts = useMemo(() => {
+        const counts = {};
+        bookCountsArray.forEach(([val, count]) => { counts[val] = count; });
+        return counts;
+    }, [bookCountsArray]);
 
     const tagCounts = useMemo(() => {
         const counts = {};
@@ -202,9 +259,18 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
             {/* --- ROW 2: TOOLBAR (Scrollable) --- */}
             {showChipPanel && (
                 <div className="flex flex-col gap-0.5 p-0.5 bg-slate-100 dark:bg-[#0a0c20]/50 border-b border-slate-300 dark:border-white/5 overflow-hidden animate-in slide-in-from-top-2 duration-300">
-                    <FilterChipBar label="L" items={lessonCountsArray} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
-                    <FilterChipBar label="C" items={candoCountsArray} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
-                    <FilterChipBar label="T" items={tagCounts} activeValues={filters.tags} onToggle={(val) => { const curr = filters.tags || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, tags: newVals }); }} color="blue" />
+                    {availableFilters.hasLesson && (
+                        <FilterChipBar label="L" items={lessonCountsArray} activeValues={filters.lesson} onToggle={(val) => { const curr = filters.lesson || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, lesson: newVals }); }} color="blue" />
+                    )}
+                    {availableFilters.hasCando && (
+                        <FilterChipBar label="C" items={candoCountsArray} activeValues={filters.cando} onToggle={(val) => { const curr = filters.cando || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, cando: newVals }); }} color="indigo" />
+                    )}
+                    {availableFilters.hasBook && (
+                        <FilterChipBar label="B" items={bookCountsArray} activeValues={filters.book} onToggle={(val) => { const curr = filters.book || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, book: newVals }); }} color="green" />
+                    )}
+                    {availableFilters.hasTags && (
+                        <FilterChipBar label="T" items={tagCounts} activeValues={filters.tags} onToggle={(val) => { const curr = filters.tags || []; const isSelected = curr.includes(val); let newVals = isSelected ? curr.filter(v => v !== val) : [...curr, val]; onFilterChange({ ...filters, tags: newVals }); }} color="blue" />
+                    )}
                 </div>
             )}
 
@@ -214,37 +280,87 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, isEditMode, hasU
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
 
                     <div className="flex gap-1">
-                        <MultiSelectDropdown
-                            label="Lesson"
-                            options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).map(v => ({ tagId: v, name: `Lesson ${v}` }))}
-                            selectedValues={filters.lesson}
-                            onChange={(val) => onFilterChange({ ...filters, lesson: val })}
-                            countMap={lessonCounts}
-                        />
-                        <MultiSelectDropdown
-                            label="Can-do"
-                            options={[...new Set(baseData.map(v => String(v.cando)))].sort((a, b) => {
-                                const numA = parseInt(a.replace(/\D/g, '')) || 0;
-                                const numB = parseInt(b.replace(/\D/g, '')) || 0;
-                                return numA - numB;
-                            }).map(v => ({ tagId: v, name: `Can-do ${v}` }))}
-                            selectedValues={filters.cando}
-                            onChange={(val) => onFilterChange({ ...filters, cando: val })}
-                            countMap={candoCounts}
-                        />
-                        <MultiSelectDropdown
-                            label="Tag"
-                            icon={Tag}
-                            options={allTags && allTags.length > 0 ? allTags : [...new Set(baseData.flatMap(v => Array.isArray(v.tags) ? v.tags : []))].filter(Boolean).sort()}
-                            selectedValues={filters.tags}
-                            onChange={(val) => onFilterChange({ ...filters, tags: val })}
-                            enableTagManagement={true}
-                            onCreateTag={createTag}
-                            onRenameTag={renameTag}
-                            onDeleteTag={deleteTag}
-                            countMap={filteredTagCounts.tagCountMap}
-                            onlyTaggedCount={filteredTagCounts.onlyTaggedCount}
-                        />
+                        {availableFilters.hasLesson && (
+                            <MultiSelectDropdown
+                                label="Lesson"
+                                options={[...new Set(baseData.map(v => String(v.lesson)))].sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).map(v => ({ tagId: v, name: `Lesson ${v}` }))}
+                                selectedValues={filters.lesson}
+                                onChange={(val) => onFilterChange({ ...filters, lesson: val })}
+                                countMap={lessonCounts}
+                            />
+                        )}
+                        {availableFilters.hasCando && (
+                            <MultiSelectDropdown
+                                label="Can-do"
+                                options={[...new Set(baseData.map(v => String(v.cando)))].sort((a, b) => {
+                                    const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                                    const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                                    return numA - numB;
+                                }).map(v => ({ tagId: v, name: `Can-do ${v}` }))}
+                                selectedValues={filters.cando}
+                                onChange={(val) => onFilterChange({ ...filters, cando: val })}
+                                countMap={candoCounts}
+                            />
+                        )}
+                        {availableFilters.hasBook && (
+                            <MultiSelectDropdown
+                                label="Book"
+                                options={[...new Set(baseData.map(v => {
+                                    // Use uppercase 'Book' (row-level) if available, fall back to lowercase 'book' (folder)
+                                    const bookValue = v.Book !== undefined ? v.Book : v.book;
+                                    return String(bookValue);
+                                }))].sort((a, b) => {
+                                    // Sort: Book items first, then Kanji items (numeric values)
+                                    const aIsNumeric = !isNaN(a);
+                                    const bIsNumeric = !isNaN(b);
+
+                                    // If one is numeric (Kanji) and one is not (Book folder), Book folder comes first
+                                    if (aIsNumeric && !bIsNumeric) return 1;  // b (Book) comes first
+                                    if (!aIsNumeric && bIsNumeric) return -1; // a (Book) comes first
+
+                                    // If both are same type, sort numerically
+                                    const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                                    const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                                    return numA - numB;
+                                }).map(v => {
+                                    // For numeric values, check if they come from Kanji folder
+                                    const isNumeric = !isNaN(v);
+
+                                    if (isNumeric) {
+                                        // Check if this numeric value comes from Kanji folder items
+                                        const hasKanjiItems = baseData.some(item => {
+                                            const bookValue = item.Book !== undefined ? item.Book : item.book;
+                                            return String(bookValue) === String(v) && item.folderId === 'Kanji';
+                                        });
+
+                                        if (hasKanjiItems) {
+                                            return { tagId: v, name: `Kanji Book ${v}` };
+                                        }
+                                    }
+
+                                    // For non-numeric or non-Kanji values, just use the value as-is
+                                    return { tagId: v, name: v };
+                                })}
+                                selectedValues={filters.book}
+                                onChange={(val) => onFilterChange({ ...filters, book: val })}
+                                countMap={bookCounts}
+                            />
+                        )}
+                        {availableFilters.hasTags && (
+                            <MultiSelectDropdown
+                                label="Tag"
+                                icon={Tag}
+                                options={allTags && allTags.length > 0 ? allTags : [...new Set(baseData.flatMap(v => Array.isArray(v.tags) ? v.tags : []))].filter(Boolean).sort()}
+                                selectedValues={filters.tags}
+                                onChange={(val) => onFilterChange({ ...filters, tags: val })}
+                                enableTagManagement={true}
+                                onCreateTag={createTag}
+                                onRenameTag={renameTag}
+                                onDeleteTag={deleteTag}
+                                countMap={filteredTagCounts.tagCountMap}
+                                onlyTaggedCount={filteredTagCounts.onlyTaggedCount}
+                            />
+                        )}
                     </div>
 
                     {/* --- VIEW ACTIONS GROUP --- */}

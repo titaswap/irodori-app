@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { HeatmapBar } from './Shared';
 import TagCell from '../../tags/TagCell';
+import KanjiBreakdownCell from './KanjiBreakdownCell';
 
 const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, hiddenColumns, revealedCells, selectedIds, isPlaying, index, isEditMode, onUpdateCell, onRevealCell, onPlaySingle, onMark, isActive, allTags, searchTags, createTag, getTagName, toggleRowTag, isAuthenticated }) => {
     if (!item) return null;
@@ -38,6 +39,17 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
             case 'tags':
                 return <TagCell item={item} toggleRowTag={toggleRowTag} allTags={allTags} searchTags={searchTags} createTag={createTag} getTagName={getTagName} isAuthenticated={isAuthenticated} isActive={isActive} />;
             default:
+                // NEW: Kanji folder + breakdown column special handling
+                if (item.folderId === 'Kanji' && colId === 'breakdown') {
+                    return (
+                        <KanjiBreakdownCell
+                            value={item[colId]}
+                            isActive={isActive}
+                        />
+                    );
+                }
+
+                // EXISTING: Default cell rendering (unchanged)
                 const value = item[colId];
                 // Support array values if any (e.g. multi-select) - cast to string
                 const displayValue = (typeof value === 'object' && value !== null) ? JSON.stringify(value) : String(value || '');
@@ -47,13 +59,16 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
 
                 const isPrimary = colId === 'japanese' || colId === 'hiragana' || colId === 'Hiragana'; // Simple heuristic for bolding
 
+                // Special styling for kanji column in Kanji folder
+                const isKanjiColumn = item.folderId === 'Kanji' && colId === 'kanji';
+
                 return (
                     <td data-col-id={colId} className={`px-0 border-r border-slate-200 dark:border-white/5 ${isActive ? '!bg-[#e5f5f1] dark:!bg-transparent' : 'bg-white/40 dark:bg-white/[0.02]'} ${!shouldShowContent && !isEditMode && !isActive ? 'bg-slate-100/50 dark:bg-white/5 backdrop-blur-sm' : ''}`}>
                         {!shouldShowContent && !isEditMode ? (
                             <div onClick={() => onRevealCell(item.localId, colId)} className={`w-full h-full px-2 py-0.5 text-transparent cursor-pointer ${isActive ? '' : 'hover:bg-indigo-50 dark:hover:bg-slate-700'} flex items-center justify-center transition-colors group/cell`}><EyeOff size={16} className="text-slate-300 dark:text-slate-600 group-hover/cell:text-slate-500 dark:group-hover/cell:text-slate-400" /></div>
                         ) : (
                             isEditMode ? <input className={`w-full h-full px-2 py-0.5 bg-transparent outline-none text-sm border-2 border-transparent focus:border-primary focus:bg-primary/10 transition-all text-slate-900 dark:text-text-main`} value={displayValue} onChange={(e) => onUpdateCell(item.localId, colId, e.target.value)} /> :
-                                <div className={`w-full h-full px-2 py-0.5 flex items-center text-sm leading-tight ${isPrimary ? 'font-bold text-slate-800 dark:text-[#e5e7eb]' : 'text-slate-600 dark:text-[#cbd5e1]'} ${isActive ? 'text-slate-900 font-bold dark:text-indigo-100' : ''}`}>{displayValue}</div>
+                                <div className={`w-full h-full px-2 py-0.5 flex items-center leading-tight ${isKanjiColumn ? 'text-[1.25rem] font-bold text-slate-900 dark:text-[#e5e7eb]' : isPrimary ? 'text-sm font-bold text-slate-800 dark:text-[#e5e7eb]' : 'text-sm text-slate-600 dark:text-[#cbd5e1]'} ${isActive ? 'text-slate-900 font-bold dark:text-indigo-100' : ''}`}>{displayValue}</div>
                         )}
                     </td>
                 );

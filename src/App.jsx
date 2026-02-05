@@ -25,6 +25,7 @@ function App() {
 
     const [vocabList, setVocabList] = useState([]);
     const [folders, setFolders] = useState([]);
+    const [headersBySheet, setHeadersBySheet] = useState({});
     const [currentFolderId, setCurrentFolderId] = useState(() => uiStateStorage.loadCurrentFolder());
 
     // Save folder selection
@@ -88,14 +89,13 @@ function App() {
     }, []);
 
     // Helper: Load from LocalStorage (now in dataService.js)
-    const loadLocalDataWrapper = () => loadLocalData(setVocabList, setFolders, setIsLoading);
+    const loadLocalDataWrapper = () => loadLocalData(setVocabList, setFolders, setIsLoading, setHeadersBySheet);
 
     const apiService = createApiService();
 
-
-
+    // Helper: Fetch from Google Sheets
     const fetchSheetDataWrapper = async (silent = false) => {
-        await fetchSheetData(silent, vocabList, setIsLoading, setVocabList, setFolders);
+        await fetchSheetData(silent, vocabList, setIsLoading, setVocabList, setFolders, setHeadersBySheet);
     };
 
     // Save to LocalStorage whenever list changes
@@ -435,6 +435,7 @@ function App() {
                         setVocabList={setVocabList}
                         folders={folders}
                         setFolders={setFolders}
+                        headersBySheet={headersBySheet}
                         currentFolderId={currentFolderId}
                         setCurrentFolderId={setCurrentFolderId}
                         isLoading={isLoading}

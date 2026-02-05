@@ -8,13 +8,26 @@ import { fetchAllProgress } from '../../services/firestore/activityService';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXyfE5aiGFaLh9MfX_4oxHLS9J_I6K8pyoHgUmJQZDmbqECS19Q8lGsOUxBFADWthh_Q/exec';
 
-export function loadLocalData(setVocabList, setFolders, setIsLoading) {
+export function loadLocalData(setVocabList, setFolders, setIsLoading, setHeadersBySheet) {
     const saved = localStorage.getItem('vocabList');
+    const savedHeaders = localStorage.getItem('headersBySheet');
+
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
                 setVocabList(parsed);
+
+                // Load headers if available
+                if (savedHeaders) {
+                    try {
+                        const headers = JSON.parse(savedHeaders);
+                        setHeadersBySheet(headers);
+                        console.log("[App] Loaded headers by sheet from localStorage:", headers);
+                    } catch (e) {
+                        console.error("Failed to parse saved headers", e);
+                    }
+                }
 
                 // Generate folders immediately
                 const uniqueBooks = [...new Set(parsed.map(item => item.book))].filter(b => b);
@@ -35,7 +48,7 @@ export function loadLocalData(setVocabList, setFolders, setIsLoading) {
     return false;
 }
 
-export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabList, setFolders) {
+export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabList, setFolders, setHeadersBySheet) {
     if (!silent && vocabList.length === 0) setIsLoading(true);
 
     try {
@@ -49,11 +62,19 @@ export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabLi
 
         const json = await response.json();
         let rawData = [];
+        const headersBySheet = {};
 
         // Handle new script response: { "Sheet1": [...], "Sheet2": [...] }
         if (typeof json === 'object' && !Array.isArray(json) && !json.data) {
             Object.keys(json).forEach(sheetName => {
-                if (Array.isArray(json[sheetName])) {
+                if (Array.isArray(json[sheetName]) && json[sheetName].length > 0) {
+                    // Extract headers from first row of this sheet
+                    const firstRow = json[sheetName][0];
+                    const sheetHeaders = Object.keys(firstRow).filter(key =>
+                        key && key.trim() !== '' && !['id', 'is_problem'].includes(key) // Exclude system fields and empty keys
+                    );
+                    headersBySheet[sheetName] = sheetHeaders;
+
                     json[sheetName].forEach(row => {
                         rawData.push({ ...row, book: sheetName });
                     });
@@ -116,6 +137,13 @@ export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabLi
             }
 
             setVocabList(mappedData);
+
+            // Store headers by sheet
+            if (Object.keys(headersBySheet).length > 0) {
+                setHeadersBySheet(headersBySheet);
+                localStorage.setItem('headersBySheet', JSON.stringify(headersBySheet));
+                console.log("[App] Stored headers by sheet:", headersBySheet);
+            }
         } else {
             console.error("Unexpected data format:", json);
         }

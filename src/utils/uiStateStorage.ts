@@ -44,6 +44,10 @@ export const uiStateStorage = {
         uiStateStorage.save(UI_STATE_KEYS.CANDO_FILTER, candos);
     },
     
+    saveBookFilter: (book: string | string[]): void => {
+        uiStateStorage.save(UI_STATE_KEYS.BOOK_FILTER, book);
+    },
+    
     saveViewMode: (mode: string): void => {
         uiStateStorage.save(UI_STATE_KEYS.VIEW_MODE, mode);
     },
@@ -64,6 +68,10 @@ export const uiStateStorage = {
     
     loadCandoFilter: (): string[] => {
         return uiStateStorage.load(UI_STATE_KEYS.CANDO_FILTER, UI_STATE_DEFAULTS.CANDO_FILTER);
+    },
+    
+    loadBookFilter: (): string | string[] => {
+        return uiStateStorage.load(UI_STATE_KEYS.BOOK_FILTER, UI_STATE_DEFAULTS.BOOK_FILTER);
     },
     
     loadViewMode: (): string => {

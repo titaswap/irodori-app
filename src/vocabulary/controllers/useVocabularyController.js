@@ -27,6 +27,7 @@ export function useVocabularyController({
     vocabList,
     setVocabList,
     folders,
+    headersBySheet,
     currentFolderId,
     setCurrentFolderId,
     isLoading,
@@ -95,6 +96,7 @@ export function useVocabularyController({
         currentAudioRowId
     } = useVocabularyViewModel({
         vocabList,
+        headersBySheet,
         currentFolderId,
         displayData,
         currentPage,
@@ -119,7 +121,8 @@ export function useVocabularyController({
         setColumnWidths,
         itemsPerPage,
         setItemsPerPage,
-        preferenceStore
+        preferenceStore,
+        currentFolderId // ✅ Pass currentFolderId
     });
 
     // --- PAGINATION RESET ---

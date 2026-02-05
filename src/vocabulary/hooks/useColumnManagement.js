@@ -3,7 +3,8 @@
  * Manages column order synchronization and preference hydration
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { loadFolderConfig, saveFolderConfig } from '../../services/firestore/preferenceService';
 
 export function useColumnManagement({
     allColumns,
@@ -15,28 +16,95 @@ export function useColumnManagement({
     setColumnWidths,
     itemsPerPage,
     setItemsPerPage,
-    preferenceStore
+    preferenceStore,
+    currentFolderId // ✅ NEW: Dependency on folder ID
 }) {
-    // Column Order Sync - append new columns to existing order
-    useEffect(() => {
-        setColumnOrder(prev => {
-            const cleanPrev = (prev || []);
-            const existingSet = new Set(cleanPrev);
-            const newColumns = allColumns
-                .filter(c => !existingSet.has(c.id))
-                .map(c => c.id);
-            return [...cleanPrev, ...newColumns];
-        });
-    }, [allColumns, setColumnOrder]);
+    const isHydrating = useRef(false);
 
-    // Preference Hydration - sync with preferenceStore changes
+    // 1. HARD RESET & LOAD on Folder Change
+    useEffect(() => {
+        if (!currentFolderId) return;
+
+        let isMounted = true;
+        isHydrating.current = true; // Block saves while loading
+
+        const loadConfig = async () => {
+            // A. Hard Reset State (prevent leakage)
+            // We set a temporary "safe" state based on schema ONLY
+            const defaultOrder = allColumns.map(c => c.id);
+            setColumnOrder(defaultOrder);
+            setColumnVisibility({});
+            setColumnWidths({}); // Correctly reset widths to prevent leakage
+
+            // B. Fetch Folder Config
+            const savedConfig = await loadFolderConfig(currentFolderId);
+
+            if (!isMounted) return;
+
+            if (savedConfig) {
+                // C. SCHEMA VALIDATION & AUTO-HEALING
+                // 1. Validate Order
+                const safeOrder = (savedConfig.columnOrder || [])
+                    .filter(id => allColumns.some(c => c.id === id)); // Remove invalid
+
+                // Add missing columns from schema
+                const missingCols = allColumns
+                    .filter(c => !safeOrder.includes(c.id))
+                    .map(c => c.id);
+
+                const finalOrder = [...safeOrder, ...missingCols];
+
+                if (finalOrder.length > 0) setColumnOrder(finalOrder);
+
+                // 2. Validate Visibility (Active Keys Only)
+                if (savedConfig.columnVisibility) {
+                    const safeVis = {};
+                    Object.keys(savedConfig.columnVisibility).forEach(key => {
+                        if (allColumns.some(c => c.id === key)) {
+                            safeVis[key] = savedConfig.columnVisibility[key];
+                        }
+                    });
+                    setColumnVisibility(safeVis);
+                }
+
+                // 3. Widths (Less critical, but good to load)
+                if (savedConfig.columnWidths) {
+                    setColumnWidths(savedConfig.columnWidths);
+                }
+            } else {
+                // No config? Ensure default schema order is set (already done in reset, but confirm)
+                setColumnOrder(defaultOrder);
+            }
+
+            isHydrating.current = false; // Enable saves
+        };
+
+        loadConfig();
+
+        return () => { isMounted = false; };
+    }, [currentFolderId, allColumns, setColumnOrder, setColumnVisibility, setColumnWidths]);
+
+    // 2. SAVE on Change (Debounced)
+    useEffect(() => {
+        if (isHydrating.current || !currentFolderId) return;
+
+        const timer = setTimeout(() => {
+            saveFolderConfig(currentFolderId, {
+                columnOrder,
+                columnVisibility,
+                columnWidths
+            });
+        }, 1000); // 1s debounce
+
+        return () => clearTimeout(timer);
+    }, [columnOrder, columnVisibility, columnWidths, currentFolderId]);
+
+    // 3. Global Preferences (Items Per Page only) - Keep existing logic for non-column prefs
     useEffect(() => {
         const unsubscribe = preferenceStore.subscribe((prefs) => {
             if (prefs.itemsPerPage !== itemsPerPage) setItemsPerPage(prefs.itemsPerPage);
-            if (JSON.stringify(prefs.columnOrder) !== JSON.stringify(columnOrder)) setColumnOrder(prefs.columnOrder);
-            if (JSON.stringify(prefs.columnVisibility) !== JSON.stringify(columnVisibility)) setColumnVisibility(prefs.columnVisibility);
-            if (JSON.stringify(prefs.columnWidths) !== JSON.stringify(columnWidths)) setColumnWidths(prefs.columnWidths);
+            // Removed global column sync
         });
         return () => unsubscribe();
-    }, [itemsPerPage, columnOrder, columnVisibility, columnWidths, setItemsPerPage, setColumnOrder, setColumnVisibility, setColumnWidths, preferenceStore]);
+    }, [itemsPerPage, setItemsPerPage, preferenceStore]);
 }

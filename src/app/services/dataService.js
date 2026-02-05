@@ -90,9 +90,15 @@ export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabLi
                 } catch (e) { console.error("Merge error", e); }
             }
 
-            // Overlay Firestore progress
+            // Overlay Firestore progress with timeout protection
             try {
-                const firestoreProgress = await fetchAllProgress();
+                const progressPromise = fetchAllProgress();
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Firestore timeout')), 3000)
+                );
+
+                const firestoreProgress = await Promise.race([progressPromise, timeoutPromise]);
+
                 if (firestoreProgress && Object.keys(firestoreProgress).length > 0) {
                     mappedData.forEach(item => {
                         if (item.id && firestoreProgress[item.id]) {
@@ -106,7 +112,7 @@ export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabLi
                     console.log("[App] Merged Firestore progress into vocabList");
                 }
             } catch (e) {
-                console.error("[App] Failed to merge Firestore progress", e);
+                console.warn("[App] Firestore progress skipped (offline/timeout):", e.message);
             }
 
             setVocabList(mappedData);

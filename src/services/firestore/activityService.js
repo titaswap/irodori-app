@@ -27,7 +27,14 @@ export const fetchAllProgress = async () => {
     try {
         console.log(`[Firestore] Fetching learning progress for ${userId}`);
         const colRef = collection(db, "users", userId, "progress");
-        const snapshot = await getDocs(colRef);
+
+        // Add timeout protection to prevent blocking when offline
+        const snapshotPromise = getDocs(colRef);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('getDocs timeout')), 2000)
+        );
+
+        const snapshot = await Promise.race([snapshotPromise, timeoutPromise]);
 
         const progressMap = {};
         if (snapshot.empty) {
@@ -42,7 +49,7 @@ export const fetchAllProgress = async () => {
         console.log(`[Firestore] Loaded ${Object.keys(progressMap).length} progress items.`);
         return progressMap;
     } catch (e) {
-        console.error("[Firestore] Failed to fetch progress", e);
+        console.warn("[Firestore] Progress fetch skipped (offline/timeout):", e.message);
         return {};
     }
 };

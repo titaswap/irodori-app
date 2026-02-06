@@ -36,10 +36,11 @@ export function useVocabularyViewModel({
         let currentHeaders = [];
 
         if (currentFolderId === 'root') {
-            // Root folder: Show union of all headers from all sheets
+            // Root folder: Show union of headers from BOOK folders only
             const allHeadersSet = new Set();
-            Object.values(headersBySheet).forEach(headers => {
-                if (Array.isArray(headers)) {
+            Object.entries(headersBySheet).forEach(([folderId, headers]) => {
+                // Only include headers from Book folders (exclude Kanji, Note, etc.)
+                if (folderId.toLowerCase().includes('book') && Array.isArray(headers)) {
                     headers.forEach(h => allHeadersSet.add(h));
                 }
             });

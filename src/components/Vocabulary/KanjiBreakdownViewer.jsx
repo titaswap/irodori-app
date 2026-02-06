@@ -8,8 +8,35 @@ import { X } from 'lucide-react';
  * - No dynamic height calculations
  * - No mouse position tracking
  * - Renders content ONLY ONCE when opened
+ * 
+ * PORTAL DARK MODE FIX: Since this renders via Portal to document.body,
+ * it doesn't inherit the 'dark' class. We use useEffect to detect dark mode.
  */
 const KanjiBreakdownViewer = React.memo(({ isOpen, text, onClose }) => {
+    // Track dark mode state (Portal doesn't inherit dark class)
+    const [isDark, setIsDark] = React.useState(
+        () => document.documentElement.classList.contains('dark')
+    );
+
+    // Watch for dark mode changes
+    React.useEffect(() => {
+        const checkDarkMode = () => {
+            setIsDark(document.documentElement.classList.contains('dark'));
+        };
+
+        // Initial check
+        checkDarkMode();
+
+        // Watch for class changes on html element
+        const observer = new MutationObserver(checkDarkMode);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
     // Memoize close handler to prevent re-renders
     const handleClose = useCallback(() => {
         onClose();
@@ -86,21 +113,22 @@ const KanjiBreakdownViewer = React.memo(({ isOpen, text, onClose }) => {
                             </button>
                         </div>
 
-                        {/* Content - STABLE, overflow internal only */}
                         <div
                             className="flex-1 p-6"
                             style={{
                                 overflowY: 'auto',
                                 overflowX: 'hidden',
-                                maxWidth: '100%'
+                                maxWidth: '100%',
+                                color: isDark ? 'white' : '#1e293b'
                             }}
                         >
                             <div
-                                className="text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                                className="text-sm leading-relaxed"
                                 style={{
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
-                                    maxWidth: '100%'
+                                    maxWidth: '100%',
+                                    color: isDark ? 'white' : '#1e293b'
                                 }}
                             >
                                 {text || 'No breakdown available.'}
@@ -156,15 +184,17 @@ const KanjiBreakdownViewer = React.memo(({ isOpen, text, onClose }) => {
                             style={{
                                 overflowY: 'auto',
                                 overflowX: 'hidden',
-                                maxWidth: '100%'
+                                maxWidth: '100%',
+                                color: isDark ? 'white' : '#1e293b'
                             }}
                         >
                             <div
-                                className="text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                                className="text-sm leading-relaxed"
                                 style={{
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
-                                    maxWidth: '100%'
+                                    maxWidth: '100%',
+                                    color: isDark ? 'white' : '#1e293b'
                                 }}
                             >
                                 {text || 'No breakdown available.'}

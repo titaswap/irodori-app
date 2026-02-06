@@ -1,0 +1,88 @@
+/**
+ * kanji-typography.css
+ * 
+ * Dedicated typography styles for Kanji characters in the Kanji folder.
+ * Optimized for stroke detail visibility and learning.
+ * 
+ * Applied ONLY to:
+ * - Kanji folder
+ * - Kanji column
+ */
+
+/* Kanji cell typography - large, bold, clear */
+.kanji-cell {
+    font-size: 3rem !important; /* 48px */
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'Hiragino Mincho Pro', serif !important;
+    letter-spacing: 0.05em !important;
+    color: #1a1a1a !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+
+/* Dark mode support */
+.dark .kanji-cell {
+    color: #f5f5f5 !important;
+}
+
+/* Ensure proper spacing and alignment */
+.kanji-cell-container {
+    padding: 1rem 0.75rem !important;
+    min-height: 5rem !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Active/playing row - maintain visibility */
+.kanji-cell.active {
+    color: #0f172a !important;
+}
+
+.dark .kanji-cell.active {
+    color: #e0e7ff !important;
+}
+
+/* Hover state - subtle enhancement */
+.kanji-cell:hover {
+    color: #0f172a !important;
+}
+
+.dark .kanji-cell:hover {
+    color: #ffffff !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .kanji-cell {
+        font-size: 2.5rem !important; /* 40px on mobile */
+    }
+    
+    .kanji-cell-container {
+        min-height: 4rem !important;
+    }
+}
+
+@media (min-width: 1920px) {
+    .kanji-cell {
+        font-size: 4rem !important; /* 64px on large screens */
+    }
+    
+    .kanji-cell-container {
+        min-height: 6rem !important;
+    }
+}
+
+/* Kanji Breakdown Modal - Dark Mode Fix */
+/* Portal renders to body, so we need specific selector */
+.dark body > div.hidden.md\:block > div > div > div.flex-1.p-6 > div {
+    color: white !important;
+}
+
+/* Mobile version */
+.dark body > div.md\:hidden > div > div > div.flex-1.p-6 > div {
+    color: white !important;
+}

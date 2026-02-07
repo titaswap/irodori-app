@@ -61,7 +61,14 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
                 const isPrimary = colId === 'japanese' || colId === 'hiragana' || colId === 'Hiragana'; // Simple heuristic for bolding
 
                 // Special styling for kanji column in Kanji folder
-                const isKanjiColumn = item.folderId === 'Kanji' && colId === 'Kanji';
+                const KANJI_FOLDERS = ['Kanji', 'Kanji 660'];
+                const KANJI_COLUMNS = ['Kanji', 'Kanji Word']; // পরে চাইলে আরো add করবে
+
+                const isKanjiColumn =
+                    KANJI_FOLDERS.includes(item.folderId) &&
+                    KANJI_COLUMNS.includes(colId);
+
+
 
                 return (
                     <td data-col-id={colId} className={`px-0 border-r border-slate-200 dark:border-white/5 ${isActive ? '!bg-[#e5f5f1] dark:!bg-transparent' : 'bg-white/40 dark:bg-white/[0.02]'} ${!shouldShowContent && !isEditMode && !isActive ? 'bg-slate-100/50 dark:bg-white/5 backdrop-blur-sm' : ''} ${isKanjiColumn ? 'kanji-cell-container' : ''}`}>

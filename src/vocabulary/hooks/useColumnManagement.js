@@ -88,7 +88,8 @@ export function useColumnManagement({
         loadConfig();
 
         return () => { isMounted = false; };
-    }, [currentFolderId, allColumns, setColumnOrder, setColumnVisibility, setColumnWidths]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentFolderId]);
 
     // 2. SAVE on Change (Debounced)
     useEffect(() => {

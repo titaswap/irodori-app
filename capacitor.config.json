@@ -1,0 +1,8 @@
+{
+  "appId": "com.irodoriai.app",
+  "appName": "IrodoriAI",
+  "webDir": "dist",
+  "android": {
+    "path": "android_app"
+  }
+}

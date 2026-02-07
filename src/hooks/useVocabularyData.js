@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 
 export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList) => {
@@ -7,31 +6,48 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
 
     const filteredAndSortedData = useMemo(() => {
         let data = [...safeDataList];
+
         if (currentFolderId !== 'root') data = data.filter(i => i.folderId === currentFolderId);
-        if (searchTerm) { const l = searchTerm.toLowerCase(); data = data.filter(i => i.japanese.includes(l) || i.bangla.includes(l)); }
+
+        if (searchTerm) {
+            const l = searchTerm.toLowerCase();
+            data = data.filter(i => i.japanese.includes(l) || i.bangla.includes(l));
+        }
 
         // DEBUG LOGGING
-        // console.log("Filtering Debug:", {
-        //     filters,
-        //     uniqueLessons: [...new Set(data.map(i => i.lesson))],
-        //     uniqueKando: [...new Set(data.map(i => i.cando))]
-        // });
+        // console.log("Filtering Debug:", { ... });
+
+        const initialCount = data.length;
 
         if (Array.isArray(filters.lesson) && filters.lesson.length > 0) {
             // Normalize filter values to strings
             const filterStrings = filters.lesson.map(String);
-            data = data.filter(i => filterStrings.includes(String(i.lesson)));
+            data = data.filter(i => {
+                // Handle both 'Lesson' (uppercase) and 'lesson' (lowercase)
+                const lessonValue = i.Lesson !== undefined ? i.Lesson : i.lesson;
+                return filterStrings.includes(String(lessonValue));
+            });
         }
-        else if (filters.lesson !== 'all' && !Array.isArray(filters.lesson)) {
-            data = data.filter(i => String(i.lesson) === String(filters.lesson));
+        else if (filters.lesson !== 'all' && filters.lesson !== undefined && !Array.isArray(filters.lesson)) {
+            data = data.filter(i => {
+                const lessonValue = i.Lesson !== undefined ? i.Lesson : i.lesson;
+                return String(lessonValue) === String(filters.lesson);
+            });
         }
 
         if (Array.isArray(filters.cando) && filters.cando.length > 0) {
             const filterStrings = filters.cando.map(String);
-            data = data.filter(i => filterStrings.includes(String(i.cando)));
+            data = data.filter(i => {
+                // Handle both 'Cando' (uppercase) and 'cando' (lowercase)
+                const candoValue = i.Cando !== undefined ? i.Cando : i.cando;
+                return filterStrings.includes(String(candoValue));
+            });
         }
-        else if (filters.cando !== 'all' && !Array.isArray(filters.cando)) {
-            data = data.filter(i => String(i.cando) === String(filters.cando));
+        else if (filters.cando !== 'all' && filters.cando !== undefined && !Array.isArray(filters.cando)) {
+            data = data.filter(i => {
+                const candoValue = i.Cando !== undefined ? i.Cando : i.cando;
+                return String(candoValue) === String(filters.cando);
+            });
         }
 
         // Book filter (for sheets that have book column)
@@ -43,7 +59,8 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
                 return filterStrings.includes(String(bookValue));
             });
         }
-        else if (filters.book !== 'all' && !Array.isArray(filters.book)) {
+        // FIXED: Check for undefined to prevent filtering out all items when key is missing (e.g. Book folders)
+        else if (filters.book !== 'all' && filters.book !== undefined && !Array.isArray(filters.book)) {
             data = data.filter(i => {
                 const bookValue = i.Book !== undefined ? i.Book : i.book;
                 return String(bookValue) === String(filters.book);

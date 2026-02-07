@@ -36,6 +36,11 @@ export function useVocabularyActions({
     const handleFolderChange = (id) => attemptAction(() => {
         startTransition(() => {
             setCurrentFolderId(id);
+            // Reset viewMode to 'all' when changing folders to prevent
+            // marked-only view from carrying over to folders with no marked items
+            if (viewMode !== 'all') {
+                setViewMode('all');
+            }
         });
     });
     const handleFilterChange = (f) => attemptAction(() => setFilters(f));

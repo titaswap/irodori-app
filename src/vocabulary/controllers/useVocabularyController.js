@@ -22,6 +22,7 @@ import { useDeleteHandler } from '../handlers/useDeleteHandler';
 import { useEditFlowHandler } from '../handlers/useEditFlowHandler';
 import { useVocabularyModals } from '../handlers/useVocabularyModals';
 import { useVocabularyViewModel } from '../hooks/useVocabularyViewModel';
+import { useGroupFilters } from '../../hooks/useGroupFilters';
 
 export function useVocabularyController({
     vocabList,
@@ -52,13 +53,21 @@ export function useVocabularyController({
         isColumnManagerOpen, setIsColumnManagerOpen,
         isMobileSidebarOpen, setIsMobileSidebarOpen,
         sortConfig, setSortConfig,
-        filters, setFilters,
+        filters: placeholderFilters, setFilters: placeholderSetFilters,
         searchTerm,
         viewMode, setViewMode,
         selectedIds, setSelectedIds,
         currentPage, setCurrentPage,
         itemsPerPage, setItemsPerPage
     } = useVocabularyState();
+
+    // --- GROUP-BASED FILTER MANAGEMENT ---
+    // Override placeholder filter state with group-based filters
+    const {
+        filters,
+        setFilters,
+        currentGroup
+    } = useGroupFilters(currentFolderId, folders);
 
     // --- DATA PROCESSING ---
     const { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(

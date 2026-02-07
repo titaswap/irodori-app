@@ -75,24 +75,16 @@ export function useVocabularyState() {
 
     // Filter and Sort State
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-    const [filters, setFilters] = useState(() => ({
-        lesson: uiStateStorage.loadLessonFilter(),
-        cando: uiStateStorage.loadCandoFilter(),
-        book: uiStateStorage.loadBookFilter(),
-        tags: tagFilterStorage.load()
-    }));
 
-    useEffect(() => {
-        uiStateStorage.saveLessonFilter(filters.lesson);
-    }, [filters.lesson]);
-
-    useEffect(() => {
-        uiStateStorage.saveCandoFilter(filters.cando);
-    }, [filters.cando]);
-
-    useEffect(() => {
-        uiStateStorage.saveBookFilter(filters.book);
-    }, [filters.book]);
+    // NOTE: Filter state is now managed by useGroupFilters hook in the controller
+    // This provides group-based filter isolation (Kanji/Book/Other groups)
+    // Keeping this placeholder for backward compatibility during migration
+    const [filters, setFilters] = useState({
+        lesson: [],
+        cando: [],
+        book: 'all',
+        tags: []
+    });
 
     const [searchTerm] = useState('');
     const [viewMode, setViewMode] = useState(() => uiStateStorage.loadViewMode());
@@ -102,11 +94,6 @@ export function useVocabularyState() {
     }, [viewMode]);
 
     const [selectedIds, setSelectedIds] = useState(new Set());
-
-    // Save tag filters
-    useEffect(() => {
-        tagFilterStorage.save(filters.tags);
-    }, [filters.tags]);
 
     // Practice Mode State
     const [practiceQueue, setPracticeQueue] = useState([]);

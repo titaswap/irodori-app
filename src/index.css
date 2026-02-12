@@ -196,3 +196,21 @@
 *::after {
   border-style: none !important;
 }
+
+/* Selection Column Safeguard */
+.selection-column {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    white-space: nowrap;
+}
+
+/* English Column Safeguard - User Requested Hard Lock */
+td[data-col-id="english"],
+th[data-col-id="english"],
+td[data-col-id="English"],
+th[data-col-id="English"] {
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+}

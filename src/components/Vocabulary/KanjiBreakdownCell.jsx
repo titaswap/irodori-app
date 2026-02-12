@@ -24,9 +24,9 @@ const KanjiBreakdownCell = ({ value, isActive }) => {
 
     return (
         <>
-            <td
+            <div
                 data-col-id="breakdown"
-                className={`px-0 border-r border-slate-200 dark:border-white/5 ${isActive
+                className={`w-full h-full px-0 border-r border-slate-200 dark:border-white/5 ${isActive
                     ? '!bg-[#e5f5f1] dark:!bg-transparent'
                     : 'bg-white/40 dark:bg-white/[0.02]'
                     }`}
@@ -36,7 +36,7 @@ const KanjiBreakdownCell = ({ value, isActive }) => {
                     onViewClick={handleViewClick}
                     isActive={isActive}
                 />
-            </td>
+            </div>
             {/* CRITICAL: Panel rendered via Portal to document.body (outside table) */}
             {isPanelOpen && createPortal(
                 <KanjiBreakdownPanel

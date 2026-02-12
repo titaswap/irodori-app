@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { getMinWidth, getMaxWidth, isAutoWidth } from '../../config/tableConfig';
 
 const DynamicHeader = ({
   colId,
@@ -28,6 +29,14 @@ const DynamicHeader = ({
      RESIZE LOGIC (OPTIMIZED)
   ========================= */
   const handleMouseDown = (e) => {
+    // DIRECT FIX: Always allow resize for Bangla and English columns
+    const ALWAYS_RESIZABLE = ['bangla', 'english', 'Bangla', 'English'];
+    const isAlwaysResizable = ALWAYS_RESIZABLE.includes(colId);
+
+    // STEP 3: Disable resize for autoWidth columns (except always resizable ones)
+    if (!isAlwaysResizable && isAutoWidth(colId)) {
+      return; // No resizing for content-based columns
+    }
     e.preventDefault();
     e.stopPropagation();
 
@@ -73,13 +82,67 @@ const DynamicHeader = ({
   /* =========================
      HEADER RENDER
   ========================= */
+  // Determine if this column uses auto-width
+  const useAutoWidth = isAutoWidth(colId);
+
+  // DIRECT FIX: Force specific widths for icon columns (audio, isMarked)
+  const getHeaderStyle = () => {
+    if (colId === 'audio') {
+      return { width: '44px', minWidth: '44px', maxWidth: '44px' };
+    }
+    if (colId === 'isMarked') {
+      return { width: '40px', minWidth: '40px', maxWidth: '40px' };
+    }
+    // DIRECT FIX: Force specific width for Bangla column (bypassing config caching)
+    // To change Bangla width, edit these values directly:
+    if (colId === 'bangla' || colId === 'Bangla') {
+      return { width: '200px', minWidth: '200px', maxWidth: '200px' };
+    }
+    // DIRECT FIX: Compact width for selection column
+    if (colId === 'selection') {
+      return { width: '48px', minWidth: '48px', maxWidth: '48px' };
+    }
+
+    // DIRECT FIX: Robust Book column logic (bypass config cache + allow resize)
+    if (colId === 'book' || colId === 'Book') {
+      const manual = columnWidths[colId];
+      const width = manual ? Math.max(70, Math.min(150, manual)) : 100;
+      return {
+        width: `${width}px`,
+        minWidth: '70px',
+        maxWidth: '150px'
+      };
+    }
+
+    // DIRECT FIX: Hard-lock English column to 240px
+    if (colId === 'english' || colId === 'English') {
+      return {
+        width: '240px',
+        minWidth: '240px',
+        maxWidth: '240px'
+      };
+    }
+
+    // DIRECT FIX: Compact width for metadata columns
+    if (['lesson', 'cando'].includes(colId)) {
+      return { width: '70px', minWidth: '70px', maxWidth: '70px' };
+    }
+    if (useAutoWidth) {
+      return {};
+    }
+    return {
+      minWidth: `${getMinWidth(colId)}px`,
+      maxWidth: `${getMaxWidth(colId)}px`
+    };
+  };
+
   return (
     <th
       draggable={!isFixed}
       onDragStart={(e) => !isFixed && onDragStart(e, colId)}
       onDragOver={!isFixed ? onDragOver : undefined}
       onDrop={(e) => !isFixed && onDrop(e, colId)}
-      // style={{ width: columnWidths[colId] || 160 }} // Managed by colgroup now
+      style={getHeaderStyle()}
       data-col-id={colId}
       className={`
           relative sticky top-0 z-30
@@ -111,7 +174,7 @@ const DynamicHeader = ({
       {/* =========================
           RESIZE HANDLE
          ========================= */}
-      {!isFixed && (
+      {!isFixed && !isAutoWidth(colId) && (
         <div
           onMouseDown={handleMouseDown}
           className="

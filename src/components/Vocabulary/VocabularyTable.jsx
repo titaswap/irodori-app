@@ -1,6 +1,7 @@
 import React from 'react';
 import SheetRow from './SheetRow';
 import DynamicHeader from './DynamicHeader';
+import { getEffectiveWidth, getMinWidth, getMaxWidth, isAutoWidth } from '../../config/tableConfig';
 
 function VocabularyTable({
     columnOrder,
@@ -41,21 +42,36 @@ function VocabularyTable({
 }) {
     return (
         <div className={`mx-2 md:mx-6 mb-6 ${isTableHoverLocked ? 'table-hover-locked' : ''}`}>
-            <table className="w-full border-collapse bg-transparent text-sm table-auto bg-white dark:bg-[#080a1c]/60 border border-slate-300 dark:border-white/5 rounded-[1.5rem] shadow-sm">
+            <table
+                className="w-full border-collapse bg-transparent text-sm bg-white dark:bg-[#080a1c]/60 border border-slate-300 dark:border-white/5 rounded-[1.5rem] shadow-sm"
+            >
                 <colgroup>
-                    {columnOrder.map(colId => {
+                    {columnOrder.map((colId) => {
                         const def = allColumns.find(c => c.id === colId);
                         if (!def || (def.editOnly && !isEditMode) || columnVisibility[colId] === false) return null;
 
-                        let width = columnWidths[colId];
-                        if (!width) {
-                            const twMap = { 'w-10': 40, 'w-12': 48, 'w-16': 64, 'w-20': 80, 'w-24': 96, 'w-32': 128, 'w-40': 160, 'w-48': 192, 'w-64': 256 };
-                            const match = def.width && typeof def.width === 'string' && def.width.match(/w-(\d+)/);
-                            if (twMap[def.width]) width = twMap[def.width];
-                            else if (match) width = parseInt(match[1]) * 4;
-                            else width = 160;
+                        // DIRECT FIX: Hard-lock English column to 240px
+                        if (colId === 'english' || colId === 'English') {
+                            return <col key={colId} id={`col-${colId}`} style={{ width: '240px', minWidth: '240px', maxWidth: '240px' }} />;
                         }
-                        return <col key={colId} id={`col-${colId}`} style={{ width: width }} />;
+
+                        // Get effective width (undefined for autoWidth columns)
+                        const width = getEffectiveWidth(colId, columnWidths);
+
+                        // Auto-width columns: no style, let content determine size
+                        if (width === undefined) {
+                            return <col key={colId} id={`col-${colId}`} />;
+                        }
+
+                        // Fixed-width columns: apply width constraints
+                        const minWidth = getMinWidth(colId);
+                        const maxWidth = getMaxWidth(colId);
+
+                        return <col key={colId} id={`col-${colId}`} style={{
+                            width: `${width}px`,
+                            minWidth: `${minWidth}px`,
+                            maxWidth: `${maxWidth}px`
+                        }} />;
                     })}
                 </colgroup>
                 <thead className="z-10 shadow-sm">

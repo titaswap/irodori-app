@@ -14,13 +14,14 @@ export const INTERNAL_KEYS = new Set([
 ]);
 
 export const FIXED_SYSTEM_COLUMNS = [
-    { id: 'isMarked', label: '❗', width: 'w-12', type: 'action', },
-    { id: 'audio', label: '🔊', width: 'w-12', type: 'action', },
-    { id: 'tags', label: 'TAG', width: 'w-32', type: 'tags', },
+    { id: 'isMarked', label: '❗', width: 'w-12', defaultWidth: 80, type: 'action', },
+    { id: 'audio', label: '🔊', width: 'w-12', defaultWidth: 80, type: 'action', },
+    { id: 'tags', label: 'TAG', width: 'w-32', defaultWidth: 180, type: 'tags', },
 ];
 
-export const SELECTION_COLUMN = { id: 'selection', label: '#', width: 'w-10', type: 'system', fixed: 'left' };
+export const SELECTION_COLUMN = { id: 'selection', label: '#', width: 'w-10', defaultWidth: 48, type: 'system', fixed: 'left' };
 // export const DELETE_COLUMN = { id: 'delete', label: '🗑', width: 'w-12', type: 'action', editOnly: true, fixed: 'right' };
+
 
 // --- HELPERS ---
 export const mapToSheet = (item) => {

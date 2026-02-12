@@ -6,6 +6,8 @@
 
 import { useMemo } from 'react';
 import { INTERNAL_KEYS, FIXED_SYSTEM_COLUMNS, SELECTION_COLUMN } from '../../utils/vocabularyUtils';
+import { getDefaultWidth, getMinWidth, getMaxWidth, shouldWrap } from '../../config/tableConfig';
+
 
 export function useVocabularyViewModel({
     vocabList,
@@ -59,14 +61,20 @@ export function useVocabularyViewModel({
                 .filter(key => key !== 'japanese' || !first._isSyntheticJapanese);
         }
 
-        // Map headers to column definitions
-        dynamicCols = currentHeaders.map(key => ({
-            id: key,
-            label: key,
-            width: 'min-w-[140px]',
-            type: 'text',
-            sortable: true
-        }));
+        // Map headers to column definitions with centralized config
+        dynamicCols = currentHeaders.map(key => {
+            return {
+                id: key,
+                label: key,
+                defaultWidth: getDefaultWidth(key),
+                minWidth: getMinWidth(key),
+                maxWidth: getMaxWidth(key),
+                wrap: shouldWrap(key),
+                width: 'min-w-[140px]', // Keep for backward compatibility
+                type: 'text',
+                sortable: true
+            };
+        });
 
         return [SELECTION_COLUMN, ...dynamicCols, ...FIXED_SYSTEM_COLUMNS];
     }, [vocabList, currentFolderId, headersBySheet]);

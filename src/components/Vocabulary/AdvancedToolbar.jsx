@@ -286,7 +286,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                     {/* Status Indicators (Folder Nav removed) */}
                     {hasUnsavedChanges && !isSyncing && <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse flex-shrink-0" title="Unsaved Changes"></div>}
 
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 bg-slate-200/60 dark:bg-[#0a0c20]/50 rounded-2xl p-0.5 border border-slate-300 dark:border-white/5 flex-shrink-0">
                         {availableFilters.hasLesson && (
                             <MultiSelectDropdown
                                 label="Lesson"
@@ -371,20 +371,19 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                     </div>
 
                     {/* --- VIEW ACTIONS GROUP --- */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div className="flex items-center gap-0.5 bg-slate-200/60 dark:bg-[#0a0c20]/50 rounded-2xl p-0.5 border border-slate-300 dark:border-white/5 flex-shrink-0">
                         {showMarked && (
                             <button
                                 onClick={() => onViewModeChange('problem')}
-                                className={`flex items-center justify-center gap-1 h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${viewMode === 'problem' ? 'bg-primary text-white shadow-sm shadow-primary/20 border-transparent' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'} active:scale-95`}
+                                className={`flex items-center justify-center gap-1 h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${viewMode === 'problem' ? 'bg-transparent border border-primary text-primary dark:text-primary hover:bg-primary/10' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                 title="Toggle Marked View"
                             >
-                                <span className="material-symbols-outlined text-sm text-primary-glow mr-0.5">info</span>
+                                <span className="material-symbols-outlined text-sm mr-0.5">info</span>
                                 <span className={viewMode === 'problem' ? "inline" : "hidden md:inline"}>Marked</span>
                             </button>
                         )}
                     </div>
 
-                    <div className="h-5 w-px bg-slate-200 dark:bg-white/5 mx-1 flex-shrink-0"></div>
 
                     {/* --- PLAYBACK GROUP --- */}
                     {!isEditMode && (
@@ -414,17 +413,17 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
 
                     {/* --- LANGUAGE TOGGLE (Segmented Control) --- */}
                     {showLanguages && (
-                        <div className="flex gap-1 ml-1 flex-shrink-0">
+                        <div className="flex gap-0.5 ml-1 flex-shrink-0 bg-slate-200/60 dark:bg-[#0a0c20]/50 rounded-2xl p-0.5 border border-slate-300 dark:border-white/5">
                             <button
                                 onClick={() => onVisibilityToggle('bangla')}
-                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.bangla ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
+                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.bangla ? 'bg-transparent border border-primary text-primary dark:text-primary hover:bg-primary/10' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                 title={!hiddenColumns.bangla ? "Hide Bangla" : "Show Bangla"}
                             >
                                 <span className="relative">BN</span>
                             </button>
                             <button
                                 onClick={() => onVisibilityToggle('japanese')}
-                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.japanese ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
+                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${hiddenColumns.japanese ? 'bg-transparent border border-primary text-primary dark:text-primary hover:bg-primary/10' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                 title={!hiddenColumns.japanese ? "Hide Japanese" : "Show Japanese"}
                             >
                                 <span className="relative">JP</span>
@@ -432,7 +431,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                             {/* NEW: Kanji Toggle */}
                             <button
                                 onClick={onToggleKanji}
-                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${!kanjiVisible ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
+                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${!kanjiVisible ? 'bg-transparent border border-primary text-primary dark:text-primary hover:bg-primary/10' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                 title={kanjiVisible ? "Hide Kanji" : "Show Kanji"}
                             >
                                 <span className="relative">KJ</span>
@@ -440,22 +439,24 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                         </div>
                     )}
 
-                    {/* Columns Button (Standalone) */}
-                    {showChips && (
-                        <button
-                            onClick={() => setShowChipPanel(!showChipPanel)}
-                            className="flex items-center justify-center gap-1 h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a] active:scale-95"
-                            title={showChipPanel ? "Hide Chips" : "Show Chips"}
-                        >
-                            {showChipPanel ? <ChevronDown size={14} /> : <ArrowRight size={14} />}
-                            <span className="hidden md:inline">Chips</span>
-                        </button>
-                    )}
-                    {showColumns && (
-                        <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]" title="Columns">
-                            <SettingsIcon size={14} />
-                        </button>
-                    )}
+                    {/* Chips & Columns Buttons */}
+                    <div className="flex items-center gap-0.5 bg-slate-200/60 dark:bg-[#0a0c20]/50 rounded-2xl p-0.5 border border-slate-300 dark:border-white/5 flex-shrink-0">
+                        {showChips && (
+                            <button
+                                onClick={() => setShowChipPanel(!showChipPanel)}
+                                className="flex items-center justify-center gap-1 h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                                title={showChipPanel ? "Hide Chips" : "Show Chips"}
+                            >
+                                {showChipPanel ? <ChevronDown size={14} /> : <ArrowRight size={14} />}
+                                <span className="hidden md:inline">Chips</span>
+                            </button>
+                        )}
+                        {showColumns && (
+                            <button onClick={() => setIsColumnManagerOpen(true)} className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Columns">
+                                <SettingsIcon size={14} />
+                            </button>
+                        )}
+                    </div>
                     {/* Search Bar (Desktop Only) */}
                     <div className="hidden md:block ml-2">
                         <SearchBar searchTerm={searchTerm} onSearch={onSearch} placeholder="Search..." />

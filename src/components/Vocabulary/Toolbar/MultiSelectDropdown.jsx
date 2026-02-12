@@ -206,15 +206,15 @@ export const MultiSelectDropdown = ({
                 className={`
                     flex items-center justify-center gap-1.5 appearance-none 
                     transition-all duration-200
-                    text-[11px] md:text-xs font-semibold 
+                    text-[11px] font-semibold 
                     rounded-full
                     focus:outline-none 
-                    ${isOpen ? 'ring-2 ring-primary/50' : ''}
-                    h-6 md:h-7 min-w-[24px] md:min-w-[80px] px-1 md:px-2 md:justify-between relative overflow-hidden group
+                    h-6 md:h-7 min-w-[24px] md:min-w-[80px] px-1 md:px-2 md:justify-between
                     ${!isAll
-                        ? 'bg-primary text-white shadow-sm shadow-primary/20'
-                        : 'bg-primary/10 border border-primary/20 text-primary dark:text-white hover:bg-primary/20'
+                        ? 'bg-transparent border border-primary text-primary dark:text-primary hover:bg-primary/10'
+                        : 'bg-transparent border border-slate-500 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-700 dark:hover:border-indigo-400/50'
                     }
+                    ${isOpen ? 'ring-2 ring-primary/50' : ''}
                 `}
             >
                 <div className="md:hidden flex items-center justify-center gap-0.5">

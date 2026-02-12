@@ -54,7 +54,7 @@ export function useVocabularyController({
         isMobileSidebarOpen, setIsMobileSidebarOpen,
         sortConfig, setSortConfig,
         filters: placeholderFilters, setFilters: placeholderSetFilters,
-        searchTerm,
+        searchTerm, setSearchTerm,
         viewMode, setViewMode,
         selectedIds, setSelectedIds,
         currentPage, setCurrentPage,
@@ -69,16 +69,14 @@ export function useVocabularyController({
         currentGroup
     } = useGroupFilters(currentFolderId, folders);
 
-    // --- DATA PROCESSING ---
-    const { filteredAndSortedData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
-        vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList
-    );
-
-    const displayData = filteredAndSortedData;
-
     // --- TAG MANAGEMENT ---
     const { allTags, searchTags, createTag, renameTag, deleteTag, getTagName } = useTags(vocabList, setVocabList, user);
     const { toggleRowTag } = useRowTags(vocabList, setVocabList, showToast);
+
+    // --- DATA PROCESSING ---
+    const { filteredAndSortedData: displayData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
+        vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList, allTags
+    );
 
     // --- STATS ---
     const { showingCount, totalCount } = useResultStats(vocabList, displayData, currentFolderId);
@@ -203,7 +201,7 @@ export function useVocabularyController({
         practiceModeActive,
         setPracticeModeActive
     } = usePracticeMode({
-        filteredAndSortedData,
+        filteredAndSortedData: displayData,
         vocabList,
         showToast,
         attemptAction
@@ -469,6 +467,10 @@ export function useVocabularyController({
         setToast,
 
         // Auth
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
+
+        // Search
+        searchTerm,
+        setSearchTerm // Exposed for SearchBar
     };
 }

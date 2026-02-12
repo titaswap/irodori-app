@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         WebView.setWebContentsDebuggingEnabled(true);
         
         // Load Local Assets (Offline/Dev Mode)
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.loadUrl("file:///android_asset/public/index.html");
     }
 
     @Override

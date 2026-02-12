@@ -6,8 +6,9 @@ import {
 } from 'lucide-react';
 import { FilterChipBar } from './Toolbar/FilterChipBar';
 import { MultiSelectDropdown } from './Toolbar/MultiSelectDropdown';
+import SearchBar from './SearchBar';
 
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags, kanjiVisible, onToggleKanji, searchTerm, onSearch }) => {
     const [showChipPanel, setShowChipPanel] = useState(false);
 
     const containerRef = React.useRef(null);
@@ -238,14 +239,20 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
         <div className="bg-slate-50 dark:bg-[#030413] border-b border-slate-300 dark:border-white/5 flex flex-col flex-shrink-0 z-20 sticky top-0 max-w-[100vw] shadow-sm">
 
             {/* --- ROW 1: MOBILE ONLY (Logo & Menu) --- */}
-            <div className="md:hidden flex items-center justify-between px-3 py-1 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                <div className="flex items-center gap-1.5">
+            <div className="md:hidden flex items-center justify-between px-3 py-1 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white gap-2">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
                     <div className="w-7 h-7 bg-indigo-600 rounded flex-shrink-0 flex items-center justify-center font-bold text-base shadow-lg text-white">あ</div>
-                    <span className="font-bold text-base tracking-tight leading-none">Irodori<span className="text-indigo-500">AI</span></span>
+                    <span className="font-bold text-base tracking-tight leading-none hidden sm:inline">Irodori<span className="text-indigo-500">AI</span></span>
                 </div>
-                <div className="flex items-center gap-2">
+
+                {/* Mobile Search Bar */}
+                <div className="flex-1 min-w-0 max-w-[200px]">
+                    <SearchBar searchTerm={searchTerm} onSearch={onSearch} placeholder="Search..." />
+                </div>
+
+                <div className="flex items-center gap-2 flex-shrink-0">
                     <div className="text-[10px] text-slate-400 font-mono text-right leading-none flex flex-col gap-0.5">
-                        <div className="font-bold text-slate-700 dark:text-white max-w-[100px] truncate">{currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}</div>
+                        <div className="font-bold text-slate-700 dark:text-white max-w-[80px] truncate">{currentFolderId === 'root' ? 'My Drive' : folders.find(f => f.id === currentFolderId)?.name || '...'}</div>
                         <div className="opacity-80">{showingCount} / {totalCount}</div>
                     </div>
                     {setIsMobileSidebarOpen && (
@@ -422,6 +429,14 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                             >
                                 <span className="relative">JP</span>
                             </button>
+                            {/* NEW: Kanji Toggle */}
+                            <button
+                                onClick={onToggleKanji}
+                                className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${!kanjiVisible ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-slate-200 dark:bg-[#121432] border border-slate-400 dark:border-[#2d3269] text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-[#1a1d4a]'}`}
+                                title={kanjiVisible ? "Hide Kanji" : "Show Kanji"}
+                            >
+                                <span className="relative">KJ</span>
+                            </button>
                         </div>
                     )}
 
@@ -441,6 +456,11 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                             <SettingsIcon size={14} />
                         </button>
                     )}
+                    {/* Search Bar (Desktop Only) */}
+                    <div className="hidden md:block ml-2">
+                        <SearchBar searchTerm={searchTerm} onSearch={onSearch} placeholder="Search..." />
+                    </div>
+
                     {/* Desktop Folder Info (Right aligned) */}
                     <div className="hidden md:flex items-center gap-2 ml-auto mr-2 px-4 py-2 bg-slate-200/80 dark:bg-slate-900/60 border border-slate-400 dark:border-primary/40 rounded-full shadow-lg backdrop-blur-md relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>

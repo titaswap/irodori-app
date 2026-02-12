@@ -12,6 +12,7 @@ import AdvancedToolbar from './components/Vocabulary/AdvancedToolbar';
 import ColumnManager from './components/Vocabulary/ColumnManager';
 import ImportModal from './components/Vocabulary/ImportModal';
 import Sidebar from './components/Vocabulary/Sidebar';
+import SearchBar from './components/Vocabulary/SearchBar';
 import PaginationControls from './components/Vocabulary/PaginationControls';
 import PracticeModeView from './components/Vocabulary/PracticeModeView';
 import VocabularyTable from './components/Vocabulary/VocabularyTable';
@@ -19,6 +20,8 @@ import VocabularyModals from './components/Vocabulary/VocabularyModals';
 
 // --- CONTROLLER ---
 import { useVocabularyController } from './vocabulary/controllers/useVocabularyController';
+import { useKanjiColumnVisibility } from './hooks/useKanjiColumnVisibility';
+import { handleAudioProblemTag } from './utils/audioProblemTagHandler';
 
 // --- MAIN VOCABULARY VIEW ---
 function VocabularyView({
@@ -51,6 +54,9 @@ function VocabularyView({
         user
     });
 
+    // --- KANJI VISIBILITY ---
+    const { isKanjiVisible: kanjiVisible, toggleKanji } = useKanjiColumnVisibility();
+
     // --- RENDER ---
     if (ctrl.isLoading) return <div className="h-screen flex items-center justify-center font-bold text-slate-500"><Loader className="animate-spin mr-2" /> Loading...</div>;
 
@@ -77,6 +83,8 @@ function VocabularyView({
             />
 
             <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-[#0a0d1f]">
+
+
                 <AdvancedToolbar
                     currentFolderId={ctrl.currentFolderId}
                     folders={ctrl.folders}
@@ -111,6 +119,11 @@ function VocabularyView({
                     onImport={ctrl.openImport}
                     onToggleSidebar={() => ctrl.setIsMobileSidebarOpen(true)}
                     onToggleSettings={() => ctrl.setIsColumnManagerOpen(true)}
+                    // NEW: Kanji Visibility Props
+                    kanjiVisible={kanjiVisible}
+                    onToggleKanji={toggleKanji}
+                    searchTerm={ctrl.searchTerm}
+                    onSearch={ctrl.setSearchTerm}
                 />
 
                 <div
@@ -139,7 +152,7 @@ function VocabularyView({
                         itemsPerPage={ctrl.itemsPerPage}
                         selectedIds={ctrl.selectedIds}
                         isPlaying={ctrl.isPlaying}
-                        hiddenColumns={ctrl.hiddenColumns}
+                        hiddenColumns={{ ...ctrl.hiddenColumns, Kanji: !kanjiVisible }} // MERGE: Kanji visibility
                         revealedCells={ctrl.revealedCells}
                         handleUpdateCell={ctrl.handleUpdateCell}
                         revealSingleCell={ctrl.revealSingleCell}
@@ -156,6 +169,7 @@ function VocabularyView({
                         toggleSelection={ctrl.toggleSelection}
                         isTableHoverLocked={ctrl.isTableHoverLocked}
                         isAuthenticated={ctrl.isAuthenticated}
+                        searchTerm={ctrl.searchTerm}
                     />
                 </div>
 
@@ -181,7 +195,8 @@ function VocabularyView({
                         onTogglePlayPause={ctrl.togglePlayPause}
                         onPrevTrack={ctrl.onPrevTrack}
                         onNextTrack={ctrl.onNextTrack}
-                        onToggleMark={ctrl.toggleMark}
+                        // MOVED: Replaced onToggleMark with new tag handler
+                        onToggleMark={(item) => handleAudioProblemTag(item, ctrl.allTags, ctrl.createTag, ctrl.toggleRowTag)}
                         onCycleRepeat={(val) => ctrl.setAudioConfig({ ...ctrl.audioConfig, repeatPerItem: val })}
                         onCycleSpeed={() => {
                             const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];

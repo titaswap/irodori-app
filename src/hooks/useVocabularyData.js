@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import { globalSearch } from '../utils/globalSearch';
 
-export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList) => {
+export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList, allTags = []) => {
     const activeDataList = isEditMode ? draftVocabList : vocabList;
     const safeDataList = Array.isArray(activeDataList) ? activeDataList : [];
 
@@ -8,11 +9,6 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         let data = [...safeDataList];
 
         if (currentFolderId !== 'root') data = data.filter(i => i.folderId === currentFolderId);
-
-        if (searchTerm) {
-            const l = searchTerm.toLowerCase();
-            data = data.filter(i => i.japanese.includes(l) || i.bangla.includes(l));
-        }
 
         // DEBUG LOGGING
         // console.log("Filtering Debug:", { ... });
@@ -99,6 +95,11 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         if (viewMode === 'problem') data = data.filter(i => i.isMarked);
         else if (viewMode === 'weak') data = data.filter(i => i.isMarked); // Stats removed, fallback to marked
 
+        // UNIVERSAL SEARCH (Moved to end of pipeline for performance)
+        if (searchTerm) {
+            data = globalSearch(data, searchTerm, allTags);
+        }
+
         if (sortConfig.key === 'random') {
             // Deterministic Shuffle using Seed
             // We need a stable seed to ensure the order stays the same 
@@ -124,7 +125,7 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
             });
         }
         return data;
-    }, [safeDataList, currentFolderId, searchTerm, filters, sortConfig, viewMode]);
+    }, [safeDataList, currentFolderId, searchTerm, filters, sortConfig, viewMode, allTags]);
 
     return { filteredAndSortedData, safeDataList };
 };

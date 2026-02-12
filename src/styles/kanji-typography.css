@@ -23,6 +23,13 @@
     -moz-osx-font-smoothing: grayscale !important;
 }
 
+/* Prevent wrapping and allow expansion */
+.kanji-nowrap {
+    white-space: nowrap !important;
+    width: auto !important;
+    min-width: min-content !important;
+}
+
 
 /* Dark mode support */
 .dark .kanji-cell {

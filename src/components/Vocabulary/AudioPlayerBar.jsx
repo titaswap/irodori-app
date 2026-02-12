@@ -73,11 +73,22 @@ const AudioPlayerBar = ({
                 <button onClick={onNextTrack} className="text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 md:p-1.5 rounded-full transition-colors"><SkipForward size={16} className="md:w-[18px] md:h-[18px]" /></button>
 
                 <button
-                    onClick={() => onToggleMark(currentItem.id || currentItem.localId)}
-                    className={`flex-shrink-0 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full transition-colors order-last outline-none ${currentItem.isMarked ? 'text-amber-400 bg-amber-50 dark:bg-amber-900/30' : 'text-slate-300 dark:text-slate-600 hover:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                    title={currentItem.isMarked ? "Unmark" : "Mark"}
+                    onClick={() => onToggleMark(currentItem)} // UPDATED: Pass entire item for tag handler
+                    className={`flex-shrink-0 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full transition-colors order-last outline-none ${Array.isArray(currentItem.tags) && currentItem.tags.some(t => {
+                        const tagName = typeof t === 'string' ? t : t.name;
+                        return tagName === 'Audio';
+                    })
+                        ? 'text-amber-400 bg-amber-50 dark:bg-amber-900/30'
+                        : 'text-slate-300 dark:text-slate-600 hover:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                    title="Tag as Audio Problem"
                 >
-                    <Star size={16} className="md:w-[18px] md:h-[18px]" fill={currentItem.isMarked ? "currentColor" : "none"} />
+                    <Star size={16} className="md:w-[18px] md:h-[18px]" fill={
+                        Array.isArray(currentItem.tags) && currentItem.tags.some(t => {
+                            const tagName = typeof t === 'string' ? t : t.name;
+                            return tagName === 'Audio';
+                        }) ? "currentColor" : "none"
+                    } />
                 </button>
                 <div className="hidden md:block text-[9px] text-slate-400 dark:text-slate-500 font-mono tracking-widest uppercase ml-2">{currentIndex + 1} / {playbackQueue.length} • {audioConfig.repeatMode.toUpperCase()}</div>
             </div>

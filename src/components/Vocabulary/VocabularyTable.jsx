@@ -36,11 +36,12 @@ function VocabularyTable({
     lastPlayedRowId,
     toggleSelection,
     isTableHoverLocked,
-    isAuthenticated
+    isAuthenticated,
+    searchTerm // NEW
 }) {
     return (
         <div className={`mx-2 md:mx-6 mb-6 ${isTableHoverLocked ? 'table-hover-locked' : ''}`}>
-            <table className="w-full border-collapse bg-transparent text-sm table-fixed bg-white dark:bg-[#080a1c]/60 border border-slate-300 dark:border-white/5 rounded-[1.5rem] shadow-sm">
+            <table className="w-full border-collapse bg-transparent text-sm table-auto bg-white dark:bg-[#080a1c]/60 border border-slate-300 dark:border-white/5 rounded-[1.5rem] shadow-sm">
                 <colgroup>
                     {columnOrder.map(colId => {
                         const def = allColumns.find(c => c.id === colId);
@@ -97,6 +98,7 @@ function VocabularyTable({
                                 getTagName={getTagName}
                                 toggleRowTag={toggleRowTag}
                                 isAuthenticated={isAuthenticated}
+                                searchTerm={searchTerm}
                             />
                         );
                     })}

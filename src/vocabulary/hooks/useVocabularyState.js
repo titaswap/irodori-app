@@ -86,7 +86,7 @@ export function useVocabularyState() {
         tags: []
     });
 
-    const [searchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState(() => uiStateStorage.loadViewMode());
 
     useEffect(() => {
@@ -160,6 +160,7 @@ export function useVocabularyState() {
         filters,
         setFilters,
         searchTerm,
+        setSearchTerm,
         viewMode,
         setViewMode,
         selectedIds,

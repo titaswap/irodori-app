@@ -6,9 +6,11 @@ import {
 import { HeatmapBar } from './Shared';
 import TagCell from '../../tags/TagCell';
 import KanjiBreakdownCell from './KanjiBreakdownCell';
-import '../../styles/kanji-typography.css';
 
-const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, hiddenColumns, revealedCells, selectedIds, isPlaying, index, isEditMode, onUpdateCell, onRevealCell, onPlaySingle, onMark, isActive, allTags, searchTags, createTag, getTagName, toggleRowTag, isAuthenticated }) => {
+import '../../styles/kanji-typography.css';
+import { textHighlighter } from '../../utils/searchHighlighter.jsx';
+
+const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, hiddenColumns, revealedCells, selectedIds, isPlaying, index, isEditMode, onUpdateCell, onRevealCell, onPlaySingle, onMark, isActive, allTags, searchTags, createTag, getTagName, toggleRowTag, isAuthenticated, searchTerm }) => {
     if (!item) return null;
     const isSelected = selectedIds.has(item.localId);
 
@@ -76,7 +78,7 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
                             <div onClick={() => onRevealCell(item.localId, colId)} className={`w-full h-full px-2 py-0.5 text-transparent cursor-pointer ${isActive ? '' : 'hover:bg-indigo-50 dark:hover:bg-slate-700'} flex items-center justify-center transition-colors group/cell`}><EyeOff size={16} className="text-slate-300 dark:text-slate-600 group-hover/cell:text-slate-500 dark:group-hover/cell:text-slate-400" /></div>
                         ) : (
                             isEditMode ? <input className={`w-full h-full px-2 py-0.5 bg-transparent outline-none text-sm border-2 border-transparent focus:border-primary focus:bg-primary/10 transition-all text-slate-900 dark:text-text-main`} value={displayValue} onChange={(e) => onUpdateCell(item.localId, colId, e.target.value)} /> :
-                                <div className={`w-full h-full flex items-center leading-tight ${isKanjiColumn ? 'kanji-cell' : isPrimary ? 'px-2 py-0.5 text-sm font-bold text-slate-800 dark:text-[#e5e7eb]' : 'px-2 py-0.5 text-sm text-slate-600 dark:text-[#cbd5e1]'} ${isActive && !isKanjiColumn ? 'text-slate-900 font-bold dark:text-indigo-100' : ''}`}>{displayValue}</div>
+                                <div className={`w-full h-full flex items-center leading-tight ${isKanjiColumn ? 'kanji-cell kanji-nowrap' : isPrimary ? 'px-2 py-0.5 text-sm font-bold text-slate-800 dark:text-[#e5e7eb]' : 'px-2 py-0.5 text-sm text-slate-600 dark:text-[#cbd5e1]'} ${isActive && !isKanjiColumn ? 'text-slate-900 font-bold dark:text-indigo-100' : ''}`}>{textHighlighter(displayValue, searchTerm)}</div>
                         )}
                     </td>
                 );
@@ -112,7 +114,8 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
         prevProps.columnVisibility === nextProps.columnVisibility &&
         prevProps.revealedCells === nextProps.revealedCells &&
         prevProps.hiddenColumns === nextProps.hiddenColumns &&
-        prevProps.allTags === nextProps.allTags
+        prevProps.allTags === nextProps.allTags &&
+        prevProps.searchTerm === nextProps.searchTerm
     );
 });
 

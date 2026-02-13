@@ -91,7 +91,7 @@ const DynamicHeader = ({
       return { width: '44px', minWidth: '44px', maxWidth: '44px' };
     }
     if (colId === 'isMarked' || colId === 'ismarked') {
-      return { width: '40px', minWidth: '40px', maxWidth: '40px' };
+      return { width: '40px', minWidth: '40px', maxWidth: '40px', padding: '0' };
     }
     // DIRECT FIX: Force specific width for Bangla column (bypassing config caching)
     // To change Bangla width, edit these values directly:

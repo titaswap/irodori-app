@@ -59,16 +59,36 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
             case 'ismarked':
                 return (
                     <td
-                        data-col-id={colId}
-                        style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }}
-                        className={`px-0 py-0.5 border-r border-slate-200 dark:border-white/5 ${isActive ? '!bg-[#e5f5f1] dark:!bg-transparent' : 'bg-white/50 dark:bg-white/[0.02]'} text-center ${cellBaseClass}`}
+                        data-col-id="isMarked"
+                        style={{
+                            width: '40px',
+                            minWidth: '40px',
+                            maxWidth: '40px',
+                            padding: '0'
+                        }}
+                        className="text-center"
                     >
-                        <button onClick={() => onMark(item.localId)} className="p-0.5 hover:scale-105 transition-transform">
-                            <AlertCircle
-                                size={14}
-                                className={item.isMarked ? "text-red-500 fill-red-500/20 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-slate-400 dark:text-slate-600"}
-                            />
-                        </button>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '100%'
+                        }}>
+                            <button
+                                onClick={() => onMark(item.localId)}
+                                style={{
+                                    padding: 0,
+                                    margin: 0
+                                }}
+                                className="hover:scale-105 transition-transform"
+                            >
+                                <AlertCircle
+                                    size={16}
+                                    className={item.isMarked ? "text-red-500 fill-red-500/20 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-slate-400 dark:text-slate-600"}
+                                />
+                            </button>
+                        </div>
                     </td>
                 );
             case 'tags':

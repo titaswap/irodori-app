@@ -55,6 +55,11 @@ function VocabularyTable({
                             return <col key={colId} id={`col-${colId}`} style={{ width: '240px', minWidth: '240px', maxWidth: '240px' }} />;
                         }
 
+                        // DIRECT FIX: Hard-lock isMarked column to 40px
+                        if (colId === 'isMarked' || colId === 'ismarked') {
+                            return <col key={colId} id={`col-${colId}`} style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }} />;
+                        }
+
                         // Get effective width (undefined for autoWidth columns)
                         const width = getEffectiveWidth(colId, columnWidths);
 

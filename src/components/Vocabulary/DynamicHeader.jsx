@@ -90,7 +90,7 @@ const DynamicHeader = ({
     if (colId === 'audio') {
       return { width: '44px', minWidth: '44px', maxWidth: '44px' };
     }
-    if (colId === 'isMarked') {
+    if (colId === 'isMarked' || colId === 'ismarked') {
       return { width: '40px', minWidth: '40px', maxWidth: '40px' };
     }
     // DIRECT FIX: Force specific width for Bangla column (bypassing config caching)

@@ -213,4 +213,16 @@ th[data-col-id="English"] {
   width: 240px !important;
   min-width: 240px !important;
   max-width: 240px !important;
+  max-width: 240px !important;
+}
+
+/* Marked Column Safeguard */
+td[data-col-id="isMarked"],
+th[data-col-id="isMarked"],
+td[data-col-id="ismarked"],
+th[data-col-id="ismarked"] {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  padding: 0 !important;
 }

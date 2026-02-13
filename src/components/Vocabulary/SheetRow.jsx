@@ -56,6 +56,7 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
                     </td>
                 );
             case 'isMarked':
+            case 'ismarked':
                 return (
                     <td
                         data-col-id={colId}
@@ -80,7 +81,7 @@ const SheetRow = React.memo(({ item, columnOrder, columnDefs, columnVisibility, 
                 // DIRECT FIX: Force auto-width for Kanji columns (bypassing config caching issues)
                 const KANJI_COLUMNS_LIST = ['Kanji', 'Kanji Word'];
                 // DIRECT FIX: Force auto-width for icon columns (audio, isMarked)
-                const ICON_COLUMNS_LIST = ['audio', 'isMarked'];
+                const ICON_COLUMNS_LIST = ['audio', 'isMarked', 'ismarked'];
                 const forceAutoWidth = KANJI_COLUMNS_LIST.includes(colId) || ICON_COLUMNS_LIST.includes(colId);
 
                 let widthStyle = {};

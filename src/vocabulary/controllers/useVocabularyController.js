@@ -55,6 +55,8 @@ export function useVocabularyController({
         sortConfig, setSortConfig,
         filters: placeholderFilters, setFilters: placeholderSetFilters,
         searchTerm, setSearchTerm,
+        sortMode, setSortMode,
+        randomOrderIds, setRandomOrderIds,
         viewMode, setViewMode,
         selectedIds, setSelectedIds,
         currentPage, setCurrentPage,
@@ -75,7 +77,7 @@ export function useVocabularyController({
 
     // --- DATA PROCESSING ---
     const { filteredAndSortedData: displayData, trendData, weaknessSuggestion, safeDataList } = useVocabularyData(
-        vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList, allTags
+        vocabList, currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList, allTags, sortMode, randomOrderIds
     );
 
     // --- STATS ---
@@ -135,7 +137,7 @@ export function useVocabularyController({
     // --- PAGINATION RESET ---
     useEffect(() => {
         setCurrentPage(1);
-    }, [currentFolderId, searchTerm, filters, viewMode, sortConfig]);
+    }, [currentFolderId, searchTerm, filters, viewMode, sortConfig, sortMode, randomOrderIds]);
 
     // --- UI STATE RESET ON FOLDER CHANGE ---
     useEffect(() => {
@@ -240,7 +242,11 @@ export function useVocabularyController({
         setVocabList,
         updateDraftCell,
         toggleMarkInDraft,
-        apiService
+        apiService,
+        sortMode,
+        setSortMode,
+        setRandomOrderIds,
+        currentFolderId
     });
 
     // --- IMPORT HANDLER ---
@@ -400,6 +406,7 @@ export function useVocabularyController({
 
         // Sorting
         sortConfig,
+        sortMode,
         handleSort,
         handleShuffle,
 

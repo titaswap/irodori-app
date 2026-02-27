@@ -17,6 +17,14 @@ import { hasTag } from './tagHelpers';
 const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagName, isAuthenticated, isActive }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [inputValue, setInputValue] = useState('');
+    const [recentTags, setRecentTags] = useState(() => {
+        try {
+            const saved = localStorage.getItem('recentTags');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
+    });
     const inputRef = useRef(null);
     const cellRef = useRef(null);
 
@@ -67,11 +75,23 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
     // This ensures that when allTags updates (e.g. after creation), 
     // the suggestions update immediately without local state caching.
     const suggestions = React.useMemo(() => {
-        if (!inputValue.trim()) {
-            return allTags;
+        let baseList = !inputValue.trim() ? allTags : searchTags(inputValue);
+
+        if (recentTags.length > 0) {
+            // Stable sort based on recency
+            baseList = [...baseList].sort((a, b) => {
+                const idxA = recentTags.indexOf(a.name);
+                const idxB = recentTags.indexOf(b.name);
+
+                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                if (idxA !== -1) return -1;
+                if (idxB !== -1) return 1;
+                return 0;
+            });
         }
-        return searchTags(inputValue);
-    }, [allTags, inputValue, searchTags]);
+
+        return baseList;
+    }, [allTags, inputValue, searchTags, recentTags]);
 
     // Force re-render verification (as requested)
     /*     console.log(
@@ -93,6 +113,13 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
             return;
         }
 
+        try {
+            const saved = localStorage.getItem('recentTags');
+            if (saved) {
+                setRecentTags(JSON.parse(saved));
+            }
+        } catch (e) { }
+
         setIsEditing(true);
         setInputValue('');
     };
@@ -103,6 +130,17 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
 
         // Update suggestions based on input (search in tag names)
         // Derived state handles this automatically now
+    };
+
+    const updateRecentTags = (tagName) => {
+        try {
+            const saved = localStorage.getItem('recentTags');
+            let recents = saved ? JSON.parse(saved) : [];
+            recents = recents.filter(name => name !== tagName);
+            recents.unshift(tagName);
+            localStorage.setItem('recentTags', JSON.stringify(recents));
+            setRecentTags(recents);
+        } catch (e) { }
     };
 
     const handleSelectTag = (tagObj) => {
@@ -117,6 +155,8 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
         // Toggle tag by ID and NAME (for snapshot storage)
         toggleRowTag(item.localId, tagObj.tagId, tagObj.name);
 
+        updateRecentTags(tagObj.name);
+
         // Clear input but keep dropdown open for multi-select
         setInputValue('');
         console.log('[TagCell] Tag toggled successfully');
@@ -129,6 +169,8 @@ const TagCell = ({ item, toggleRowTag, allTags, searchTags, createTag, getTagNam
         if (newTagId) {
             // Add to item using the tagId and tagName
             toggleRowTag(item.localId, newTagId, tagName);
+
+            updateRecentTags(tagName);
 
             // Clear input but keep dropdown open
             setInputValue('');

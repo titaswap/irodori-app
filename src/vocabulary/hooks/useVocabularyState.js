@@ -76,6 +76,37 @@ export function useVocabularyState() {
     // Filter and Sort State
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
+    const [sortMode, setSortMode] = useState(() => {
+        try {
+            return localStorage.getItem('sortMode') || 'serial';
+        } catch {
+            return 'serial';
+        }
+    });
+
+    const [randomOrderIds, setRandomOrderIds] = useState(() => {
+        try {
+            const saved = localStorage.getItem('randomOrderIds');
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('sortMode', sortMode);
+        } catch { }
+    }, [sortMode]);
+
+    useEffect(() => {
+        try {
+            if (randomOrderIds) {
+                localStorage.setItem('randomOrderIds', JSON.stringify(randomOrderIds));
+            }
+        } catch { }
+    }, [randomOrderIds]);
+
     // NOTE: Filter state is now managed by useGroupFilters hook in the controller
     // This provides group-based filter isolation (Kanji/Book/Other groups)
     // Keeping this placeholder for backward compatibility during migration
@@ -155,6 +186,10 @@ export function useVocabularyState() {
         setIsMobileSidebarOpen,
 
         // Filters and Sort
+        sortMode,
+        setSortMode,
+        randomOrderIds,
+        setRandomOrderIds,
         sortConfig,
         setSortConfig,
         filters,

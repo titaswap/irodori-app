@@ -124,6 +124,7 @@ function VocabularyView({
                     onToggleKanji={toggleKanji}
                     searchTerm={ctrl.searchTerm}
                     onSearch={ctrl.setSearchTerm}
+                    sortMode={ctrl.sortMode}
                 />
 
                 <div

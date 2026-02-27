@@ -7,8 +7,7 @@ import {
 import { FilterChipBar } from './Toolbar/FilterChipBar';
 import { MultiSelectDropdown } from './Toolbar/MultiSelectDropdown';
 import SearchBar from './SearchBar';
-
-const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags, kanjiVisible, onToggleKanji, searchTerm, onSearch }) => {
+const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, isEditMode, hasUnsavedChanges, filters, hiddenColumns, viewMode, onFilterChange, onViewModeChange, onVisibilityToggle, onSave, onDiscard, onPlaylistStart, setIsColumnManagerOpen, isSyncing, filteredData, onRefresh, onShuffle, isPlaying, onTogglePlay, showingCount, totalCount, setIsMobileSidebarOpen, createTag, renameTag, deleteTag, allTags, kanjiVisible, onToggleKanji, searchTerm, onSearch, sortMode }) => {
     const [showChipPanel, setShowChipPanel] = useState(false);
 
     const containerRef = React.useRef(null);
@@ -202,6 +201,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
     const filteredTagCounts = useMemo(() => {
         const tagCountMap = {};
         let onlyTaggedCount = 0;
+        let unmarkedCount = 0;
 
         if (Array.isArray(filteredData)) {
             filteredData.forEach(item => {
@@ -210,6 +210,11 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                 // Count for "Only Tagged" option
                 if (itemTags.length > 0) {
                     onlyTaggedCount++;
+                }
+
+                // Count for "Unmarked Only" option
+                if (item.marked === false || (!item.marked && !item.isMarked)) {
+                    unmarkedCount++;
                 }
 
                 // Count for each individual tag
@@ -229,7 +234,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
             });
         }
 
-        return { tagCountMap, onlyTaggedCount };
+        return { tagCountMap, onlyTaggedCount, unmarkedCount };
     }, [filteredData]);
 
 
@@ -366,6 +371,7 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                                 onDeleteTag={deleteTag}
                                 countMap={filteredTagCounts.tagCountMap}
                                 onlyTaggedCount={filteredTagCounts.onlyTaggedCount}
+                                unmarkedCount={filteredTagCounts.unmarkedCount}
                             />
                         )}
                     </div>
@@ -399,7 +405,12 @@ const AdvancedToolbar = ({ currentFolderId, folders, vocabList, headersBySheet, 
                                 </button>
                             )}
                             {showShuffle && (
-                                <button onClick={onShuffle} disabled={isSyncing} className="flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5" title="Shuffle">
+                                <button
+                                    onClick={onShuffle}
+                                    disabled={isSyncing}
+                                    className={`flex items-center justify-center h-6 md:h-7 min-w-[24px] md:min-w-[28px] px-1 md:px-2 rounded-full text-[11px] font-semibold transition-all duration-200 focus:outline-none ${sortMode === 'random' ? 'bg-transparent border border-primary text-primary dark:text-primary hover:bg-primary/10' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                    title={sortMode === 'random' ? "Random (Click to clear and open random order)" : "Shuffle"}
+                                >
                                     <Shuffle size={14} />
                                 </button>
                             )}

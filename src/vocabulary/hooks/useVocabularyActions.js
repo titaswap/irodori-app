@@ -27,7 +27,11 @@ export function useVocabularyActions({
     setVocabList,
     updateDraftCell,
     toggleMarkInDraft,
-    apiService
+    apiService,
+    sortMode,
+    setSortMode,
+    setRandomOrderIds,
+    currentFolderId
 }) {
     // Sync state for optimistic updates
     const activeSyncs = useRef(0);
@@ -56,6 +60,13 @@ export function useVocabularyActions({
             showToast("Save or discard changes before refreshing", "warning");
             return;
         }
+
+        // Set to serial and persist to local storage requested keys
+        setSortMode('serial');
+        try {
+            localStorage.setItem('app_sort_mode', 'serial');
+        } catch (e) { }
+
         setIsSyncing(true);
         try {
             await fetchSheetData(true);
@@ -68,13 +79,31 @@ export function useVocabularyActions({
         }
     };
 
-    const handleSort = (key) => setSortConfig({
-        key,
-        direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc'
-    });
+    const handleSort = (key) => {
+        setSortMode('serial');
+        setSortConfig({
+            key,
+            direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc'
+        });
+    };
 
     const handleShuffle = () => {
-        setSortConfig({ key: 'random', direction: 'asc', seed: Date.now() });
+        // Only shuffle items that belong to the current folder, or all if root
+        let itemsToShuffle = currentFolderId === 'root'
+            ? [...vocabList]
+            : vocabList.filter(i => i.folderId === currentFolderId);
+
+        // Fisher-Yates Shuffle
+        for (let i = itemsToShuffle.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [itemsToShuffle[i], itemsToShuffle[j]] = [itemsToShuffle[j], itemsToShuffle[i]];
+        }
+
+        const ids = itemsToShuffle.map(i => i.id || i.localId);
+
+        setRandomOrderIds(ids);
+        setSortMode('random');
+        setSortConfig({ key: null, direction: 'asc' }); // Reset column sorting
     };
 
     // --- Row Actions ---

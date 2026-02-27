@@ -1,12 +1,30 @@
 import { useMemo } from 'react';
 import { globalSearch } from '../utils/globalSearch';
 
-export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList, allTags = []) => {
+export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, filters, sortConfig, viewMode, isEditMode, draftVocabList, allTags = [], sortMode = 'serial', randomOrderIds = null) => {
     const activeDataList = isEditMode ? draftVocabList : vocabList;
     const safeDataList = Array.isArray(activeDataList) ? activeDataList : [];
 
     const filteredAndSortedData = useMemo(() => {
         let data = [...safeDataList];
+
+        // 1. Random ordering BEFORE filtering
+        if (sortMode === 'random' && Array.isArray(randomOrderIds) && randomOrderIds.length > 0) {
+            const itemMap = new Map(data.map(i => [i.id || i.localId, i]));
+            const reordered = [];
+            // Push items in the saved order
+            randomOrderIds.forEach(id => {
+                if (itemMap.has(id)) {
+                    reordered.push(itemMap.get(id));
+                    itemMap.delete(id);
+                }
+            });
+            // Push any remaining new items that weren't in the saved random order
+            for (const item of itemMap.values()) {
+                reordered.push(item);
+            }
+            data = reordered;
+        }
 
         if (currentFolderId !== 'root') data = data.filter(i => i.folderId === currentFolderId);
 
@@ -67,9 +85,14 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
         // Special mode: "__ONLY_TAGGED__" shows only rows with at least one tag
         if (Array.isArray(filters.tags) && filters.tags.length > 0) {
             const ONLY_TAGGED_MODE = '__ONLY_TAGGED__';
+            const UNMARKED_MODE = 'UNMARKED';
 
+            // Check if "Unmarked Only" mode is active
+            if (filters.tags.length === 1 && filters.tags[0] === UNMARKED_MODE) {
+                data = data.filter(item => item.marked === false || (!item.marked && !item.isMarked));
+            }
             // Check if "Only Tagged" mode is active
-            if (filters.tags.length === 1 && filters.tags[0] === ONLY_TAGGED_MODE) {
+            else if (filters.tags.length === 1 && filters.tags[0] === ONLY_TAGGED_MODE) {
                 // Show only rows that have at least one tag
                 data = data.filter(item => {
                     const itemTags = Array.isArray(item.tags) ? item.tags : [];
@@ -100,23 +123,8 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
             data = globalSearch(data, searchTerm, allTags);
         }
 
-        if (sortConfig.key === 'random') {
-            // Deterministic Shuffle using Seed
-            // We need a stable seed to ensure the order stays the same 
-            // even when item attributes (like isMarked) change.
-            let seed = sortConfig.seed || 12345;
-
-            const random = () => {
-                const x = Math.sin(seed++) * 10000;
-                return x - Math.floor(x);
-            };
-
-            // Fisher-Yates Shuffle with stable random generator
-            for (let i = data.length - 1; i > 0; i--) {
-                const j = Math.floor(random() * (i + 1));
-                [data[i], data[j]] = [data[j], data[i]];
-            }
-        } else if (sortConfig.key) {
+        // Secondary sorting for columns
+        if (sortConfig.key && sortConfig.key !== 'random') {
             data.sort((a, b) => {
                 let va = a[sortConfig.key], vb = b[sortConfig.key];
                 if (typeof va === 'string') va = va.toLowerCase();
@@ -125,7 +133,7 @@ export const useVocabularyData = (vocabList = [], currentFolderId, searchTerm, f
             });
         }
         return data;
-    }, [safeDataList, currentFolderId, searchTerm, filters, sortConfig, viewMode, allTags]);
+    }, [safeDataList, currentFolderId, searchTerm, filters, sortConfig, viewMode, allTags, sortMode, randomOrderIds]);
 
     return { filteredAndSortedData, safeDataList };
 };

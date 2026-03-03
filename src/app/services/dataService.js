@@ -53,7 +53,7 @@ export async function fetchSheetData(silent, vocabList, setIsLoading, setVocabLi
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 90000);
 
         const response = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
         clearTimeout(timeoutId);

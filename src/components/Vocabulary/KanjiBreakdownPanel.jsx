@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { X } from 'lucide-react';
 import { useTableHoverLock } from '../../hooks/useTableHoverLock.jsx';
 import SmartBreakdownFormatter from './SmartBreakdownFormatter.jsx';
@@ -18,6 +18,18 @@ import SmartBreakdownFormatter from './SmartBreakdownFormatter.jsx';
  */
 const KanjiBreakdownPanel = React.memo(({ isOpen, text, onClose }) => {
     const { lock, unlock } = useTableHoverLock();
+
+    // Real-time dark mode detection (Portal doesn't inherit dark class from DOM tree)
+    const [isDark, setIsDark] = useState(
+        () => document.documentElement.classList.contains('dark')
+    );
+    useEffect(() => {
+        const check = () => setIsDark(document.documentElement.classList.contains('dark'));
+        check();
+        const obs = new MutationObserver(check);
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => obs.disconnect();
+    }, []);
 
     // Lock table hover when panel opens, unlock when it closes
     useEffect(() => {
@@ -128,10 +140,10 @@ const KanjiBreakdownPanel = React.memo(({ isOpen, text, onClose }) => {
                                 maxWidth: '100%'
                             }}
                         >
-                            {/* Smart formatter - automatically detects structure and applies styling */}
+                            {/* Smart formatter - dark mode aware */}
                             <SmartBreakdownFormatter
                                 text={text}
-                                isDark={false}
+                                isDark={isDark}
                             />
                         </div>
                     </div>
@@ -187,10 +199,10 @@ const KanjiBreakdownPanel = React.memo(({ isOpen, text, onClose }) => {
                                 maxWidth: '100%'
                             }}
                         >
-                            {/* Smart formatter - automatically detects structure and applies styling */}
+                            {/* Smart formatter - dark mode aware */}
                             <SmartBreakdownFormatter
                                 text={text}
-                                isDark={false}
+                                isDark={isDark}
                             />
                         </div>
                     </div>
